@@ -24,6 +24,14 @@ export default function Home() {
             <div style={{ fontWeight: '600', marginBottom: '4px' }}>Drug Interaction Checker →</div>
             <div style={{ fontSize: '14px', color: '#6b7280' }}>Check mechanisms, severity, enzyme pathways and exam angles for any drug combination</div>
           </a>
+          <a href="/calculator" style={{ display: 'block', padding: '1.25rem', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', textDecoration: 'none', color: '#15803d' }}>
+            <div style={{ fontWeight: '600', marginBottom: '4px' }}>PK/PD Calculator →</div>
+           <div style={{ fontSize: '14px', color: '#6b7280' }}>Interactive plasma concentration curves with AI explanations</div>
+          </a>
+          <a href="/exercises" style={{ display: 'block', padding: '1.25rem', background: '#fef9c3', border: '1px solid #fde047', borderRadius: '12px', textDecoration: 'none', color: '#854d0e' }}>
+            <div style={{ fontWeight: '600', marginBottom: '4px' }}>PK/PD Exercise Helper →</div>
+            <div style={{ fontSize: '14px', color: '#6b7280' }}>Paste any exercise — get full step-by-step working, formulas, substitutions and exam insights</div>
+          </a>
         </div>
       </SignedIn>
     </main>
