@@ -1,10 +1,23 @@
-import Image from "next/image";
+import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 
 export default function Home() {
   return (
     <main style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>PharmLab 💊</h1>
-      <p>Your pharmacy study tools. Coming soon.</p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1>PharmLab</h1>
+        <SignedOut>
+          <SignInButton />
+        </SignedOut>
+        <SignedIn>
+          <UserButton />
+        </SignedIn>
+      </div>
+      <SignedOut>
+        <p>Your pharmacy study tools. Sign in to get started.</p>
+      </SignedOut>
+      <SignedIn>
+        <p>Welcome to PharmLab! Your tools are coming soon.</p>
+      </SignedIn>
     </main>
   )
 }
