@@ -28,6 +28,15 @@ const features = [
     border: '#fde047',
     cta: 'Solve an exercise →'
   },
+  {
+  icon: '🛡️',
+  title: 'Harm Reduction',
+  description: 'Pharmacokinetic tools for informed decision-making. BAC calculator with Widmark model, legal limits, and food effects. MDMA and cannabis coming soon.',
+  href: '/harm-reduction',
+  color: '#f0fdf4',
+  border: '#bbf7d0',
+  cta: 'Open tools →'
+},
 ]
 
 const topics = [

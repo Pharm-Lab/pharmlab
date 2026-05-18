@@ -9,6 +9,7 @@ export default function Navbar() {
     { href: '/interactions', label: 'Interactions' },
     { href: '/calculator', label: 'Calculator' },
     { href: '/exercises', label: 'Exercise Helper' },
+    { href: '/harm-reduction', label: 'Harm Reduction' },
   ]
 
   return (
