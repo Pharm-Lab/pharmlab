@@ -38,14 +38,16 @@ export default function HarmReduction() {
            </div>
           </a>
 
-        <div style={{ background: '#f9fafb', border: '1px dashed #d1d5db', borderRadius: '12px', padding: '1.25rem', opacity: 0.7 }}>
-          <div style={{ fontSize: '28px', marginBottom: '10px' }}>🌿</div>
-          <h2 style={{ fontSize: '15px', fontWeight: '600', color: '#6b7280', margin: '0 0 6px' }}>Cannabis</h2>
-          <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 10px', lineHeight: '1.5' }}>
-            THC pharmacokinetics by route of administration, impairment timeline, and harm reduction guidance.
-          </p>
-          <span style={{ fontSize: '12px', color: '#9ca3af' }}>Coming soon</span>
-        </div>
+        <a href="/harm-reduction/cannabis" style={{ textDecoration: 'none' }}>
+           <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '1.25rem', height: '100%', boxSizing: 'border-box' }}>
+            <div style={{ fontSize: '28px', marginBottom: '10px' }}>🌿</div>
+            <h2 style={{ fontSize: '15px', fontWeight: '600', color: '#111827', margin: '0 0 6px' }}>Cannabis</h2>
+            <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 10px', lineHeight: '1.5' }}>
+              THC pharmacokinetics for smoked and oral routes. Shows the edible delay, driving limits, food effects, and why oral and smoked cannabis feel so different.
+            </p>
+            <span style={{ fontSize: '12px', color: '#16a34a', fontWeight: '500' }}>Open calculator →</span>
+          </div>
+        </a>
 
       </div>
 
