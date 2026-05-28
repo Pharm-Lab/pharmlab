@@ -19,35 +19,52 @@ export default function HarmReduction() {
         <a href="/harm-reduction/alcohol" style={{ textDecoration: 'none' }}>
           <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '1.25rem', height: '100%', boxSizing: 'border-box' }}>
             <div style={{ fontSize: '28px', marginBottom: '10px' }}>🍺</div>
-            <h2 style={{ fontSize: '15px', fontWeight: '600', color: '#111827', margin: '0 0 6px' }}>Alcohol Calculator</h2>
-            <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 10px', lineHeight: '1.5' }}>
-              BAC curve over time using the Widmark model. Legal driving limits for NL, DE, BE, FR. Food effects, steady state simulation, and uncertainty band.
-            </p>
-            <span style={{ fontSize: '12px', color: '#2563eb', fontWeight: '500' }}>Open calculator →</span>
-          </div>
+              <h2 style={{ fontSize: '15px', fontWeight: '600', color: '#111827', margin: '0 0 6px' }}>Alcohol</h2>
+              <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 10px', lineHeight: '1.5' }}>BAC curve, Widmark model, legal limits for NL/DE/BE/FR, food effects, steady state simulation.</p>
+              <span style={{ fontSize: '12px', color: '#2563eb', fontWeight: '500' }}>Open calculator →</span>
+            </div>
         </a>
 
         <a href="/harm-reduction/mdma" style={{ textDecoration: 'none' }}>
           <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '1.25rem', height: '100%', boxSizing: 'border-box' }}>
             <div style={{ fontSize: '28px', marginBottom: '10px' }}>💊</div>
             <h2 style={{ fontSize: '15px', fontWeight: '600', color: '#111827', margin: '0 0 6px' }}>MDMA</h2>
-            <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 10px', lineHeight: '1.5' }}>
-              Plasma concentration curve, dose and body weight effects, redosing simulation, dangerous combinations, and CYP2D6 variation.
-            </p>
+            <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 10px', lineHeight: '1.5' }}>Plasma concentration, multi-dose simulation, CYP2D6 variation, dangerous combinations.</p>
             <span style={{ fontSize: '12px', color: '#7c3aed', fontWeight: '500' }}>Open calculator →</span>
-           </div>
-          </a>
+          </div>
+        </a>
 
         <a href="/harm-reduction/cannabis" style={{ textDecoration: 'none' }}>
-           <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '1.25rem', height: '100%', boxSizing: 'border-box' }}>
+          <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '1.25rem', height: '100%', boxSizing: 'border-box' }}>
             <div style={{ fontSize: '28px', marginBottom: '10px' }}>🌿</div>
             <h2 style={{ fontSize: '15px', fontWeight: '600', color: '#111827', margin: '0 0 6px' }}>Cannabis</h2>
-            <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 10px', lineHeight: '1.5' }}>
-              THC pharmacokinetics for smoked and oral routes. Shows the edible delay, driving limits, food effects, and why oral and smoked cannabis feel so different.
-            </p>
+            <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 10px', lineHeight: '1.5' }}>Smoked vs oral THC, edible delay modelled, driving limits, food effects.</p>
             <span style={{ fontSize: '12px', color: '#16a34a', fontWeight: '500' }}>Open calculator →</span>
           </div>
         </a>
+
+        <a href="/harm-reduction/cocaine" style={{ textDecoration: 'none' }}>
+          <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '1.25rem', height: '100%', boxSizing: 'border-box' }}>
+           <div style={{ fontSize: '28px', marginBottom: '10px' }}>🤧</div>
+           <h2 style={{ fontSize: '15px', fontWeight: '600', color: '#111827', margin: '0 0 6px' }}>Cocaine</h2>
+            <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 10px', lineHeight: '1.5' }}>Intranasal PK, binge pattern visualised, cocaethylene warning, cardiovascular risk zones.</p>
+            <span style={{ fontSize: '12px', color: '#dc2626', fontWeight: '500' }}>Open calculator →</span>
+          </div>
+        </a>
+
+        <div style={{ background: '#f9fafb', border: '1px dashed #d1d5db', borderRadius: '12px', padding: '1.25rem', opacity: 0.7 }}>
+          <div style={{ fontSize: '28px', marginBottom: '10px' }}>⚡</div>
+          <h2 style={{ fontSize: '15px', fontWeight: '600', color: '#6b7280', margin: '0 0 6px' }}>Amphetamines</h2>
+          <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 10px', lineHeight: '1.5' }}>Long t½, sleep deprivation risk, cardiovascular load over time.</p>
+          <span style={{ fontSize: '12px', color: '#9ca3af' }}>Coming soon</span>
+        </div>
+
+        <div style={{ background: '#f9fafb', border: '1px dashed #d1d5db', borderRadius: '12px', padding: '1.25rem', opacity: 0.7 }}>
+          <div style={{ fontSize: '28px', marginBottom: '10px' }}>🧪</div>
+          <h2 style={{ fontSize: '15px', fontWeight: '600', color: '#6b7280', margin: '0 0 6px' }}>Cathinones</h2>
+          <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 10px', lineHeight: '1.5' }}>Variable compounds, high uncertainty, harm reduction focus.</p>
+          <span style={{ fontSize: '12px', color: '#9ca3af' }}>Coming soon</span>
+        </div>
 
       </div>
 

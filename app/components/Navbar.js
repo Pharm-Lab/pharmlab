@@ -10,6 +10,7 @@ export default function Navbar() {
     { href: '/calculator', label: 'Calculator' },
     { href: '/exercises', label: 'Exercise Helper' },
     { href: '/harm-reduction', label: 'Harm Reduction' },
+    { href: '/sources', label: 'Sources' },
   ]
 
   return (
