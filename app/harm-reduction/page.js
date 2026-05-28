@@ -27,14 +27,16 @@ export default function HarmReduction() {
           </div>
         </a>
 
-        <div style={{ background: '#f9fafb', border: '1px dashed #d1d5db', borderRadius: '12px', padding: '1.25rem', opacity: 0.7 }}>
-          <div style={{ fontSize: '28px', marginBottom: '10px' }}>💊</div>
-          <h2 style={{ fontSize: '15px', fontWeight: '600', color: '#6b7280', margin: '0 0 6px' }}>MDMA</h2>
-          <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 10px', lineHeight: '1.5' }}>
-            Plasma concentration curve, dangerous combinations, redosing risks, and harm reduction guidance.
-          </p>
-          <span style={{ fontSize: '12px', color: '#9ca3af' }}>Coming soon</span>
-        </div>
+        <a href="/harm-reduction/mdma" style={{ textDecoration: 'none' }}>
+          <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '1.25rem', height: '100%', boxSizing: 'border-box' }}>
+            <div style={{ fontSize: '28px', marginBottom: '10px' }}>💊</div>
+            <h2 style={{ fontSize: '15px', fontWeight: '600', color: '#111827', margin: '0 0 6px' }}>MDMA</h2>
+            <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 10px', lineHeight: '1.5' }}>
+              Plasma concentration curve, dose and body weight effects, redosing simulation, dangerous combinations, and CYP2D6 variation.
+            </p>
+            <span style={{ fontSize: '12px', color: '#7c3aed', fontWeight: '500' }}>Open calculator →</span>
+           </div>
+          </a>
 
         <div style={{ background: '#f9fafb', border: '1px dashed #d1d5db', borderRadius: '12px', padding: '1.25rem', opacity: 0.7 }}>
           <div style={{ fontSize: '28px', marginBottom: '10px' }}>🌿</div>
