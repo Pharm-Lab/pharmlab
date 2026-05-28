@@ -59,6 +59,18 @@ const SOURCES = {
         { citation: 'European Union Drugs Agency (EUDA). (2024). Amphetamines — the current situation in Europe. European Drug Report 2024. euda.europa.eu', note: 'Prevalence of amphetamine vs methamphetamine in Europe, trends in use.' },
         { citation: 'Correlation-European Harm Reduction Network / TEDI. (2025). European Drug Checking Trends 2018–2024. correlation-net.org', note: 'Adulteration trends in European amphetamine samples.' },
     ]
+ },
+ 'Cathinone Calculator': {
+    description: 'Mephedrone PK model with wide uncertainty band. Market data from Trimbos DIMS 2025.',
+     sources: [
+            { citation: 'Trimbos-instituut. (2025). 3-MMC bevat vrijwel nooit échte 3-MMC. trimbos.nl/actueel/3-mmc-bevat-vrijwel-nooit-echte-3-mmc/', note: '3% of "3-MMC" samples contain actual 3-MMC (2025), 76% contain 2-MMC, 5% contain NEP.' },
+            { citation: 'Trimbos-instituut / DIMS. (2024). DIMS Jaarbericht 2024. trimbos.nl', note: 'Recordaantal 3-MMC samples; 13% actual 3-MMC in 2024; NEP found in 4% of samples.' },
+            { citation: 'Archer, R.P., et al. (2014). Mephedrone: an emerging drug of abuse. Annals of Clinical Biochemistry, 51(2), 132–136.', note: 'Mephedrone PK: t½ ~2–3h, oral bioavailability ~70%, estimated Vd.' },
+            { citation: 'Sidekicks Berlin. (2025). NEP instead of "3-MMC". sidekicks.berlin/en/nep/', note: 'NEP warnings in Berlin party scene, overdose risk when dosed like 3-MMC.' },
+            { citation: 'Lisbonaddictions.eu / DIMS. (2024). Effects of legislative measures on 3-MMC in Netherlands. lisbonaddictions.eu', note: 'DIMS data 2021–2023: 85% → 35% → 15% actual 3-MMC; other cathinones found.' },
+            { citation: 'Papaseit, E., et al. (2025). Acute pharmacological effects of NEP and NEH in humans. PMC12115307.', note: 'Human observational data on NEP: cardiovascular effects, BP +21mmHg, HR +22bpm, onset within 20 min.' },
+            { citation: 'Correlation-European Harm Reduction Network / TEDI. (2025). European Drug Checking Trends 2018–2024. correlation-net.org', note: 'Cathinone market trends, adulteration patterns.' },
+    ]
     },
   'PK/PD Calculator': {
     description: 'Pharmacokinetic models using closed-form equations (linear 1-compartment) and RK4 numerical integration (2-compartment, Michaelis-Menten).',
