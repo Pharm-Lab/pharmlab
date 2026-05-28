@@ -48,6 +48,18 @@ const SOURCES = {
       { citation: 'Correlation-European Harm Reduction Network / TEDI. (2025). European Drug Checking Trends 2018–2024. correlation-net.org', note: 'Most common adulterants in European cocaine samples.' },
     ]
   },
+  'Amphetamine Calculator': {
+    description: 'Plasma concentration model for oral amphetamine and methamphetamine with pH-dependent elimination.',
+     sources: [
+        { citation: 'Cruickshank, C.C., & Dyer, K.R. (2009). A review of the clinical pharmacology of methamphetamine. Addiction, 104(7), 1085–1099.', note: 'Methamphetamine PK parameters: t½ ~10h, Vd ~3.7 L/kg, F ~67%, CNS potency vs amphetamine.' },
+        { citation: 'Schepers, R.J., Oyler, J.M., Joseph, R.E., et al. (2003). Methamphetamine and amphetamine pharmacokinetics in oral fluid and plasma after controlled oral methamphetamine administration. Clinical Chemistry, 49(1), 121–132.', note: 'Comparative oral PK, Tmax values, plasma concentration-time profiles.' },
+        { citation: 'Shappell, S.A., Kearns, G.L., Valentine, J.L., et al. (1996). Chromatographic-mass spectrometric analysis and pharmacokinetic modeling of amphetamine after intravenous administration. Journal of Chromatography B, 678(2), 309–318.', note: 'Amphetamine PK parameters: ke, Vd ~3.5 L/kg, t½ ~11h.' },
+        { citation: 'Beckett, A.H., & Rowland, M. (1965). Urinary excretion kinetics of amphetamine in man. Journal of Pharmacy and Pharmacology, 17(10), 628–639.', note: 'pH-dependent elimination — acidic urine increases elimination rate ~50%. Basis for vitamin C harm reduction strategy.' },
+        { citation: 'Poklis, A. (1995). Amphetamine/methamphetamine: a review of their actions, toxicology, and disposition. Therapeutic Drug Monitoring, 17(5), 461–467.', note: 'Elimination pH-dependence, clinical toxicology, urinary pH effect on t½.' },
+        { citation: 'European Union Drugs Agency (EUDA). (2024). Amphetamines — the current situation in Europe. European Drug Report 2024. euda.europa.eu', note: 'Prevalence of amphetamine vs methamphetamine in Europe, trends in use.' },
+        { citation: 'Correlation-European Harm Reduction Network / TEDI. (2025). European Drug Checking Trends 2018–2024. correlation-net.org', note: 'Adulteration trends in European amphetamine samples.' },
+    ]
+    },
   'PK/PD Calculator': {
     description: 'Pharmacokinetic models using closed-form equations (linear 1-compartment) and RK4 numerical integration (2-compartment, Michaelis-Menten).',
     sources: [
