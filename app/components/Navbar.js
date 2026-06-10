@@ -8,6 +8,7 @@ export default function Navbar() {
   const links = [
   { href: '/tools',          label: 'Tools' },
   { href: '/lab',            label: 'Lab Prep' },
+  { href: '/formulas',       label: 'Formulas' },
   { href: '/harm-reduction', label: 'Harm Reduction' },
   { href: '/sources',        label: 'Sources' },
   ]
