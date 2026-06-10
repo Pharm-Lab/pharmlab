@@ -62,6 +62,24 @@ export default function Tools() {
           </div>
         </a>
 
+        <a href="/tools/adme" style={{ textDecoration: 'none' }}>
+            <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '1.25rem', height: '100%', boxSizing: 'border-box' }}>
+                <div style={{ fontSize: '28px', marginBottom: '10px' }}>🔬</div>
+                <h2 style={{ fontSize: '15px', fontWeight: '600', color: '#111827', margin: '0 0 6px' }}>Interactive ADME</h2>
+                <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 10px', lineHeight: '1.5' }}>Click through the drug journey — absorption, distribution, metabolism, excretion — with equations, physiology, and clinical examples at each step.</p>
+                <span style={{ fontSize: '12px', color: '#2563eb', fontWeight: '500' }}>Explore →</span>
+            </div>
+        </a>
+
+        <a href="/tools/analytics" style={{ textDecoration: 'none' }}>
+            <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '1.25rem', height: '100%', boxSizing: 'border-box' }}>
+                <div style={{ fontSize: '28px', marginBottom: '10px' }}>🔬</div>
+                <h2 style={{ fontSize: '15px', fontWeight: '600', color: '#111827', margin: '0 0 6px' }}>Analytical Technique Trainer</h2>
+                <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 10px', lineHeight: '1.5' }}>Decision trainer, technique explorer, and quiz — HPLC, GC, CE, IEX, SEC, SPE, LLE.</p>
+                <span style={{ fontSize: '12px', color: '#2563eb', fontWeight: '500' }}>Open →</span>
+            </div>
+        </a>
+
       </div>
     </main>
   )
