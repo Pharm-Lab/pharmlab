@@ -195,6 +195,34 @@ const SOURCES = {
       { citation: 'Gibaldi, M., & Perrier, D. (1982). Pharmacokinetics (2nd ed.). Marcel Dekker.', note: 'Multi-compartment model mathematics, moment analysis.' },
     ]
   },
+  'Gel Image Analyser': {
+    description: 'Molecular weight estimation from SDS-PAGE and agarose gel images using log(MW) vs Rf linear regression against a ladder standard curve.',
+    sources: [
+      { citation: 'Laemmli, U.K. (1970). Cleavage of structural proteins during the assembly of the head of bacteriophage T4. Nature, 227(5259), 680–685.', note: 'SDS-PAGE methodology establishing the linear log(MW) vs migration distance relationship that underpins all gel MW estimation.' },
+      { citation: 'Sambrook, J., & Russell, D.W. (2001). Molecular Cloning: A Laboratory Manual (3rd ed.). Cold Spring Harbor Laboratory Press.', note: 'Practical gel electrophoresis protocols, Rf calculation method, ladder selection, and MW estimation from standard curves.' },
+      { citation: 'Thermo Fisher Scientific. (2024). PageRuler Prestained Protein Ladder — Product Manual. thermofisher.com', note: 'Band sizes and migration characteristics for PageRuler 10–200 kDa and 3.5–500 kDa ladders used as presets.' },
+      { citation: 'New England Biolabs. (2024). Quick-Load DNA Ladder — Product Information. neb.com', note: 'Band sizes for GeneRuler 1kb and 100bp DNA ladders used as presets.' },
+    ]
+  },
+  'Protein Tools': {
+    description: 'Bradford/BCA/Lowry protein quantification with standard curve fitting, plus isoelectric point and extinction coefficient calculation from amino acid sequence.',
+    sources: [
+      { citation: 'Bradford, M.M. (1976). A rapid and sensitive method for the quantitation of microgram quantities of protein utilizing the principle of protein-dye binding. Analytical Biochemistry, 72(1–2), 248–254.', note: 'Original Bradford assay paper. Coomassie Brilliant Blue G-250 binding to protein, A595, BSA standard curve linear range ~0.1–1.4 mg/mL.' },
+      { citation: 'Smith, P.K., Krohn, R.I., Hermanson, G.T., et al. (1985). Measurement of protein using bicinchoninic acid. Analytical Biochemistry, 150(1), 76–85.', note: 'Original BCA assay paper. Cu²⁺ reduction and bicinchoninic acid reaction, A562, linear range 20–2000 μg/mL.' },
+      { citation: 'Pace, C.N., Vajdos, F., Fee, L., Grimsley, G., & Gray, T. (1995). How to measure and predict the molar absorption coefficient of a protein. Protein Science, 4(11), 2411–2423.', note: 'Pace method for ε₂₈₀ calculation: ε = 5500×nTrp + 1490×nTyr + 125×nCys(SS). The standard reference for extinction coefficient prediction from sequence.' },
+      { citation: 'Bjellqvist, B., Hughes, G.J., Pasquali, C., et al. (1993). The focusing positions of polypeptides in immobilised pH gradients can be predicted from their amino acid sequences. Electrophoresis, 14(1), 1023–1031.', note: 'pKa values and method for pI calculation used in the sequence analyser. Henderson-Hasselbalch bisection approach.' },
+      { citation: 'Gasteiger, E., Hoogland, C., Gattiker, A., et al. (2005). Protein identification and analysis tools on the ExPASy server. In J.M. Walker (Ed.), The Proteomics Protocols Handbook. Humana Press.', note: 'ExPASy ProtParam tool methodology — validation reference for MW, pI, and ε₂₈₀ computations implemented here.' },
+    ]
+  },
+  'Spectrophotometry': {
+    description: 'Beer-Lambert calculator, nucleic acid quantification (A260/A280/A230 purity), batch sample mode, and dilution back-calculator.',
+    sources: [
+      { citation: 'Beer, A. (1852). Bestimmung der Absorption des rothen Lichts in farbigen Flüssigkeiten. Annalen der Physik und Chemie, 162(5), 78–88.', note: 'Original Beer-Lambert law: A = ε × c × l. The foundation of all absorbance-based quantification.' },
+      { citation: 'Sambrook, J., & Russell, D.W. (2001). Molecular Cloning: A Laboratory Manual (3rd ed.). Cold Spring Harbor Laboratory Press.', note: 'A260/A280 purity ratios for nucleic acids: 1.8 for pure dsDNA, 2.0 for pure RNA. Contamination interpretation guidelines.' },
+      { citation: 'Wilfinger, W.W., Mackey, K., & Chomczynski, P. (1997). Effect of pH and ionic strength on the spectrophotometric assessment of nucleic acid purity. BioTechniques, 22(3), 474–481.', note: 'A260/A230 ratio for assessing phenol/guanidinium contamination after TRIzol and column extractions. Pure samples: A260/A230 ≥ 2.0.' },
+      { citation: 'Thermo Fisher Scientific. (2020). NanoDrop Spectrophotometer Technical Guide. thermofisher.com', note: 'Nucleic acid concentration factors: 50 μg/mL per A260 for dsDNA, 40 μg/mL for RNA, 33 μg/mL for ssDNA. Standard reference for the conversion factors used here.' },
+    ]
+  },
 }
 
 export default function Sources() {
@@ -264,6 +292,8 @@ export default function Sources() {
           ))}
 
           <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '1rem', fontSize: '12px', color: '#6b7280', marginTop: '1rem', lineHeight: '1.65' }}>
+            <strong>On accessing sources:</strong> Journal articles are accessible through Universiteit Leiden library (LUCRIS). The core textbooks — Rowland & Tozer, Shargel, Clayden, Hansen/Pedersen-Bjergaard/Rasmussen — are all available via UB Leiden.
+            <br /><br />
             <strong>On AI-generated content:</strong> The drug interaction checker and exercise helper use Claude (Anthropic). AI output should be cross-checked against primary sources for clinical or academic use. PharmLab is an educational tool — not a clinical decision support system.
           </div>
         </div>
