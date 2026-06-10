@@ -26,19 +26,23 @@ export default function Tools() {
           </div>
         </a>
 
-        <div style={{ background: '#f9fafb', border: '1px dashed #d1d5db', borderRadius: '12px', padding: '1.25rem', opacity: 0.7 }}>
-          <div style={{ fontSize: '28px', marginBottom: '10px' }}>📊</div>
-          <h2 style={{ fontSize: '15px', fontWeight: '600', color: '#6b7280', margin: '0 0 6px' }}>NCA Tool</h2>
-          <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 10px', lineHeight: '1.5' }}>Paste raw C-time data → trapezoidal AUC, log-linear t½, Cmax, Tmax.</p>
-          <span style={{ fontSize: '12px', color: '#9ca3af' }}>Coming soon</span>
-        </div>
+        <a href="/tools/nca" style={{ textDecoration: 'none' }}>
+            <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '1.25rem', height: '100%', boxSizing: 'border-box' }}>
+                <div style={{ fontSize: '28px', marginBottom: '10px' }}>📊</div>
+                <h2 style={{ fontSize: '15px', fontWeight: '600', color: '#111827', margin: '0 0 6px' }}>NCA Tool</h2>
+                <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 10px', lineHeight: '1.5' }}>Paste raw C-time data → trapezoidal AUC, log-linear λz regression, t½, CL/F, Vd/F, MRT.</p>
+                <span style={{ fontSize: '12px', color: '#2563eb', fontWeight: '500' }}>Open →</span>
+            </div>
+        </a>
 
-        <div style={{ background: '#f9fafb', border: '1px dashed #d1d5db', borderRadius: '12px', padding: '1.25rem', opacity: 0.7 }}>
-          <div style={{ fontSize: '28px', marginBottom: '10px' }}>⚖️</div>
-          <h2 style={{ fontSize: '15px', fontWeight: '600', color: '#6b7280', margin: '0 0 6px' }}>Bioequivalence Analyser</h2>
-          <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 10px', lineHeight: '1.5' }}>Two AUC/Cmax values → 90% CI, BE criteria, plain English explanation.</p>
-          <span style={{ fontSize: '12px', color: '#9ca3af' }}>Coming soon</span>
-        </div>
+        <a href="/tools/bioequivalence" style={{ textDecoration: 'none' }}>
+            <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '1.25rem', height: '100%', boxSizing: 'border-box' }}>
+                <div style={{ fontSize: '28px', marginBottom: '10px' }}>⚖️</div>
+                <h2 style={{ fontSize: '15px', fontWeight: '600', color: '#111827', margin: '0 0 6px' }}>Bioequivalence Analyser</h2>
+                <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 10px', lineHeight: '1.5' }}>TOST procedure on log-transformed AUC and Cmax. 90% CI plot, GMR, FDA/EMA acceptance criterion.</p>
+                <span style={{ fontSize: '12px', color: '#2563eb', fontWeight: '500' }}>Open →</span>
+            </div>
+        </a>
 
         <a href="/interactions" style={{ textDecoration: 'none' }}>
           <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '1.25rem', height: '100%', boxSizing: 'border-box' }}>
