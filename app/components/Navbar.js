@@ -6,11 +6,10 @@ export default function Navbar() {
   const pathname = usePathname()
 
   const links = [
-    { href: '/interactions', label: 'Interactions' },
-    { href: '/calculator', label: 'Calculator' },
-    { href: '/exercises', label: 'Exercise Helper' },
-    { href: '/harm-reduction', label: 'Harm Reduction' },
-    { href: '/sources', label: 'Sources' },
+  { href: '/tools',          label: 'Tools' },
+  { href: '/lab',            label: 'Lab Prep' },
+  { href: '/harm-reduction', label: 'Harm Reduction' },
+  { href: '/sources',        label: 'Sources' },
   ]
 
   return (
