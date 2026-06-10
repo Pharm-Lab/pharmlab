@@ -227,77 +227,86 @@ const SOURCES = {
 
 export default function Sources() {
   const [selected, setSelected] = useState(null)
-  const [showAll,  setShowAll]  = useState(false)
-
   const topics = Object.keys(SOURCES)
+  const C = {
+    bg:'#0a0f1e', bgCard:'#0f1629', border:'rgba(255,255,255,0.07)',
+    borderHov:'rgba(255,255,255,0.13)', blue:'#2a6fdb', blueLight:'#93b4f7',
+    text:'#f0f4ff', textMid:'rgba(240,244,255,0.65)', textDim:'rgba(240,244,255,0.35)',
+  }
 
   return (
-    <main style={{ maxWidth: '860px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
+    <main style={{ fontFamily:"'Inter',system-ui,sans-serif", background:C.bg, minHeight:'100vh', color:C.text }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        * { box-sizing:border-box; }
+        .src-pill { transition: background 0.15s, border-color 0.15s; cursor:pointer; }
+        .src-pill:hover { border-color: rgba(42,111,219,0.5) !important; background: rgba(42,111,219,0.15) !important; }
+        .src-card { transition: border-color 0.15s; }
+        .src-card:hover { border-color: rgba(255,255,255,0.14) !important; }
+      `}</style>
 
-      <div style={{ textAlign: 'center', padding: '3rem 1rem 2rem' }}>
-        <div style={{ fontSize: '48px', marginBottom: '12px' }}>📚</div>
-        <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#111827', margin: '0 0 8px' }}>Sources</h1>
-        <p style={{ fontSize: '16px', color: '#6b7280', margin: '0 0 2rem' }}>
-          Source: trust me bro
+      {/* Header */}
+      <div style={{ borderBottom:`1px solid ${C.border}`, padding:'2rem 2rem 1.5rem', maxWidth:'860px', margin:'0 auto' }}>
+        <p style={{ fontSize:'11px', color:C.blueLight, fontWeight:'700', letterSpacing:'0.12em', textTransform:'uppercase', margin:'0 0 6px' }}>Transparency</p>
+        <h1 style={{ fontSize:'28px', fontWeight:'800', letterSpacing:'-0.03em', color:C.text, margin:'0 0 6px' }}>Sources</h1>
+        <p style={{ fontSize:'14px', color:C.textMid, margin:0, lineHeight:'1.6' }}>
+          Source: trust me bro.{' '}
+          <span style={{ color:C.textDim, fontSize:'13px' }}>
+            (or click a tool below to see the actual papers)
+          </span>
         </p>
-        <button
-          onClick={() => setShowAll(!showAll)}
-          style={{ padding: '10px 24px', background: '#2563eb', color: 'white', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>
-          {showAll ? 'Hide sources ↑' : 'Actually show me the sources ↓'}
-        </button>
       </div>
 
-      {showAll && (
-        <div>
-          <div style={{ marginBottom: '1.5rem' }}>
-            <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '8px' }}>Filter by tool:</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-              <button
-                onClick={() => setSelected(null)}
-                style={{ padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px',
-                  fontWeight: selected === null ? '600' : '400',
-                  border: selected === null ? '2px solid #2563eb' : '1px solid #d1d5db',
-                  background: selected === null ? '#eff6ff' : 'white',
-                  color: selected === null ? '#1d4ed8' : '#374151' }}>
-                All tools
-              </button>
-              {topics.map(t => (
-                <button key={t} onClick={() => setSelected(t)}
-                  style={{ padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px',
-                    fontWeight: selected === t ? '600' : '400',
-                    border: selected === t ? '2px solid #2563eb' : '1px solid #d1d5db',
-                    background: selected === t ? '#eff6ff' : 'white',
-                    color: selected === t ? '#1d4ed8' : '#374151' }}>
-                  {t}
-                </button>
+      <div style={{ maxWidth:'860px', margin:'0 auto', padding:'1.5rem 2rem 4rem' }}>
+
+        {/* Filter pills */}
+        <div style={{ display:'flex', flexWrap:'wrap', gap:'6px', marginBottom:'1.5rem' }}>
+          <button className="src-pill" onClick={() => setSelected(null)}
+            style={{ padding:'5px 14px', borderRadius:'999px', fontSize:'12px', fontWeight: selected===null?'600':'400',
+              border: selected===null ? `1px solid ${C.blue}` : `1px solid ${C.border}`,
+              background: selected===null ? `${C.blue}22` : 'transparent',
+              color: selected===null ? C.blueLight : C.textDim }}>
+            All ({topics.length})
+          </button>
+          {topics.map(t => (
+            <button key={t} className="src-pill" onClick={() => setSelected(selected===t ? null : t)}
+              style={{ padding:'5px 14px', borderRadius:'999px', fontSize:'12px', fontWeight: selected===t?'600':'400',
+                border: selected===t ? `1px solid ${C.blue}` : `1px solid ${C.border}`,
+                background: selected===t ? `${C.blue}22` : 'transparent',
+                color: selected===t ? C.blueLight : C.textDim }}>
+              {t}
+            </button>
+          ))}
+        </div>
+
+        {/* Source cards */}
+        {(selected ? [selected] : topics).map(topic => (
+          <div key={topic} className="src-card"
+            style={{ marginBottom:'10px', border:`1px solid ${C.border}`, borderRadius:'14px', overflow:'hidden' }}>
+            {/* Card header */}
+            <div style={{ background:'#0f1629', padding:'14px 18px', borderBottom:`1px solid ${C.border}` }}>
+              <h2 style={{ fontSize:'14px', fontWeight:'700', color:C.text, margin:'0 0 3px', letterSpacing:'-0.01em' }}>{topic}</h2>
+              <p style={{ fontSize:'12px', color:C.textDim, margin:0, lineHeight:'1.5' }}>{SOURCES[topic].description}</p>
+            </div>
+            {/* Citations */}
+            <div style={{ padding:'4px 0' }}>
+              {SOURCES[topic].sources.map((s, i) => (
+                <div key={i} style={{ padding:'12px 18px', borderBottom: i < SOURCES[topic].sources.length-1 ? `1px solid ${C.border}` : 'none' }}>
+                  <p style={{ fontSize:'12px', color:C.textMid, margin:'0 0 4px', lineHeight:'1.6', fontStyle:'italic' }}>{s.citation}</p>
+                  <p style={{ fontSize:'11px', color:C.textDim, margin:0 }}>↳ {s.note}</p>
+                </div>
               ))}
             </div>
           </div>
+        ))}
 
-          {(selected ? [selected] : topics).map(topic => (
-            <div key={topic} style={{ marginBottom: '1.5rem', border: '1px solid #e5e7eb', borderRadius: '12px', overflow: 'hidden' }}>
-              <div style={{ background: '#f9fafb', padding: '12px 16px', borderBottom: '1px solid #e5e7eb' }}>
-                <h2 style={{ fontSize: '15px', fontWeight: '600', color: '#111827', margin: '0 0 3px' }}>{topic}</h2>
-                <p style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>{SOURCES[topic].description}</p>
-              </div>
-              <div style={{ padding: '12px 16px' }}>
-                {SOURCES[topic].sources.map((s, i) => (
-                  <div key={i} style={{ marginBottom: '10px', paddingBottom: '10px', borderBottom: i < SOURCES[topic].sources.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
-                    <p style={{ fontSize: '13px', color: '#374151', margin: '0 0 3px', lineHeight: '1.55' }}>{s.citation}</p>
-                    <p style={{ fontSize: '11px', color: '#9ca3af', margin: 0 }}>Used for: {s.note}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-
-          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '1rem', fontSize: '12px', color: '#6b7280', marginTop: '1rem', lineHeight: '1.65' }}>
-            <strong>On accessing sources:</strong> Journal articles are accessible through Universiteit Leiden library (LUCRIS). The core textbooks — Rowland & Tozer, Shargel, Clayden, Hansen/Pedersen-Bjergaard/Rasmussen — are all available via UB Leiden.
-            <br /><br />
-            <strong>On AI-generated content:</strong> The drug interaction checker and exercise helper use Claude (Anthropic). AI output should be cross-checked against primary sources for clinical or academic use. PharmLab is an educational tool — not a clinical decision support system.
-          </div>
+        {/* Footer note */}
+        <div style={{ marginTop:'1.5rem', padding:'16px 18px', background:'#0f1629', border:`1px solid ${C.border}`, borderRadius:'12px', fontSize:'12px', color:C.textDim, lineHeight:'1.7' }}>
+          <span style={{ color:C.textMid, fontWeight:'600' }}>Accessing sources:</span> Journal articles are available through Universiteit Leiden library (LUCRIS). Core textbooks — Rowland & Tozer, Shargel, Clayden, Hansen/Pedersen-Bjergaard/Rasmussen — are in UB Leiden.
+          <br /><br />
+          <span style={{ color:C.textMid, fontWeight:'600' }}>AI-generated content:</span> The drug interaction checker and exercise helper use Claude (Anthropic). AI output should be cross-checked against primary sources. PharmLab is an educational tool — not a clinical decision support system.
         </div>
-      )}
+      </div>
     </main>
   )
 }

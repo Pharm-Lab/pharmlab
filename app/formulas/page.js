@@ -921,73 +921,59 @@ const MATH_FORMULAS = [
   },
 ]
 
-// ─── Components ───────────────────────────────────────────────────
+// ─── PASTE THIS BELOW YOUR EXISTING PK_FORMULAS AND MATH_FORMULAS DATA ───────
+// Replace everything from `function FormulaCard` to the end of the file
+
+const C = {
+  bg: '#0a0f1e', bgCard: '#0f1629', border: 'rgba(255,255,255,0.07)',
+  blue: '#2a6fdb', blueLight: '#93b4f7', purple: '#7c3aed',
+  text: '#f0f4ff', textMid: 'rgba(240,244,255,0.65)', textDim: 'rgba(240,244,255,0.35)',
+}
 
 function FormulaCard({ formula, isExpanded, onToggle }) {
   return (
-    <div
-      style={{
-        background: 'white',
-        border: '1px solid #e5e7eb',
-        borderRadius: '12px',
-        overflow: 'hidden',
-        marginBottom: '8px',
-        transition: 'box-shadow 0.15s',
-      }}
-    >
+    <div style={{
+      border: `1px solid ${isExpanded ? 'rgba(42,111,219,0.35)' : C.border}`,
+      borderRadius: '12px',
+      overflow: 'hidden',
+      marginBottom: '6px',
+      background: isExpanded ? 'rgba(42,111,219,0.06)' : C.bgCard,
+      transition: 'border-color 0.15s, background 0.15s',
+    }}>
       {/* Header — always visible */}
       <button
         onClick={onToggle}
         style={{
-          width: '100%',
-          padding: '12px 16px',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          textAlign: 'left',
+          width: '100%', padding: '12px 16px',
+          background: 'none', border: 'none', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', gap: '12px', textAlign: 'left',
         }}
       >
         {/* Symbol badge */}
         <div style={{
-          background: '#f0f4ff',
-          border: '1px solid #c7d2fe',
-          borderRadius: '6px',
-          padding: '4px 10px',
-          fontSize: '13px',
-          fontWeight: '700',
-          color: '#3730a3',
+          background: 'rgba(42,111,219,0.15)', border: '1px solid rgba(42,111,219,0.3)',
+          borderRadius: '6px', padding: '4px 10px',
+          fontSize: '13px', fontWeight: '700', color: C.blueLight,
           fontFamily: 'ui-monospace, monospace',
-          whiteSpace: 'nowrap',
-          flexShrink: 0,
-          minWidth: '56px',
-          textAlign: 'center',
+          whiteSpace: 'nowrap', flexShrink: 0, minWidth: '56px', textAlign: 'center',
         }}>
           {formula.symbol}
         </div>
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: '14px', fontWeight: '600', color: '#111827', marginBottom: '2px' }}>
+          <div style={{ fontSize: '14px', fontWeight: '600', color: C.text, marginBottom: '2px' }}>
             {formula.name}
           </div>
           <div style={{
-            fontSize: '13px',
-            fontFamily: 'ui-monospace, monospace',
-            color: '#4b5563',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
+            fontSize: '12px', fontFamily: 'ui-monospace, monospace', color: C.textDim,
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}>
             {formula.formula.split('\n')[0]}
           </div>
         </div>
 
         <div style={{
-          fontSize: '18px',
-          color: '#9ca3af',
-          flexShrink: 0,
+          fontSize: '16px', color: C.textDim, flexShrink: 0,
           transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
           transition: 'transform 0.2s',
         }}>›</div>
@@ -995,34 +981,27 @@ function FormulaCard({ formula, isExpanded, onToggle }) {
 
       {/* Expanded detail */}
       {isExpanded && (
-        <div style={{ padding: '0 16px 14px', borderTop: '1px solid #f3f4f6' }}>
+        <div style={{ padding: '0 16px 16px', borderTop: `1px solid ${C.border}` }}>
 
-          {/* Full formula — monospace block */}
+          {/* Full formula block */}
           <div style={{
-            background: '#0a0f1e',
-            borderRadius: '8px',
-            padding: '12px 16px',
-            margin: '10px 0',
-            fontFamily: 'ui-monospace, monospace',
-            fontSize: '14px',
-            color: '#93b4f7',
-            whiteSpace: 'pre-wrap',
-            lineHeight: '1.7',
+            background: '#060b18', border: `1px solid ${C.border}`,
+            borderRadius: '8px', padding: '12px 16px', margin: '12px 0',
+            fontFamily: 'ui-monospace, monospace', fontSize: '13px',
+            color: C.blueLight, whiteSpace: 'pre-wrap', lineHeight: '1.7',
           }}>
             {formula.formula}
           </div>
 
           {/* Variables */}
           {formula.variables?.length > 0 && (
-            <div style={{ marginBottom: '10px' }}>
-              <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 6px' }}>Variables</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+            <div style={{ marginBottom: '12px' }}>
+              <p style={{ fontSize: '10px', color: C.textDim, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 8px' }}>Variables</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 {formula.variables.map(v => (
-                  <div key={v.sym} style={{ display: 'flex', gap: '10px', fontSize: '13px' }}>
-                    <code style={{ background: '#f3f4f6', padding: '1px 7px', borderRadius: '4px', color: '#3730a3', fontWeight: '600', flexShrink: 0, fontFamily: 'ui-monospace, monospace' }}>
-                      {v.sym}
-                    </code>
-                    <span style={{ color: '#6b7280' }}>{v.desc}</span>
+                  <div key={v.sym} style={{ display: 'flex', gap: '10px', fontSize: '12px' }}>
+                    <span style={{ fontFamily: 'ui-monospace, monospace', color: C.blueLight, fontWeight: '600', minWidth: '52px', flexShrink: 0 }}>{v.sym}</span>
+                    <span style={{ color: C.textMid }}>{v.desc}</span>
                   </div>
                 ))}
               </div>
@@ -1031,47 +1010,32 @@ function FormulaCard({ formula, isExpanded, onToggle }) {
 
           {/* Units */}
           {formula.units && (
-            <div style={{ marginBottom: '10px', fontSize: '12px' }}>
-              <span style={{ color: '#9ca3af', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '11px' }}>Units: </span>
-              <code style={{ fontFamily: 'ui-monospace, monospace', color: '#374151' }}>{formula.units}</code>
+            <div style={{ marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '10px', color: C.textDim, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Units</span>
+              <span style={{ fontSize: '12px', fontFamily: 'ui-monospace, monospace', color: C.textMid, background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: '4px', border: `1px solid ${C.border}` }}>{formula.units}</span>
             </div>
           )}
 
           {/* Notes */}
           {formula.notes && (
-            <div style={{ background: '#f9fafb', borderRadius: '8px', padding: '10px 12px', fontSize: '13px', color: '#374151', lineHeight: '1.6' }}>
+            <p style={{ fontSize: '12px', color: C.textMid, lineHeight: '1.65', margin: '0', padding: '10px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: '7px', border: `1px solid ${C.border}` }}>
               {formula.notes}
-            </div>
+            </p>
           )}
-
-          {/* Tags */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '10px' }}>
-            {formula.tags?.map(tag => (
-              <span key={tag} style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '999px', background: '#f3f4f6', color: '#6b7280', border: '1px solid #e5e7eb' }}>
-                {tag}
-              </span>
-            ))}
-          </div>
         </div>
       )}
     </div>
   )
 }
 
-// ─── Main ─────────────────────────────────────────────────────────
-
 export default function Formulas() {
-  const [tab,      setTab]      = useState('pk')
-  const [query,    setQuery]    = useState('')
-  const [expanded, setExpanded] = useState(new Set())
-  const [catFilter,setCatFilter]= useState('All')
+  const [tab,       setTab]       = useState('pk')
+  const [query,     setQuery]     = useState('')
+  const [expanded,  setExpanded]  = useState(new Set())
+  const [catFilter, setCatFilter] = useState('All')
 
-  const formulas = tab === 'pk' ? PK_FORMULAS : MATH_FORMULAS
-
-  const categories = useMemo(() => {
-    const cats = ['All', ...new Set(formulas.map(f => f.category))]
-    return cats
-  }, [tab, formulas])
+  const formulas   = tab === 'pk' ? PK_FORMULAS : MATH_FORMULAS
+  const categories = useMemo(() => ['All', ...new Set(formulas.map(f => f.category))], [tab, formulas])
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase().trim()
@@ -1100,103 +1064,115 @@ export default function Formulas() {
   function toggleExpanded(id) {
     setExpanded(prev => {
       const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
+      next.has(id) ? next.delete(id) : next.add(id)
       return next
     })
   }
 
-  function expandAll()   { setExpanded(new Set(filtered.map(f => f.id))) }
-  function collapseAll() { setExpanded(new Set()) }
-
-  const tabBtn = active => ({
-    padding: '8px 20px', cursor: 'pointer', fontSize: '14px',
-    fontWeight: active ? '600' : '400',
-    border: 'none',
-    borderBottom: active ? '2px solid #2563eb' : '2px solid transparent',
-    background: 'transparent',
-    color: active ? '#1d4ed8' : '#6b7280',
-    marginBottom: '-1px',
-  })
-
   return (
-    <main style={{ maxWidth: '860px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'system-ui, sans-serif' }}>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#111827', margin: '0 0 4px' }}>Formula Reference</h1>
-      <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '1.5rem', lineHeight: '1.6' }}>
-        Searchable reference for pharmacokinetics, pharmacodynamics, statistics, and calculus. Click any formula to expand variables, units, and notes.
-      </p>
+    <main style={{ fontFamily: "'Inter',system-ui,sans-serif", background: C.bg, minHeight: '100vh', color: C.text }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        * { box-sizing: border-box; }
+        input::placeholder { color: rgba(240,244,255,0.25); }
+        .tab-btn { transition: color 0.15s; }
+        .tab-btn:hover { color: rgba(240,244,255,0.9) !important; }
+        .cat-pill { transition: background 0.15s, border-color 0.15s; cursor: pointer; }
+        .cat-pill:hover { border-color: rgba(42,111,219,0.5) !important; background: rgba(42,111,219,0.12) !important; }
+      `}</style>
 
-      {/* Tabs */}
-      <div style={{ borderBottom: '1px solid #e5e7eb', marginBottom: '1.25rem', display: 'flex', gap: '0' }}>
-        <button onClick={() => { setTab('pk'); setCatFilter('All'); setQuery('') }} style={tabBtn(tab === 'pk')}>
-          💊 PK / PD / Biopharmaceutics
-        </button>
-        <button onClick={() => { setTab('math'); setCatFilter('All'); setQuery('') }} style={tabBtn(tab === 'math')}>
-          📐 Statistics, Algebra & Calculus
-        </button>
-      </div>
+      {/* Header */}
+      <div style={{ borderBottom: `1px solid ${C.border}`, padding: '2rem 2rem 0', maxWidth: '900px', margin: '0 auto' }}>
+        <p style={{ fontSize: '11px', color: C.blueLight, fontWeight: '700', letterSpacing: '0.12em', textTransform: 'uppercase', margin: '0 0 6px' }}>Reference</p>
+        <h1 style={{ fontSize: '28px', fontWeight: '800', letterSpacing: '-0.03em', color: C.text, margin: '0 0 6px' }}>Formula Reference</h1>
+        <p style={{ fontSize: '13px', color: C.textMid, margin: '0 0 1.5rem', lineHeight: '1.6' }}>
+          Searchable PK/PD equations, statistics, and calculus. Click any formula to expand variables, units, and notes.
+        </p>
 
-      {/* Search + filter row */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '1rem', flexWrap: 'wrap' }}>
-        <input
-          type="text"
-          placeholder="Search formulas, symbols, topics..."
-          value={query}
-          onChange={e => { setQuery(e.target.value); setCatFilter('All') }}
-          style={{
-            flex: 1, minWidth: '200px', padding: '9px 14px',
-            borderRadius: '8px', border: '1px solid #d1d5db',
-            fontSize: '14px', color: '#111827', background: 'white',
-            outline: 'none',
-          }}
-        />
-        <select
-          value={catFilter}
-          onChange={e => setCatFilter(e.target.value)}
-          style={{
-            padding: '9px 12px', borderRadius: '8px', border: '1px solid #d1d5db',
-            fontSize: '13px', color: '#111827', background: 'white',
-          }}
-        >
-          {categories.map(c => <option key={c} value={c}>{c}</option>)}
-        </select>
-      </div>
-
-      {/* Controls + count */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-        <span style={{ fontSize: '12px', color: '#9ca3af' }}>
-          {filtered.length} formula{filtered.length !== 1 ? 's' : ''}
-          {query && ` matching "${query}"`}
-        </span>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button onClick={expandAll}   style={{ fontSize: '12px', color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}>Expand all</button>
-          <span style={{ color: '#d1d5db' }}>·</span>
-          <button onClick={collapseAll} style={{ fontSize: '12px', color: '#6b7280', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}>Collapse all</button>
+        {/* Tabs */}
+        <div style={{ display: 'flex', gap: '0', marginBottom: '-1px' }}>
+          {[
+            { key: 'pk',   label: '💊 PK / PD / Biopharmaceutics' },
+            { key: 'math', label: '📐 Statistics, Algebra & Calculus' },
+          ].map(t => (
+            <button key={t.key} className="tab-btn"
+              onClick={() => { setTab(t.key); setCatFilter('All'); setQuery('') }}
+              style={{
+                padding: '10px 20px', cursor: 'pointer', fontSize: '13px',
+                fontWeight: tab === t.key ? '600' : '400',
+                border: 'none', background: 'none',
+                borderBottom: tab === t.key ? `2px solid ${C.blue}` : '2px solid transparent',
+                color: tab === t.key ? C.text : C.textDim,
+                marginBottom: 0,
+              }}>
+              {t.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Formula list */}
-      {filtered.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#9ca3af', fontSize: '14px' }}>
-          No formulas found for "{query}"
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '1.5rem 2rem 4rem' }}>
+
+        {/* Search + category filter */}
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '12px', flexWrap: 'wrap' }}>
+          <input
+            type="text" placeholder="Search formulas, symbols, topics…"
+            value={query}
+            onChange={e => { setQuery(e.target.value); setCatFilter('All') }}
+            style={{
+              flex: 1, minWidth: '220px', padding: '9px 14px',
+              borderRadius: '9px', border: `1px solid ${C.border}`,
+              fontSize: '13px', color: C.text, background: C.bgCard,
+              outline: 'none',
+            }}
+          />
+          <select value={catFilter} onChange={e => setCatFilter(e.target.value)}
+            style={{ padding: '9px 12px', borderRadius: '9px', border: `1px solid ${C.border}`, fontSize: '12px', color: C.textMid, background: C.bgCard, cursor: 'pointer' }}>
+            {categories.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
         </div>
-      ) : (
-        Object.entries(grouped).map(([category, items]) => (
-          <div key={category} style={{ marginBottom: '1.5rem' }}>
-            <h2 style={{ fontSize: '12px', fontWeight: '700', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 8px', paddingLeft: '2px' }}>
-              {category}
-            </h2>
-            {items.map(formula => (
-              <FormulaCard
-                key={formula.id}
-                formula={formula}
-                isExpanded={expanded.has(formula.id)}
-                onToggle={() => toggleExpanded(formula.id)}
-              />
-            ))}
+
+        {/* Count + expand controls */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+          <span style={{ fontSize: '12px', color: C.textDim }}>
+            {filtered.length} formula{filtered.length !== 1 ? 's' : ''}{query && ` matching "${query}"`}
+          </span>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={() => setExpanded(new Set(filtered.map(f => f.id)))}
+              style={{ fontSize: '12px', color: C.blueLight, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}>
+              Expand all
+            </button>
+            <span style={{ color: C.border }}>·</span>
+            <button onClick={() => setExpanded(new Set())}
+              style={{ fontSize: '12px', color: C.textDim, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}>
+              Collapse all
+            </button>
           </div>
-        ))
-      )}
+        </div>
+
+        {/* Formula list */}
+        {filtered.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '4rem', color: C.textDim, fontSize: '14px' }}>
+            No formulas found for "{query}"
+          </div>
+        ) : (
+          Object.entries(grouped).map(([category, items]) => (
+            <div key={category} style={{ marginBottom: '2rem' }}>
+              <h2 style={{ fontSize: '11px', fontWeight: '700', color: C.textDim, textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 8px' }}>
+                {category}
+              </h2>
+              {items.map(formula => (
+                <FormulaCard
+                  key={formula.id}
+                  formula={formula}
+                  isExpanded={expanded.has(formula.id)}
+                  onToggle={() => toggleExpanded(formula.id)}
+                />
+              ))}
+            </div>
+          ))
+        )}
+      </div>
     </main>
   )
 }
