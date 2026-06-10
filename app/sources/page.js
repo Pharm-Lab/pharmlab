@@ -60,6 +60,16 @@ const SOURCES = {
         { citation: 'Correlation-European Harm Reduction Network / TEDI. (2025). European Drug Checking Trends 2018–2024. correlation-net.org', note: 'Adulteration trends in European amphetamine samples.' },
     ]
  },
+ 'Ketamine Calculator': {
+    description: 'Plasma concentration model for intranasal and oral ketamine using 1-compartment PK.',
+      sources: [
+        { citation: 'Yanagihara, Y., Ohtani, M., Kariya, S., et al. (2003). Plasma concentration profiles of ketamine and norketamine after administration of various ketamine preparations. Pharmacology, 67(1), 1–8.', note: 'Intranasal bioavailability ~45%, Tmax ~15-20 min, human PK parameters.' },
+        { citation: 'Clements, J.A., Nimmo, W.S., & Grant, I.S. (1982). Bioavailability, pharmacokinetics, and analgesic activity of ketamine in humans. Journal of Pharmaceutical Sciences, 71(5), 539–542.', note: 'Elimination t½ ~2.5–3h, Vd ~3 L/kg, CYP3A4 metabolism to norketamine.' },
+        { citation: 'Mion, G., & Villevieille, T. (2013). Ketamine pharmacology: an update (pharmacodynamics and molecular aspects, recent findings). CNS Neuroscience & Therapeutics, 19(6), 370–380.', note: 'Comprehensive PK/PD review, clinical vs recreational dose ranges, racemic vs esketamine.' },
+        { citation: 'Morgan, C.J.A., & Curran, H.V. (2012). Ketamine use: a review. Addiction, 107(1), 27–38.', note: 'Ketamine-induced uropathy, bladder damage with regular use, recreational harm profile.' },
+        { citation: 'Malinovsky, J.M., Servin, F., Cozian, A., et al. (1996). Ketamine and norketamine plasma concentrations after i.v., nasal and rectal administration. British Journal of Anaesthesia, 77(2), 203–207.', note: 'Intranasal bioavailability 50% in children; norketamine Tmax ~120 min; dose-concentration relationships.' },
+    ]
+  },
  'Cathinone Calculator': {
     description: 'Mephedrone PK model with wide uncertainty band. Market data from Trimbos DIMS 2025.',
      sources: [
