@@ -1,339 +1,634 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import Image from 'next/image'
 
-const DATA = [
-  {
-    id: 0, col: '#378ADD', bg: '#E6F1FB', dark: '#0C447C', border: '#B5D4F4',
-    title: 'Oral administration',
-    sub: 'Where the journey begins',
-    plain: 'When you swallow a tablet, the drug first has to dissolve in your gut fluid before it can do anything. Think of it like dissolving a sugar cube in water — a crushed cube dissolves faster than a whole one. This is why manufacturers grind drugs into tiny particles, and why some drugs come as liquid formulations.',
-    facts: [
-      {
-        h: 'Why particle size matters',
-        body: 'Smaller particles = larger surface area = faster dissolution. This is the entire principle behind micronisation and nanomedicine. A BCS Class II drug (poorly soluble but well absorbed once dissolved) can go from 20% to 90% absorbed just by reducing particle size.',
-        hi: false,
-      },
-      {
-        h: 'Noyes-Whitney equation',
-        mono: 'dC/dt = (D·A·Cs) / (h·V)',
-        body: 'Dissolution rate increases with surface area (A) and saturation solubility (Cs). D is the diffusion coefficient, h the diffusion layer thickness, V the volume of fluid.',
-        hi: true,
-      },
-      {
-        h: 'BCS classification system',
-        body: 'Class I (high solubility, high permeability): easily absorbed — most common drugs. Class II (low S, high P): dissolution-limited — micronise or use amorphous solid dispersions. Class III (high S, low P): permeability is the barrier. Class IV (low/low): poor oral candidate, often needs reformulation or a different route.',
-        hi: false,
-      },
-    ]
+// ─── Zone definitions ─────────────────────────────────────────────────────────
+// Positions are % of the 1024×1024 image (used for hotspot placement)
+
+const ZONES = {
+  oral: {
+    id: 'oral',
+    label: 'Oral dose',
+    color: '#2563eb',
+    x: 50.0, y: 22.2,  // mouth (measured)
+    content: {
+      title: 'Oral Administration',
+      subtitle: 'The starting point for most drugs',
+      sections: [
+        {
+          heading: 'What happens here',
+          text: 'After swallowing, the drug must dissolve in GI fluid before it can be absorbed. Solid dosage forms (tablets, capsules) must first disintegrate, then the drug must dissolve — this is the rate-limiting step for poorly soluble drugs.',
+        },
+        {
+          heading: 'Dissolution — Noyes-Whitney equation',
+          formula: 'dC/dt = (D × A × Cs) / (h × V)',
+          formulaVars: [
+            { sym: 'D', desc: 'Diffusion coefficient' },
+            { sym: 'A', desc: 'Surface area of particles' },
+            { sym: 'Cs', desc: 'Saturation solubility' },
+            { sym: 'h', desc: 'Diffusion layer thickness' },
+          ],
+          text: 'Smaller particle size → larger surface area → faster dissolution. This is why micronisation and nanoformulations improve poorly soluble drug absorption.',
+        },
+        {
+          heading: 'BCS classification',
+          table: [
+            ['Class', 'Solubility', 'Permeability', 'Rate-limiting step'],
+            ['I',   'High', 'High', 'Gastric emptying'],
+            ['II',  'Low',  'High', 'Dissolution'],
+            ['III', 'High', 'Low',  'Permeability'],
+            ['IV',  'Low',  'Low',  'Both — poor candidate'],
+          ],
+        },
+        {
+          heading: 'PK connection',
+          text: 'Dissolution rate limits the absorption rate constant ka, and therefore Tmax and Cmax. Extended-release formulations deliberately slow dissolution — this is why ER tablets show a lower, later Cmax than immediate-release.',
+          highlight: true,
+        },
+      ],
+    },
   },
-  {
-    id: 1, col: '#1D9E75', bg: '#E1F5EE', dark: '#085041', border: '#9FE1CB',
-    title: 'GI absorption',
-    sub: 'Crossing the intestinal wall',
-    plain: 'The dissolved drug now has to cross the lining of your intestine to get into the bloodstream. The intestine is basically a very selective bouncer — it lets some things through and blocks others. The key rule: only the uncharged (unionised) form of the drug can cross. This means the drug\'s behaviour changes depending on whether it\'s in the acidic stomach or the more neutral small intestine.',
-    facts: [
-      {
-        h: 'The pH-partition hypothesis',
-        mono: 'Fraction unionised (acid) = 1 / (1 + 10^(pH−pKa))',
-        body: 'Only the unionised form crosses the lipid membrane. Weak acids (e.g. aspirin, pKa 3.5) are mostly unionised in the stomach (pH 2) — some gastric absorption. Weak bases (most drugs, pKa ~8–9) become unionised in the small intestine (pH 6–7.4) — primary absorption site. The small intestine also has a huge surface area (~200 m²) due to villi.',
-        hi: true,
-      },
-      {
-        h: 'The gut wall fights back — P-gp',
-        body: 'P-glycoprotein (P-gp) is a molecular pump in the intestinal wall that actively pushes drug back into the gut lumen. Many drugs that look like good candidates are partially defeated by P-gp. Grapefruit juice inhibits both P-gp and CYP3A4 in the gut wall — this is why it causes such dramatic drug interactions.',
-        hi: false,
-      },
-      {
-        h: 'Bioavailability has three components',
-        mono: 'F = Fabs × Fgut × Fliver',
-        body: 'Fabs = fraction absorbed from gut lumen. Fgut = fraction surviving gut-wall metabolism. Fliver = fraction surviving hepatic first-pass. A drug can be well absorbed (Fabs = 0.9) but still have low overall bioavailability (F = 0.3) due to gut and liver losses combined.',
-        hi: false,
-      },
-    ]
+
+  absorption: {
+    id: 'absorption',
+    label: 'GI absorption',
+    color: '#16a34a',
+    x: 53.5, y: 66.5,  // GI absorption: nudged down
+    content: {
+      title: 'Intestinal Absorption',
+      subtitle: 'The intestinal wall — first major barrier',
+      sections: [
+        {
+          heading: 'Mechanisms of absorption',
+          text: 'Most drugs are absorbed by passive transcellular diffusion — the drug dissolves through the lipid bilayer of enterocytes. This requires the drug to be unionised (neutral) and lipophilic enough to cross the membrane.',
+        },
+        {
+          heading: 'The pH-partition hypothesis',
+          formula: 'Fraction unionised (acid) = 1 / (1 + 10^(pH − pKa))',
+          text: 'Only the unionised form crosses membranes. Weak acids (e.g. aspirin, pKa 3.5) are predominantly unionised in the acidic stomach → absorbed in stomach. Weak bases (most drugs, pKa ~8–9) are unionised in the alkaline small intestine (pH 6–7.4) → absorbed there. The small intestine\'s vast surface area (~200 m²) makes it the primary absorption site.',
+          highlight: true,
+        },
+        {
+          heading: 'Transporters — not just passive diffusion',
+          text: 'Influx transporters (OATP, PepT1) actively bring some drugs into enterocytes. Efflux transporters — especially P-glycoprotein (P-gp, MDR1) — actively pump drugs back into the gut lumen, reducing net absorption. P-gp is a major source of drug interactions and variable bioavailability.',
+        },
+        {
+          heading: 'Gut-wall metabolism (CYP3A4)',
+          text: 'CYP3A4 is expressed at high levels in enterocytes. Some drugs are significantly metabolised before even reaching the portal vein. Ciclosporin, for example, is metabolised by both intestinal and hepatic CYP3A4 — both contribute to its low and variable bioavailability (~30%).',
+        },
+        {
+          heading: 'Bioavailability F',
+          formula: 'F = Fabs × Fgut × Fliver',
+          formulaVars: [
+            { sym: 'Fabs', desc: 'Fraction absorbed from gut lumen' },
+            { sym: 'Fgut', desc: 'Fraction surviving gut-wall metabolism' },
+            { sym: 'Fliver', desc: 'Fraction surviving first-pass hepatic extraction' },
+          ],
+          text: 'A drug might be well absorbed (Fabs = 0.9) but still have low bioavailability (F = 0.3) due to combined gut and hepatic first-pass effects.',
+          highlight: true,
+        },
+      ],
+    },
   },
-  {
-    id: 2, col: '#D85A30', bg: '#FAECE7', dark: '#712B13', border: '#F5C4B3',
-    title: 'Hepatic first-pass',
-    sub: 'The liver intercepts everything from the gut',
-    plain: 'Here\'s something that surprises most people: blood from your intestines does NOT go directly to the rest of your body. It goes to your liver first, via the portal vein. The liver gets first look at everything you absorb — and for some drugs, it removes so much of the dose in that first pass that barely anything reaches the rest of the body. This is why some drugs that work brilliantly as injections are useless as tablets.',
-    facts: [
-      {
-        h: 'Extraction ratio — the key concept',
-        mono: 'EH = (CA − CV) / CA\nF = 1 − EH',
-        body: 'EH is the fraction of drug removed by the liver in one pass. Morphine EH ≈ 0.75: the liver removes 75% → oral bioavailability only ~25%. This is why oral morphine doses are 3–5× higher than IV doses. Lidocaine EH ≈ 0.65: essentially useless orally — must be given IV.',
-        hi: true,
-      },
-      {
-        h: 'Two types of hepatic clearance',
-        mono: 'CLH = QH × (fu·CLint) / (QH + fu·CLint)',
-        body: 'High extraction drugs (EH > 0.7): clearance is limited by blood flow to the liver (~80 L/h). Enzyme inhibitors/inducers have little effect. Low extraction drugs (EH < 0.3): clearance depends on enzyme capacity and protein binding. These are the drugs where CYP interactions and pharmacogenomics matter most.',
-        hi: false,
-      },
-    ]
+
+  first_pass: {
+    id: 'first_pass',
+    label: 'First-pass liver',
+    color: '#dc2626',
+    x: 44.0, y: 54.5,  // first-pass: centre-left of liver
+    content: {
+      title: 'Hepatic First-Pass Effect',
+      subtitle: 'The liver removes drug before it reaches systemic circulation',
+      sections: [
+        {
+          heading: 'Why this matters',
+          text: 'All blood from the GI tract drains into the portal vein, which goes directly to the liver before reaching the heart. For highly extracted drugs, most of the dose is removed in this single passage — dramatically reducing bioavailability.',
+        },
+        {
+          heading: 'Hepatic extraction ratio (EH)',
+          formula: 'EH = (CA − CV) / CA',
+          formulaVars: [
+            { sym: 'CA', desc: 'Concentration entering liver (portal vein)' },
+            { sym: 'CV', desc: 'Concentration leaving liver (hepatic vein)' },
+          ],
+          text: 'EH ranges from 0 to 1. High extraction drugs (EH > 0.7): morphine, lidocaine, propranolol — oral bioavailability often < 30%. Low extraction drugs (EH < 0.3): warfarin, diazepam — oral and IV bioavailability similar.',
+        },
+        {
+          heading: 'Well-stirred model',
+          formula: 'CLH = QH × (fu × CLint) / (QH + fu × CLint)',
+          formulaVars: [
+            { sym: 'QH', desc: 'Hepatic blood flow (~80 L/h)' },
+            { sym: 'fu', desc: 'Unbound fraction in blood' },
+            { sym: 'CLint', desc: 'Intrinsic metabolic clearance' },
+          ],
+          text: 'High-extraction drugs: CLH ≈ QH (blood flow limited — enzyme activity changes matter little). Low-extraction drugs: CLH ≈ fu × CLint (capacity limited — enzyme induction/inhibition has large effects).',
+        },
+        {
+          heading: 'Bioavailability consequence',
+          formula: 'F = 1 − EH',
+          text: 'Morphine: EH ≈ 0.75, so oral F ≈ 25% — oral doses are 3–5× higher than IV doses. Lidocaine: EH ≈ 0.65, essentially inactive orally — must be given IV.',
+          highlight: true,
+        },
+        {
+          heading: 'Clinical drug interactions',
+          text: 'CYP3A4 inhibitors (grapefruit juice, ketoconazole) reduce first-pass metabolism → dramatically increase bioavailability of CYP3A4 substrates. Inducers (rifampicin, St. John\'s Wort) increase first-pass → dramatically reduce bioavailability.',
+        },
+      ],
+    },
   },
-  {
-    id: 3, col: '#7F77DD', bg: '#EEEDFE', dark: '#3C3489', border: '#CECBF6',
-    title: 'Distribution',
-    sub: 'Drug spreads from blood into tissues',
-    plain: 'Once in the bloodstream, the drug gets carried everywhere — but it doesn\'t stay evenly in the blood. It seeps into tissues, fat, muscles, organs. The "volume of distribution" (Vd) is a number that tells you how widely a drug spreads. A very high Vd means the drug has left the blood and is hiding in tissues — this is why some drugs have a very long duration even after blood levels look low.',
-    facts: [
-      {
-        h: 'Volume of distribution — what it actually means',
-        mono: 'Vd = Vp + Vt × (fu / fut)',
-        body: 'Vd is NOT a real anatomical volume — it\'s a mathematical concept. Vd 3L = stays in plasma. 15L = distributes to interstitial fluid. 42L = throughout total body water. >100L = extensively bound to tissues (e.g. chloroquine Vd > 200 L/kg — most of the drug is in tissues, almost none in blood).',
-        hi: true,
-      },
-      {
-        h: 'Protein binding',
-        body: 'About 90–99% of some drugs are bound to plasma proteins (mainly albumin for acidic drugs, α1-acid glycoprotein for basic drugs). Only the unbound fraction can cross membranes, be metabolised, or be filtered by the kidney. Protein binding is a dynamic equilibrium — as free drug is removed, bound drug releases to replenish it. It acts as a buffer, not a permanent trap.',
-        hi: false,
-      },
-    ]
+
+  distribution: {
+    id: 'distribution',
+    label: 'Distribution',
+    color: '#7c3aed',
+    x: 51.8, y: 37.2,  // heart centre (measured)
+    content: {
+      title: 'Distribution',
+      subtitle: 'How drug spreads from blood to tissues',
+      sections: [
+        {
+          heading: 'Volume of distribution (Vd)',
+          formula: 'Vd = Vplasma + Vtissue × (fu / fut)',
+          formulaVars: [
+            { sym: 'Vplasma', desc: 'Plasma volume (~3 L)' },
+            { sym: 'fu', desc: 'Unbound fraction in plasma' },
+            { sym: 'fut', desc: 'Unbound fraction in tissue' },
+          ],
+          text: 'Vd is not a real anatomical volume. Vd = 3 L → confined to plasma. Vd = 15 L → distributes to interstitial fluid. Vd = 42 L → total body water. Vd > 100 L → extensive tissue binding.',
+          highlight: true,
+        },
+        {
+          heading: 'Plasma protein binding',
+          text: 'Only unbound drug distributes into tissues, is metabolised, is renally filtered, and exerts pharmacological effect. Albumin binds acidic drugs; α1-acid glycoprotein binds basic drugs. Highly bound drugs may have smaller Vd if tissue binding is also low.',
+        },
+        {
+          heading: 'Blood-brain barrier',
+          text: 'Tight junctions between brain endothelial cells, no fenestrations. Lipophilic, small, uncharged drugs cross readily (diazepam). Large, polar, or ionised drugs are excluded. P-gp is highly expressed at the BBB and actively effluxes many drugs back into blood.',
+        },
+        {
+          heading: 'Factors affecting distribution',
+          text: '• Lipophilicity (log P): higher → more tissue distribution, higher Vd\n• Ionisation (pKa + pH): ionised drugs distribute poorly into cells\n• Protein binding: high plasma binding → lower free tissue concentration\n• Tissue binding: drugs binding to phospholipids have very high Vd\n• Perfusion rate: highly perfused tissues (brain, heart, kidney) equilibrate fast',
+        },
+      ],
+    },
   },
-  {
-    id: 4, col: '#534AB7', bg: '#EEEDFE', dark: '#26215C', border: '#AFA9EC',
-    title: 'Blood-brain barrier',
-    sub: 'The CNS is very picky about what gets in',
-    plain: 'The brain protects itself from most molecules in the blood — it has a specialised barrier where the blood vessels are sealed tightly. This is great for protection but a major problem for CNS drugs. Many drugs that work well elsewhere in the body simply cannot get into the brain. Designing drugs that cross the BBB is one of the hardest problems in pharmaceutical sciences.',
-    facts: [
-      {
-        h: 'What makes the BBB so selective',
-        body: 'Brain capillary cells are sealed with tight junctions — unlike most blood vessels which have small gaps. On top of this, P-glycoprotein is expressed at very high levels in the BBB and actively pumps many drugs straight back out into the blood. So a drug might cross the membrane, then immediately get ejected.',
-        hi: false,
-      },
-      {
-        h: 'The CNS drug rules of thumb',
-        body: 'MW < 450 Da. logP between 1 and 3 (lipophilic enough to cross, but not so lipophilic it gets stuck in the membrane). ≤3 H-bond donors. Not a P-gp substrate. These are guidelines, not guarantees — many drugs that fit the profile still fail in practice.',
-        hi: true,
-      },
-      {
-        h: 'Clever workarounds',
-        body: 'Prodrugs: levodopa crosses the BBB, then gets converted to dopamine (which cannot cross) inside the brain — this is the entire basis of Parkinson\'s treatment. Intranasal delivery: drugs can travel along the olfactory nerve directly to the brain, bypassing the BBB entirely. Nanoparticle targeting of transferrin receptors tricks the brain into taking up the carrier.',
-        hi: false,
-      },
-    ]
+
+  metabolism: {
+    id: 'metabolism',
+    label: 'Metabolism',
+    color: '#f97316',
+    x: 52.7, y: 53.3,  // metabolism: split between 52.2 and 54.5
+    content: {
+      title: 'Hepatic Metabolism',
+      subtitle: 'Biotransformation — making drugs more excretable',
+      sections: [
+        {
+          heading: 'Why metabolism happens',
+          text: 'Lipophilic drugs would persist indefinitely in the body — they are reabsorbed from the kidney tubule back into blood. Metabolism converts them to more polar, hydrophilic metabolites that can be renally excreted. The liver is the primary site (CYP450 enzymes), but gut wall, lung, kidney, and plasma also contribute.',
+        },
+        {
+          heading: 'Phase I — functionalisation',
+          text: '• Oxidation (most common): CYP450 adds –OH group. CYP3A4 metabolises ~50% of all drugs; CYP2D6, CYP2C9, CYP2C19 cover most of the rest.\n• Reduction: azo/nitro groups\n• Hydrolysis: ester bonds (aspirin → salicylate)\n\nPhase I metabolites are often pharmacologically active — codeine → morphine (CYP2D6), prodrugs like enalapril → enalaprilat.',
+          highlight: true,
+        },
+        {
+          heading: 'Phase II — conjugation',
+          text: '• Glucuronidation (UGT): most common Phase II, adds glucuronic acid → large, polar, ionised metabolite\n• Sulfation (SULT): fast but saturable\n• Acetylation (NAT): fast vs slow acetylator phenotype — isoniazid toxicity\n• Glutathione conjugation: detoxification of reactive metabolites — paracetamol toxicity\n\nPhase II metabolites are almost always inactive and readily excreted.',
+        },
+        {
+          heading: 'CYP450 polymorphisms',
+          text: 'CYP2D6: ~7% Europeans are poor metabolisers. PMs on standard codeine doses cannot convert it to morphine → no analgesia. PMs on standard antidepressants → much higher plasma levels → toxicity. Same dose, completely different effects.',
+        },
+        {
+          heading: 'Michaelis-Menten kinetics',
+          formula: 'v = (Vmax × C) / (Km + C)',
+          formulaVars: [
+            { sym: 'Vmax', desc: 'Maximum metabolic rate' },
+            { sym: 'Km', desc: 'Concentration at half Vmax' },
+            { sym: 'C', desc: 'Drug concentration' },
+          ],
+          text: 'At C << Km: first-order kinetics — CL constant. At C >> Km: zero-order — CL decreases, small dose increases cause disproportionate concentration rises. Phenytoin, ethanol, salicylate at high doses show this.',
+          highlight: true,
+        },
+      ],
+    },
   },
-  {
-    id: 5, col: '#BA7517', bg: '#FAEEDA', dark: '#412402', border: '#FAC775',
-    title: 'Hepatic metabolism',
-    sub: 'The liver chemically transforms drugs',
-    plain: 'Your body is constantly trying to eliminate foreign chemicals — drugs included. The liver is the main factory for this, using enzymes to chemically modify drugs into forms that are easier to excrete. This sounds simple but has huge clinical implications: the same enzyme that metabolises a drug can also be inhibited or induced by other drugs, foods, or genetic variation. This is the source of most clinically relevant drug interactions.',
-    facts: [
-      {
-        h: 'Phase I — making the drug more reactive',
-        body: 'Mainly CYP450 enzymes add or expose chemical groups (usually -OH via oxidation). CYP3A4 handles ~50% of all drugs. CYP2D6, CYP2C9, CYP2C19 handle most of the rest. Phase I metabolites are often still pharmacologically active — codeine is a prodrug converted to morphine by CYP2D6. ~7% of Europeans lack functional CYP2D6 (poor metabolisers): they get no analgesia from codeine but potentially toxicity from standard antidepressant doses.',
-        hi: true,
-      },
-      {
-        h: 'Phase II — making it water-soluble for excretion',
-        body: 'Conjugation reactions attach large polar groups to the drug or its Phase I metabolite. Glucuronidation (UGT) is the most common. Products are large, charged, water-soluble, and biologically inactive — designed to be excreted in urine or bile. When Phase II is overwhelmed (paracetamol overdose), toxic Phase I metabolites (NAPQI) accumulate.',
-        hi: false,
-      },
-      {
-        h: 'Non-linear kinetics at high doses',
-        mono: 'v = (Vmax × C) / (Km + C)',
-        body: 'At normal doses (C << Km): first-order kinetics, constant clearance. At high doses (C >> Km): zero-order kinetics — clearance decreases as enzymes saturate. Phenytoin, ethanol, high-dose aspirin all show this. A 50% dose increase can cause a 200% plasma level increase.',
-        hi: false,
-      },
-    ]
+
+  renal: {
+    id: 'renal',
+    label: 'Renal excretion',
+    color: '#0891b2',
+    x: 39.5, y: 68.0,  // renal: nudged down + slight right
+    content: {
+      title: 'Renal Excretion',
+      subtitle: 'The primary route for hydrophilic drugs and metabolites',
+      sections: [
+        {
+          heading: 'Three processes',
+          formula: 'CLR = (fu × GFR) + CLsec − CLreabs',
+          formulaVars: [
+            { sym: 'fu × GFR', desc: 'Glomerular filtration of unbound drug (~120 mL/min)' },
+            { sym: 'CLsec', desc: 'Active tubular secretion (OAT, OCT transporters)' },
+            { sym: 'CLreabs', desc: 'Passive tubular reabsorption' },
+          ],
+          text: '1. Glomerular filtration: passive, protein-bound drug NOT filtered — only free drug.\n2. Active tubular secretion: OAT and OCT transporters actively secrete drugs; can exceed GFR. Penicillins, methotrexate.\n3. Tubular reabsorption: lipophilic, unionised drugs reabsorbed back into blood. This is why hydrophilic Phase II metabolites are well excreted.',
+          highlight: true,
+        },
+        {
+          heading: 'pH and ionisation',
+          text: 'Reabsorption depends on unionised fraction → depends on urinary pH. Acidic urine → weak bases more ionised → less reabsorption → faster excretion. Alkaline urine → weak acids ionised → faster excretion. Clinical use: sodium bicarbonate alkalinises urine to treat salicylate or phenobarbital poisoning.',
+        },
+        {
+          heading: 'Renal impairment',
+          text: 'GFR reduction → reduced filtration of drug AND metabolites (some active/toxic). High renal excretion drugs accumulate: gentamicin (fe=0.95), digoxin (fe=0.7), metformin (fe=1.0 — MUST reduce dose or avoid in CKD). Use Cockcroft-Gault to estimate CrCl for dose adjustment.',
+        },
+      ],
+    },
   },
-  {
-    id: 6, col: '#0F6E56', bg: '#E1F5EE', dark: '#04342C', border: '#9FE1CB',
-    title: 'Renal excretion',
-    sub: 'The kidneys filter drug into urine',
-    plain: 'The kidneys are the main exit route for most drugs and their metabolites. They work by filtering blood continuously — the equivalent of cleaning your entire blood volume about 60 times per day. But the kidneys don\'t just passively filter; they also actively pump some drugs into the urine (secretion) and can reabsorb others back into the blood. This is why kidney disease affects drug dosing so profoundly.',
-    facts: [
-      {
-        h: 'Three things happen simultaneously',
-        mono: 'CLR = fu·GFR + CLsec − CLreabs',
-        body: 'Glomerular filtration (~120 mL/min): only unbound drug is filtered — protein-bound drug passes through. Tubular secretion (OAT/OCT transporters): active pumps that can push drug into urine faster than filtration alone. Tubular reabsorption: lipophilic, unionised drug diffuses back into blood from the tubule. The net result of all three determines renal clearance.',
-        hi: true,
-      },
-      {
-        h: 'pH trapping — a clinical tool',
-        body: 'If a drug is a weak base, making the urine acidic means more of it is ionised → it can\'t be reabsorbed → excreted faster. For weak acids, alkalinising the urine (giving sodium bicarbonate) does the same. This is used clinically to treat poisoning with salicylates (aspirin overdose) or phenobarbital — you can accelerate excretion by adjusting urine pH.',
-        hi: false,
-      },
-      {
-        h: 'Why kidney disease changes drug dosing',
-        body: 'The fraction excreted unchanged (fe) tells you how much renal impairment matters for a drug. Metformin fe=1.0: entirely dependent on kidney filtration — causes dangerous lactic acidosis in CKD, must be stopped. Gentamicin fe=0.95: accumulates in kidney failure, toxic to kidneys themselves (nephrotoxic). The Cockcroft-Gault equation estimates remaining kidney function from age, weight, sex, and serum creatinine.',
-        hi: false,
-      },
-    ]
+
+  enterohepatic: {
+    id: 'enterohepatic',
+    label: 'Enterohepatic recirculation',
+    color: '#8b5cf6',
+    x: 48.5, y: 61.0,  // EHC: nudged left + down
+    content: {
+      title: 'Enterohepatic Recirculation',
+      subtitle: 'A recycling loop that extends drug exposure',
+      sections: [
+        {
+          heading: 'The cycle',
+          text: '1. Drug is conjugated (Phase II glucuronidation) in the liver\n2. Conjugate excreted into bile via MRP2 transporter\n3. Bile empties into small intestine\n4. Gut bacteria express β-glucuronidase → cleave glucuronide\n5. Free drug reabsorbed → portal vein → liver\n\nThis recycling loop significantly extends half-life and total exposure.',
+          highlight: true,
+        },
+        {
+          heading: 'PK signature',
+          text: 'EHC produces a characteristic double-peak or shoulder on the concentration-time curve — first peak from direct absorption, second (typically 4–8h later) from biliary recycling. Seen with estradiol, morphine, indocyanine green, and many NSAIDs.',
+        },
+        {
+          heading: 'Clinical consequence',
+          text: 'Antibiotics that reach the gut (rifampicin, broad-spectrum) kill the bacteria responsible for deconjugation → interrupt the cycle → reduce drug exposure. This is one mechanism behind oral contraceptive failure with antibiotic use — though clinical significance is debated for most modern antibiotics.',
+        },
+      ],
+    },
   },
-  {
-    id: 7, col: '#185FA5', bg: '#E6F1FB', dark: '#042C53', border: '#B5D4F4',
-    title: 'EHC and final excretion',
-    sub: 'Sometimes the body recycles before excreting',
-    plain: 'You might think once the liver has modified a drug, it\'s gone — but sometimes the liver secretes drug metabolites into bile, which empties into your intestine, where gut bacteria undo the modification, and the drug gets reabsorbed. This "recycling loop" (enterohepatic recirculation) can significantly extend how long a drug stays in your body. It also explains a surprising drug interaction you might not expect.',
-    facts: [
-      {
-        h: 'The enterohepatic cycle',
-        body: 'Step by step: liver conjugates drug with glucuronic acid → conjugate secreted into bile → bile empties into small intestine → gut bacteria have the enzyme β-glucuronidase which cleaves the conjugate → free drug is reabsorbed → goes back to liver via portal vein → cycle repeats. This creates a characteristic second peak on the plasma concentration-time curve, typically 4–8h after dosing. Examples: estradiol, morphine, some NSAIDs.',
-        hi: true,
-      },
-      {
-        h: 'The antibiotic-contraceptive interaction',
-        body: 'Oral contraceptives undergo enterohepatic recirculation. If you take broad-spectrum antibiotics, they kill the gut bacteria responsible for deconjugation → the recycling loop is broken → less drug is reabsorbed → plasma levels fall → contraceptive efficacy may be reduced. This is the pharmacological mechanism behind the clinical advice to use additional contraception with antibiotics (though clinical significance is debated for most modern antibiotics).',
-        hi: false,
-      },
-      {
-        h: 'How drugs actually leave the body',
-        body: 'Urine: the main route for hydrophilic drugs and Phase II metabolites. Faeces: biliary excretion plus unabsorbed drug. Exhaled air: volatile compounds (ethanol, some anaesthetic gases). Breast milk: clinically important — some drugs transfer and reach breastfed infants. Sweat and saliva: minor but relevant for drug testing.',
-        hi: false,
-      },
-    ]
+
+  bbb: {
+    id: 'bbb',
+    label: 'Blood-brain barrier',
+    color: '#6366f1',
+    x: 50.0, y: 8.3,   // brain centre (measured)
+    content: {
+      title: 'Blood-Brain Barrier',
+      subtitle: 'The CNS has uniquely restrictive drug access',
+      sections: [
+        {
+          heading: 'Structure',
+          text: 'Brain capillary endothelial cells have tight junctions (no gaps), no fenestrations, and high expression of efflux transporters (especially P-gp/MDR1). Astrocyte foot processes wrap around capillaries. The result: only drugs with the right properties can enter the CNS passively.',
+        },
+        {
+          heading: 'What gets through',
+          text: '• Low molecular weight (< 400–500 Da)\n• Lipophilic (log P 1–3 optimal — too high means stuck in membranes)\n• Unionised at physiological pH\n• Not a P-gp substrate\n• Low hydrogen bond donor/acceptor count\n\nCNS drugs typically: MW < 450, log P 1–3, ≤ 3 H-bond donors.',
+          highlight: true,
+        },
+        {
+          heading: 'P-glycoprotein at the BBB',
+          text: 'P-gp actively effluxes many drugs that appear lipophilic enough to cross. Many HIV antiretrovirals, anticancer drugs, and antibiotics fail to reach therapeutic CNS concentrations even at high doses because of P-gp. P-gp inhibitors can increase CNS exposure — used in some CNS drug delivery strategies.',
+        },
+        {
+          heading: 'CNS drug delivery strategies',
+          text: '• Prodrugs that cross BBB then convert to active form inside CNS (levodopa → dopamine)\n• Nanoparticle encapsulation\n• Receptor-mediated transcytosis (transferrin receptor targeting)\n• Intranasal delivery (bypasses BBB via olfactory nerve)\n• Transient BBB disruption (focused ultrasound)',
+        },
+      ],
+    },
   },
+}
+
+// ─── Flow paths (SVG paths between hotspots) ─────────────────────────────────
+// These are drawn on the SVG overlay as animated dashed lines
+
+const FLOW_PATHS = [
+  // Oral → GI absorption: straight down the oesophagus, slight right arc
+  { from: 'oral', to: 'absorption', color: '#16a34a',
+    cp: [+30, +0.3, +20, -0.3] },
+  // GI absorption → First-pass: portal vein arcs left up to liver
+  { from: 'absorption', to: 'first_pass', color: '#dc2626',
+    cp: [-40, +0.3, -30, -0.3] },
+  // First-pass → Distribution: from liver left up and right to heart
+  { from: 'first_pass', to: 'distribution', color: '#7c3aed',
+    cp: [-25, +0.4, -20, -0.4] },
+  // Distribution → BBB: straight up the spine to brain, left offset
+  { from: 'distribution', to: 'bbb', color: '#6366f1',
+    cp: [-35, +0.4, -30, -0.4] },
+  // Distribution → Metabolism: heart arcs right then down to liver right
+  { from: 'distribution', to: 'metabolism', color: '#f97316',
+    cp: [+40, +0.3, +30, -0.3] },
+  // Metabolism → Renal: liver right arcs left down to left kidney
+  { from: 'metabolism', to: 'renal', color: '#0891b2',
+    cp: [-50, +0.4, -40, -0.4] },
+  // First-pass → EHC: short drop down the portal vein, left arc
+  { from: 'first_pass', to: 'enterohepatic', color: '#8b5cf6',
+    cp: [-20, +0.5, -15, -0.5] },
+  // EHC → GI absorption: arcs back right to stomach
+  { from: 'enterohepatic', to: 'absorption', color: '#8b5cf6',
+    cp: [+25, +0.4, +20, -0.4] },
 ]
 
-function PathwaySVG({ active, onPick }) {
-  useEffect(() => {
-    const style = document.createElement('style')
-    style.id = 'adme-anim'
-    style.textContent = `
-      @keyframes adme-dash { to { stroke-dashoffset: -32; } }
-      @keyframes adme-dash2 { to { stroke-dashoffset: -24; } }
-      .adme-fl  { stroke-dasharray: 7 5; animation: adme-dash 1.8s linear infinite; }
-      .adme-fl2 { stroke-dasharray: 5 7; animation: adme-dash2 2.6s linear infinite; }
-    `
-    if (!document.getElementById('adme-anim')) document.head.appendChild(style)
-    return () => document.getElementById('adme-anim')?.remove()
-  }, [])
+// ─── Content renderer ─────────────────────────────────────────────────────────
 
-  const node = (id, cx, cy, r, l1, l2) => {
-    const d = DATA[id]
-    const isActive = active === id
-    return (
-      <g key={id} style={{ cursor: 'pointer' }} onClick={() => onPick(active === id ? null : id)}>
-        <circle cx={cx} cy={cy} r={r + 8} fill={d.col} opacity={isActive ? 0.18 : 0.07} style={{ transition: 'opacity 0.2s' }} />
-        <circle cx={cx} cy={cy} r={r} fill={d.bg} stroke={d.col} strokeWidth={isActive ? 2.5 : 1.5} style={{ transition: 'stroke-width 0.15s' }} />
-        {l2
-          ? <>
-              <text x={cx} y={cy - 5} textAnchor="middle" fontSize="10" fontWeight="600" fill={d.dark} fontFamily="system-ui,sans-serif">{l1}</text>
-              <text x={cx} y={cy + 8} textAnchor="middle" fontSize="10" fontWeight="600" fill={d.dark} fontFamily="system-ui,sans-serif">{l2}</text>
-            </>
-          : <text x={cx} y={cy + 4} textAnchor="middle" fontSize="10" fontWeight="600" fill={d.dark} fontFamily="system-ui,sans-serif">{l1}</text>
-        }
-      </g>
-    )
-  }
+function ContentPanel({ zone, onClose }) {
+  if (!zone) return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#4b5563', textAlign: 'center', padding: '2rem', gap: '16px' }}>
+      <div style={{ fontSize: '48px', opacity: 0.4 }}>←</div>
+      <p style={{ fontSize: '14px', lineHeight: '1.7', margin: 0 }}>
+        Click any hotspot on the diagram to explore that stage of the ADME pathway.
+      </p>
+      <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '6px', width: '100%' }}>
+        {Object.values(ZONES).map(z => (
+          <div key={z.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#9ca3af' }}>
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: z.color, flexShrink: 0 }} />
+            {z.label}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+
+  const { content, color } = zone
 
   return (
-    <svg width="240" height="680" viewBox="0 0 240 680" style={{ display: 'block' }}>
-      <defs>
-        <marker id="adme-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-          <path d="M1 2L8 5L1 8" fill="none" stroke="context-stroke" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </marker>
-      </defs>
+    <div style={{ height: '100%', overflowY: 'auto', padding: '1.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: color, flexShrink: 0 }} />
+            <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#f9fafb', margin: 0 }}>{content.title}</h2>
+          </div>
+          <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>{content.subtitle}</p>
+        </div>
+        <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '20px', cursor: 'pointer', padding: '0 0 0 12px', lineHeight: 1 }}>×</button>
+      </div>
 
-      {/* Main flow lines */}
-      <line className="adme-fl" x1="120" y1="58"  x2="120" y2="108" stroke={DATA[1].col} strokeWidth="2" fill="none" markerEnd="url(#adme-ah)" />
-      <line className="adme-fl" x1="120" y1="166" x2="120" y2="216" stroke={DATA[2].col} strokeWidth="2" fill="none" markerEnd="url(#adme-ah)" />
-      <line className="adme-fl" x1="120" y1="274" x2="120" y2="324" stroke={DATA[3].col} strokeWidth="2" fill="none" markerEnd="url(#adme-ah)" />
-      <line className="adme-fl" x1="120" y1="390" x2="120" y2="438" stroke={DATA[6].col} strokeWidth="2" fill="none" markerEnd="url(#adme-ah)" />
-      <line className="adme-fl" x1="120" y1="500" x2="120" y2="548" stroke={DATA[7].col} strokeWidth="2" fill="none" markerEnd="url(#adme-ah)" />
+      {content.sections.map((s, i) => (
+        <div key={i} style={{
+          marginBottom: '1rem',
+          padding: '12px 14px',
+          borderRadius: '10px',
+          background: s.highlight ? `${color}18` : '#1f2937',
+          border: s.highlight ? `1px solid ${color}44` : '1px solid #374151',
+        }}>
+          <h3 style={{ fontSize: '12px', fontWeight: '700', color: s.highlight ? color : '#9ca3af', margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.heading}</h3>
 
-      {/* Branch lines from distribution */}
-      <path className="adme-fl2" d="M 104 358 C 44 358 28 428 28 458 C 28 488 46 508 68 512" stroke={DATA[4].col} strokeWidth="1.5" fill="none" markerEnd="url(#adme-ah)" />
-      <path className="adme-fl2" d="M 136 358 C 196 358 212 428 212 458 C 212 488 194 508 172 512" stroke={DATA[5].col} strokeWidth="1.5" fill="none" markerEnd="url(#adme-ah)" />
+          {s.formula && (
+            <div style={{ fontFamily: 'monospace', fontSize: '13px', color: color, background: '#111827', padding: '8px 12px', borderRadius: '6px', marginBottom: '8px', letterSpacing: '0.02em' }}>
+              {s.formula}
+            </div>
+          )}
 
-      {/* EHC loop */}
-      <path className="adme-fl2" d="M 138 564 C 230 564 234 420 234 358 C 234 290 214 256 188 244" stroke="#AFA9EC" strokeWidth="1.2" fill="none" strokeDasharray="4 8" opacity="0.7" markerEnd="url(#adme-ah)" />
+          {s.formulaVars && (
+            <div style={{ marginBottom: '8px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              {s.formulaVars.map(v => (
+                <div key={v.sym} style={{ display: 'flex', gap: '8px', fontSize: '11px' }}>
+                  <span style={{ fontFamily: 'monospace', color: color, minWidth: '50px', fontWeight: '600' }}>{v.sym}</span>
+                  <span style={{ color: '#9ca3af' }}>{v.desc}</span>
+                </div>
+              ))}
+            </div>
+          )}
 
-      {/* Flow labels */}
-      <text x="128" y="88"  fontSize="9.5" fill={DATA[1].col} fontFamily="system-ui,sans-serif" opacity="0.8">GI lumen</text>
-      <text x="128" y="196" fontSize="9.5" fill={DATA[2].col} fontFamily="system-ui,sans-serif" opacity="0.8">portal vein</text>
-      <text x="128" y="304" fontSize="9.5" fill={DATA[3].col} fontFamily="system-ui,sans-serif" opacity="0.8">→ systemic</text>
-      <text x="128" y="468" fontSize="9.5" fill={DATA[6].col} fontFamily="system-ui,sans-serif" opacity="0.8">filtered</text>
+          {s.table && (
+            <div style={{ overflowX: 'auto', marginBottom: s.text ? '8px' : 0 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                {s.table.map((row, ri) => (
+                  <tr key={ri} style={{ background: ri === 0 ? '#111827' : ri % 2 === 0 ? '#1a2332' : 'transparent' }}>
+                    {row.map((cell, ci) => (
+                      <td key={ci} style={{ padding: '5px 8px', color: ri === 0 ? '#9ca3af' : '#d1d5db', fontWeight: ri === 0 ? '600' : '400', borderBottom: '1px solid #374151' }}>
+                        {cell}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </table>
+            </div>
+          )}
 
-      {/* Nodes — larger */}
-      {node(0, 120,  34, 26, 'oral', 'dose')}
-      {node(1, 120, 136, 26, 'GI', 'absorb.')}
-      {node(2, 120, 244, 26, 'first-', 'pass')}
-      {node(3, 120, 356, 28, 'distrib-', 'ution')}
-      {node(4,  68, 524, 22, 'BBB', null)}
-      {node(5, 172, 524, 22, 'metab.', null)}
-      {node(6, 120, 462, 26, 'renal', 'excr.')}
-      {node(7, 120, 568, 26, 'EHC /', 'excr.')}
-
-      {/* Exit arrow */}
-      <line x1="120" y1="596" x2="120" y2="636" stroke="#9ca3af" strokeWidth="1.5" markerEnd="url(#adme-ah)" />
-      <text x="120" y="652" textAnchor="middle" fontSize="9" fill="#9ca3af" fontFamily="system-ui,sans-serif">urine · faeces</text>
-    </svg>
+          {s.text && (
+            <p style={{ fontSize: '12px', color: '#d1d5db', margin: 0, lineHeight: '1.7', whiteSpace: 'pre-line' }}>{s.text}</p>
+          )}
+        </div>
+      ))}
+    </div>
   )
 }
 
+// ─── Main page ────────────────────────────────────────────────────────────────
+
 export default function ADMEPage() {
-  const [active, setActive] = useState(null)
-  const d = active !== null ? DATA[active] : null
+  const [activeZone, setActiveZone] = useState(null)
+
+  const IMG_W = 520   // rendered width of the image
+  const IMG_H = 492   // rendered height (1024×968 aspect ratio)
+
+  // Convert % position to px for SVG overlay
+  const px = (pct, dim) => (pct / 100) * dim
+
+  // Build a smooth SVG path — uses per-path cp offsets to separate overlapping lines
+  // cp = [xOff1, yFrac1, xOff2, yFrac2]:
+  //   cx1 = x1 + xOff1,  cy1 = y1 + (y2-y1)*yFrac1
+  //   cx2 = x2 - xOff2,  cy2 = y2 - (y2-y1)*yFrac2  (negative yFrac = above endpoint)
+  function buildPath(fromZone, toZone, cp) {
+    const x1 = px(fromZone.x, IMG_W)
+    const y1 = px(fromZone.y, IMG_H)
+    const x2 = px(toZone.x, IMG_W)
+    const y2 = px(toZone.y, IMG_H)
+    const dy = y2 - y1
+    const [xo1, yf1, xo2, yf2] = cp || [0, 0.4, 0, 0.4]
+    const cx1 = x1 + xo1
+    const cy1 = y1 + dy * yf1
+    const cx2 = x2 - xo2
+    const cy2 = y2 - dy * yf2
+    return `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`
+  }
 
   return (
-    <main style={{ maxWidth: '1100px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'system-ui, sans-serif' }}>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#111827', margin: '0 0 4px' }}>Interactive ADME</h1>
+    <main style={{ maxWidth: '1100px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
+      <a href="/tools" style={{ fontSize: '13px', color: '#6b7280', textDecoration: 'none' }}>← Tools</a>
+      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#111827', margin: '1rem 0 4px' }}>Interactive ADME</h1>
       <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '1.5rem', lineHeight: '1.6' }}>
-        Click any stage to understand what happens to a drug at that point — plain English first, then the pharmacokinetics.
+        Click any labelled stage on the diagram to explore absorption, distribution, metabolism, and excretion in depth.
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', border: '1px solid #e5e7eb', borderRadius: '16px', overflow: 'hidden', minHeight: '680px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: `${IMG_W}px 1fr`, gap: '1.5rem', alignItems: 'start' }}>
 
-        {/* Pathway */}
-        <div style={{ background: '#f9fafb', borderRight: '1px solid #e5e7eb', padding: '24px 20px', display: 'flex', justifyContent: 'center' }}>
-          <PathwaySVG active={active} onPick={setActive} />
+        {/* ── Left: body image + SVG overlay ── */}
+        <div style={{ position: 'relative', width: IMG_W, height: IMG_H, borderRadius: '16px', overflow: 'hidden', background: '#000', flexShrink: 0 }}>
+
+          {/* Body image */}
+          <Image
+            src="/adme-body.png"
+            alt="Human body anatomy for ADME"
+            width={IMG_W}
+            height={IMG_H}
+            style={{ display: 'block', width: IMG_W, height: IMG_H, objectFit: 'fill' }}
+            priority
+          />
+
+          {/* SVG overlay — flow paths + hotspots */}
+          <svg
+            width={IMG_W}
+            height={IMG_H}
+            viewBox={`0 0 ${IMG_W} ${IMG_H}`}
+            style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
+          >
+            <defs>
+              <style>{`
+                @keyframes dash {
+                  to { stroke-dashoffset: -24; }
+                }
+                .flow-path {
+                  stroke-dasharray: 5 7;
+                  animation: dash 2s linear infinite;
+                  opacity: 0.18;
+                  transition: opacity 0.2s, stroke-width 0.2s;
+                }
+                .flow-path.active {
+                  opacity: 1;
+                  animation-duration: 0.7s;
+                }
+              `}</style>
+            </defs>
+
+            {/* Flow paths */}
+            {FLOW_PATHS.map((fp, i) => {
+              const fromZone = ZONES[fp.from]
+              const toZone = ZONES[fp.to]
+              if (!fromZone || !toZone) return null
+              const isActive = activeZone && (activeZone.id === fp.from || activeZone.id === fp.to)
+              return (
+                <path
+                  key={i}
+                  d={buildPath(fromZone, toZone, fp.cp)}
+                  fill="none"
+                  stroke={fp.color}
+                  strokeWidth={isActive ? 3.5 : 1.5}
+                  className={`flow-path${isActive ? ' active' : ''}`}
+                />
+              )
+            })}
+          </svg>
+
+          {/* Hotspot buttons — positioned absolutely over image */}
+          {Object.values(ZONES).map(zone => {
+            const left = `${zone.x}%`
+            const top = `${zone.y}%`
+            const isActive = activeZone?.id === zone.id
+
+            return (
+              <button
+                key={zone.id}
+                onClick={() => setActiveZone(isActive ? null : zone)}
+                style={{
+                  position: 'absolute',
+                  left,
+                  top,
+                  transform: 'translate(-50%, -50%)',
+                  width: isActive ? '20px' : '14px',
+                  height: isActive ? '20px' : '14px',
+                  borderRadius: '50%',
+                  background: isActive ? zone.color : `${zone.color}cc`,
+                  border: `2px solid ${zone.color}`,
+                  cursor: 'pointer',
+                  boxShadow: isActive
+                    ? `0 0 0 4px ${zone.color}44, 0 0 12px ${zone.color}88`
+                    : `0 0 0 2px ${zone.color}33`,
+                  transition: 'all 0.15s ease',
+                  zIndex: 10,
+                  padding: 0,
+                }}
+                title={zone.label}
+              />
+            )
+          })}
+
+          {/* Labels next to hotspots */}
+          {Object.values(ZONES).map(zone => {
+            const isActive = activeZone?.id === zone.id
+            // Explicit side per zone to avoid collisions
+            const labelLeft = {
+              oral: false,        // left of mouth dot
+              absorption: true,   // right of stomach
+              first_pass: false,  // left of liver
+              distribution: true, // right of heart
+              metabolism: true,   // right of liver
+              renal: false,       // left of kidney
+              enterohepatic: false, // left (long label)
+              bbb: false,         // left of brain
+            }
+            const onRight = labelLeft[zone.id]
+            return (
+              <div
+                key={`label-${zone.id}`}
+                onClick={() => setActiveZone(activeZone?.id === zone.id ? null : zone)}
+                style={{
+                  position: 'absolute',
+                  top: `${zone.y}%`,
+                  left: onRight ? `${zone.x + 2}%` : undefined,
+                  right: onRight ? undefined : `${100 - zone.x + 2}%`,
+                  transform: 'translateY(-50%)',
+                  fontSize: '10px',
+                  fontWeight: isActive ? '700' : '500',
+                  color: isActive ? zone.color : '#e5e7eb',
+                  background: isActive ? `${zone.color}22` : 'rgba(0,0,0,0.6)',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                  border: isActive ? `1px solid ${zone.color}66` : '1px solid transparent',
+                  transition: 'all 0.15s ease',
+                  zIndex: 10,
+                  pointerEvents: 'auto',
+                }}
+              >
+                {zone.label}
+              </div>
+            )
+          })}
         </div>
 
-        {/* Content */}
-        <div style={{ padding: '32px 28px', overflowY: 'auto', maxHeight: '680px', display: 'flex', flexDirection: 'column', justifyContent: active !== null ? 'flex-start' : 'center' }}>
-          {d === null ? (
-            <div style={{ textAlign: 'center', color: '#9ca3af' }}>
-              <div style={{ fontSize: '40px', marginBottom: '12px', opacity: 0.35 }}>←</div>
-              <p style={{ fontSize: '15px', fontWeight: '500', color: '#6b7280', marginBottom: '6px' }}>Select a stage</p>
-              <p style={{ fontSize: '13px', color: '#9ca3af', maxWidth: '220px', margin: '0 auto', lineHeight: 1.6 }}>
-                Each node explains what happens to the drug there — from plain English to the equations.
-              </p>
-            </div>
-          ) : (
-            <div key={active}>
-              {/* Title */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: d.col, flexShrink: 0 }} />
-                <div>
-                  <div style={{ fontSize: '20px', fontWeight: '600', color: '#111827', lineHeight: 1.2 }}>{d.title}</div>
-                  <div style={{ fontSize: '13px', color: '#6b7280', marginTop: '2px' }}>{d.sub}</div>
-                </div>
-              </div>
-
-              {/* Plain English intro */}
-              <div style={{ padding: '14px 16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', marginBottom: '14px', fontSize: '14px', color: '#374151', lineHeight: '1.75' }}>
-                {d.plain}
-              </div>
-
-              {/* Technical sections */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {d.facts.map((f, i) => (
-                  <div key={i} style={{
-                    borderRadius: '10px', padding: '12px 14px',
-                    background: f.hi ? d.bg : '#f9fafb',
-                    border: `1px solid ${f.hi ? d.border : '#e5e7eb'}`,
-                  }}>
-                    <p style={{ fontSize: '11px', fontWeight: '600', color: f.hi ? d.col : '#6b7280', textTransform: 'uppercase', letterSpacing: '0.07em', margin: '0 0 6px' }}>
-                      {f.h}
-                    </p>
-                    {f.mono && (
-                      <div style={{ padding: '8px 11px', borderRadius: '6px', background: '#0a0f1e', fontFamily: 'ui-monospace, monospace', fontSize: '12px', color: '#93b4f7', whiteSpace: 'pre-wrap', marginBottom: '7px', lineHeight: 1.6 }}>
-                        {f.mono}
-                      </div>
-                    )}
-                    <p style={{ fontSize: '13px', color: '#374151', margin: 0, lineHeight: '1.7' }}>{f.body}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+        {/* ── Right: info panel ── */}
+        <div style={{
+          background: '#111827',
+          borderRadius: '16px',
+          border: '1px solid #1f2937',
+          minHeight: `${IMG_H}px`,
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+        }}>
+          <ContentPanel zone={activeZone} onClose={() => setActiveZone(null)} />
         </div>
       </div>
 
-      <div style={{ marginTop: '1rem', padding: '10px 14px', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '12px', color: '#6b7280' }}>
-        ADME = <strong>A</strong>bsorption · <strong>D</strong>istribution · <strong>M</strong>etabolism · <strong>E</strong>xcretion — every pharmacokinetic parameter has a direct physiological basis at one of these stages.
+      {/* Stage navigation pills below diagram */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '1rem' }}>
+        {Object.values(ZONES).map(zone => (
+          <button
+            key={zone.id}
+            onClick={() => setActiveZone(activeZone?.id === zone.id ? null : zone)}
+            style={{
+              padding: '6px 14px',
+              borderRadius: '20px',
+              fontSize: '12px',
+              fontWeight: activeZone?.id === zone.id ? '600' : '400',
+              border: `1px solid ${activeZone?.id === zone.id ? zone.color : '#e5e7eb'}`,
+              background: activeZone?.id === zone.id ? `${zone.color}18` : 'white',
+              color: activeZone?.id === zone.id ? zone.color : '#374151',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            {zone.label}
+          </button>
+        ))}
       </div>
     </main>
   )
