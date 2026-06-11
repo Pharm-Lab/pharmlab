@@ -152,13 +152,13 @@ function percentile(arr, p) {
 
 function Section({ title, enabled, onToggle, children }) {
   return (
-    <div style={{ border: '1px solid #e5e7eb', borderRadius: '12px', marginBottom: '12px', overflow: 'hidden' }}>
-      <button onClick={onToggle} style={{ width: '100%', padding: '12px 16px', background: enabled ? '#eff6ff' : '#f9fafb', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '14px', fontWeight: '500', color: enabled ? '#1d4ed8' : '#374151' }}>
+    <div style={{ border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', marginBottom: '12px', overflow: 'hidden' }}>
+      <button onClick={onToggle} style={{ width: '100%', padding: '12px 16px', background: enabled ? 'rgba(42,111,219,0.15)' : '#0f1629', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '14px', fontWeight: '500', color: enabled ? '#93b4f7' : 'rgba(240,244,255,0.7)' }}>
         <span>{title}</span>
-        <span style={{ fontSize: '18px', color: '#9ca3af', display: 'inline-block', transform: enabled ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>›</span>
+        <span style={{ fontSize: '18px', color: 'rgba(240,244,255,0.3)', display: 'inline-block', transform: enabled ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>›</span>
       </button>
       {enabled && (
-        <div style={{ padding: '14px 16px', borderTop: '1px solid #e5e7eb', background: 'white' }}>
+        <div style={{ padding: '14px 16px', borderTop: '1px solid rgba(255,255,255,0.07)', background: '#0f1629' }}>
           {children}
         </div>
       )}
@@ -170,20 +170,20 @@ function PopSlider({ label, value, setValue, min, max, step, suffix }) {
   const [raw, setRaw] = useState(String(value))
   useEffect(() => { setRaw(String(value)) }, [value])
   return (
-    <div style={{ background: '#f9fafb', borderRadius: '8px', padding: '10px 12px', border: '1px solid #e5e7eb' }}>
-      <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '6px' }}>{label}</label>
+    <div style={{ background: '#0f1629', borderRadius: '8px', padding: '10px 12px', border: '1px solid rgba(255,255,255,0.07)' }}>
+      <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.8)', display: 'block', marginBottom: '6px' }}>{label}</label>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
         <input type="number" value={raw} min={min} max={max} step={step}
           onChange={e => { setRaw(e.target.value); const n = parseFloat(e.target.value); if (!isNaN(n)) setValue(n) }}
           onBlur={() => { const n = parseFloat(raw); if (isNaN(n)) { setRaw(String(value)); return } const c = Math.min(Math.max(n, min), max); setValue(c); setRaw(String(c)) }}
-          style={{ width: '72px', padding: '3px 6px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '13px', fontWeight: '600', color: '#111827', textAlign: 'right', background: 'white' }} />
-        <span style={{ fontSize: '12px', color: '#9ca3af' }}>{suffix}</span>
+          style={{ width: '72px', padding: '3px 6px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '13px', fontWeight: '600', color: '#f0f4ff', textAlign: 'right', background: 'rgba(255,255,255,0.05)' }} />
+        <span style={{ fontSize: '12px', color: 'rgba(240,244,255,0.3)' }}>{suffix}</span>
       </div>
       <input type="range" min={min} max={max} step={step}
         value={Math.min(Math.max(value, min), max)}
         onChange={e => setValue(suffix === '' ? parseInt(e.target.value) : parseFloat(e.target.value))}
         style={{ width: '100%', accentColor: '#2563eb' }} />
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#d1d5db', marginTop: '2px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'rgba(240,244,255,0.2)', marginTop: '2px' }}>
         <span>{min}</span><span>{max}</span>
       </div>
     </div>
@@ -570,23 +570,25 @@ export default function Calculator() {
     cursor: disabled ? 'not-allowed' : 'pointer',
     fontSize: '13px', fontWeight: active ? '600' : '400',
     border: active ? '2px solid #2563eb' : '1px solid #d1d5db',
-    background: active ? '#eff6ff' : 'white',
-    color: active ? '#1d4ed8' : disabled ? '#d1d5db' : '#374151',
+    background: active ? 'rgba(42,111,219,0.18)' : 'rgba(255,255,255,0.04)',
+    color: active ? '#93b4f7' : disabled ? 'rgba(255,255,255,0.15)' : 'rgba(240,244,255,0.65)',
     opacity: disabled ? 0.45 : 1,
   })
 
   return (
-    <main style={{ maxWidth: '960px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', margin: '0 0 4px', color: '#111827' }}>PK/PD Calculator</h1>
-      <p style={{ color: '#6b7280', fontSize: '14px', marginBottom: '1.5rem' }}>
+    <main style={{ maxWidth: '960px', margin: '0 auto', padding: '2rem 1rem', fontFamily: "'Inter',system-ui,sans-serif", background: '#0a0f1e', minHeight: '100vh' }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'); * { box-sizing:border-box; } input[type=range] { accent-color: #2a6fdb; } input::placeholder { color: rgba(240,244,255,0.25); }`}</style>
+      <a href="/tools" style={{ fontSize: '13px', color: 'rgba(240,244,255,0.4)', textDecoration: 'none', display: 'inline-block', marginBottom: '1rem' }}>← Tools</a>
+      <h1 style={{ fontSize: '24px', fontWeight: '700', margin: '0 0 4px', color: '#f0f4ff' }}>PK/PD Calculator</h1>
+      <p style={{ color: 'rgba(240,244,255,0.45)', fontSize: '14px', marginBottom: '1.5rem' }}>
         Linear models use closed-form equations. Non-linear (MM) and 2-compartment models use RK4 numerical integration.
       </p>
 
       {/* Model selector */}
-      <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px', marginBottom: '1.25rem' }}>
+      <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px', marginBottom: '1.25rem' }}>
 
         <div style={{ marginBottom: '12px' }}>
-          <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Route of administration</p>
+          <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Route of administration</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
             {ROUTES.map(r => (
               <button key={r.key} onClick={() => switchModel(r.key, comp, clMode)} style={btn(route === r.key)}>
@@ -597,7 +599,7 @@ export default function Calculator() {
         </div>
 
         <div style={{ marginBottom: '12px' }}>
-          <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Compartmental model</p>
+          <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Compartmental model</p>
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
             {COMPARTMENTS.map(c => {
               const disabled = !validComps.includes(c.key)
@@ -611,7 +613,7 @@ export default function Calculator() {
         </div>
 
         <div>
-          <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Clearance type</p>
+          <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Clearance type</p>
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
             {CLEARANCE_MODES.map(cl => {
               const testKey  = buildModelKey(route, comp, cl.key)
@@ -637,22 +639,22 @@ export default function Calculator() {
           const meta   = PARAM_META[key]
           const slider = SLIDER_META[key]
           return (
-            <div key={key} style={{ background: '#f9fafb', borderRadius: '10px', padding: '10px 12px', border: '1px solid #e5e7eb' }}>
+            <div key={key} style={{ background: '#0f1629', borderRadius: '10px', padding: '10px 12px', border: '1px solid rgba(255,255,255,0.07)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                <span style={{ fontSize: '12px', color: '#6b7280' }}>{meta.label}</span>
+                <span style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)' }}>{meta.label}</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <input type="number" value={rawParams[key] ?? params[key]} min={meta.min} max={meta.max} step={meta.step}
                     onChange={e => handleParamChange(key, e.target.value)}
                     onBlur={() => handleParamBlur(key)}
-                    style={{ width: '72px', padding: '2px 6px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '13px', fontWeight: '600', color: '#111827', textAlign: 'right', background: 'white' }} />
-                  <span style={{ fontSize: '11px', color: '#9ca3af', minWidth: '36px' }}>{meta.unit}</span>
+                    style={{ width: '72px', padding: '2px 6px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '13px', fontWeight: '600', color: '#f0f4ff', textAlign: 'right', background: 'rgba(255,255,255,0.05)' }} />
+                  <span style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', minWidth: '36px' }}>{meta.unit}</span>
                 </div>
               </div>
               <input type="range" min={slider.min} max={slider.max} step={slider.step}
                 value={Math.min(Math.max(params[key] ?? slider.min, slider.min), slider.max)}
                 onChange={e => handleParamChange(key, e.target.value)}
                 style={{ width: '100%', accentColor: '#2563eb' }} />
-              <div style={{ fontSize: '10px', color: '#d1d5db', marginTop: '2px' }}>{meta.hint}</div>
+              <div style={{ fontSize: '10px', color: 'rgba(240,244,255,0.2)', marginTop: '2px' }}>{meta.hint}</div>
             </div>
           )
         })}
@@ -661,31 +663,31 @@ export default function Calculator() {
       {/* Canvas */}
       <div style={{ position: 'relative', width: '100%', height: '320px', marginBottom: '10px' }}>
         {computing && (
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.85)', borderRadius: '12px', zIndex: 10, fontSize: '13px', color: '#6b7280' }}>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(10,15,30,0.85)', borderRadius: '12px', zIndex: 10, fontSize: '13px', color: 'rgba(240,244,255,0.45)' }}>
             Computing...
           </div>
         )}
-        <canvas ref={canvasRef} style={{ width: '100%', height: '100%', borderRadius: '12px', border: '1px solid #e5e7eb', background: 'white' }} />
+        <canvas ref={canvasRef} style={{ width: '100%', height: '100%', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.07)', background: '#0f1629' }} />
       </div>
 
       {/* Graph controls */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '10px', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '6px 12px' }}>
-          <span style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '500' }}>TIME TICKS</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '8px', padding: '6px 12px' }}>
+          <span style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '500' }}>TIME TICKS</span>
           <input type="range" min={4} max={20} step={1} value={timeScale}
             onChange={e => setTimeScale(parseInt(e.target.value))}
             style={{ width: '80px', accentColor: '#2563eb' }} />
-          <span style={{ fontSize: '12px', fontWeight: '600', color: '#374151', minWidth: '20px' }}>{timeScale}</span>
+          <span style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(240,244,255,0.8)', minWidth: '20px' }}>{timeScale}</span>
         </div>
         <button onClick={exportGraph}
-          style={{ padding: '7px 16px', background: '#111827', color: 'white', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: '500', cursor: 'pointer' }}>
+          style={{ padding: '7px 16px', background: 'rgba(255,255,255,0.08)', color: '#f0f4ff', border: '1px solid rgba(255,255,255,0.1)', border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: '500', cursor: 'pointer' }}>
           ↓ Export PNG (3×)
         </button>
       </div>
 
       {/* Highlights */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '1rem', padding: '10px 12px', background: '#f9fafb', borderRadius: '10px', border: '1px solid #e5e7eb', alignItems: 'center' }}>
-        <span style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '500', marginRight: '4px' }}>HIGHLIGHT</span>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '1rem', padding: '10px 12px', background: '#0f1629', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.07)', alignItems: 'center' }}>
+        <span style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '500', marginRight: '4px' }}>HIGHLIGHT</span>
         {highlights.map(h => (
           <button key={h.key} onClick={() => h.set(!h.state)}
             style={{ fontSize: '12px', padding: '4px 12px', borderRadius: '999px', border: `1.5px solid ${h.state ? h.color : '#e5e7eb'}`, background: h.state ? h.color+'18' : 'white', color: h.state ? h.color : '#6b7280', cursor: 'pointer', fontWeight: h.state ? '600' : '400' }}>
@@ -704,14 +706,14 @@ export default function Calculator() {
 
       {/* Flip-flop notice */}
       {metrics?.flipFlop && (
-        <div style={{ background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '8px', padding: '8px 14px', marginBottom: '1rem', fontSize: '13px', color: '#92400e' }}>
+        <div style={{ background: 'rgba(249,115,22,0.12)', border: '1px solid rgba(249,115,22,0.35)', borderRadius: '8px', padding: '8px 14px', marginBottom: '1rem', fontSize: '13px', color: '#fdba74' }}>
           ⚠ <strong>Flip-flop kinetics detected</strong> — ke &gt; ka means elimination is faster than absorption, so absorption becomes the rate-limiting step. The terminal slope reflects ka, not ke. The displayed t½ is the absorption half-life — a common exam trap. Seen with extended-release formulations and poorly soluble compounds.
         </div>
       )}
 
       {/* MM notice */}
       {metrics?.mmNote && (
-        <div style={{ background: '#f5f3ff', border: '1px solid #ddd6fe', borderRadius: '8px', padding: '8px 14px', marginBottom: '1rem', fontSize: '13px', color: '#5b21b6' }}>
+        <div style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.35)', borderRadius: '8px', padding: '8px 14px', marginBottom: '1rem', fontSize: '13px', color: '#c4b5fd' }}>
           ⚗ <strong>Michaelis-Menten (non-linear) kinetics</strong> — CL(C) = Vmax / (Km + C). At C &lt;&lt; Km: first-order (linear) behaviour. At C &gt;&gt; Km: zero-order (saturated enzyme) — constant elimination rate regardless of concentration. t½, AUC, and Cmax are all dose-dependent. Clinically critical for phenytoin, ethanol, and salicylate.
         </div>
       )}
@@ -734,38 +736,38 @@ export default function Calculator() {
             ...(metrics.beta  != null ? [['β',     metrics.beta,  'h⁻¹']] : []),
             ...(!metrics.mmNote && metrics.ke != null ? [['ke', metrics.ke, 'h⁻¹']] : []),
           ].filter(([, val]) => val != null && !isNaN(val) && isFinite(val)).map(([label, val, unit]) => (
-            <div key={label} style={{ background: '#f9fafb', borderRadius: '10px', padding: '10px 12px', textAlign: 'center', border: '1px solid #e5e7eb' }}>
-              <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '2px' }}>{label}</div>
-              <div style={{ fontSize: '17px', fontWeight: '700', color: '#111827' }}>{val}</div>
-              <div style={{ fontSize: '10px', color: '#9ca3af' }}>{unit}</div>
+            <div key={label} style={{ background: '#0f1629', borderRadius: '10px', padding: '10px 12px', textAlign: 'center', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', marginBottom: '2px' }}>{label}</div>
+              <div style={{ fontSize: '17px', fontWeight: '700', color: '#f0f4ff' }}>{val}</div>
+              <div style={{ fontSize: '10px', color: 'rgba(240,244,255,0.3)' }}>{unit}</div>
             </div>
           ))}
           {metrics.numerical && (
-            <div style={{ gridColumn: '1 / -1', fontSize: '11px', color: '#9ca3af' }}>* Numerically approximated from curve</div>
+            <div style={{ gridColumn: '1 / -1', fontSize: '11px', color: 'rgba(240,244,255,0.3)' }}>* Numerically approximated from curve</div>
           )}
         </div>
       )}
 
       {/* Therapeutic Window */}
       <Section title="⚗️ Therapeutic Window" enabled={showTW} onToggle={() => setShowTW(!showTW)}>
-        <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '10px' }}>Set drug-specific MEC and MTC. Lines appear on the graph and status updates automatically.</p>
+        <p style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)', marginBottom: '10px' }}>Set drug-specific MEC and MTC. Lines appear on the graph and status updates automatically.</p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
           <div>
-            <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '4px' }}>MEC — Minimum Effective Concentration (mg/L)</label>
+            <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.8)', display: 'block', marginBottom: '4px' }}>MEC — Minimum Effective Concentration (mg/L)</label>
             <input type="number" value={mec} onChange={e => setMec(e.target.value)} placeholder="e.g. 5" min="0"
-              style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '14px', color: '#111827', boxSizing: 'border-box' }} />
+              style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', color: '#f0f4ff', boxSizing: 'border-box' }} />
           </div>
           <div>
-            <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '4px' }}>MTC — Minimum Toxic Concentration (mg/L)</label>
+            <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.8)', display: 'block', marginBottom: '4px' }}>MTC — Minimum Toxic Concentration (mg/L)</label>
             <input type="number" value={mtc} onChange={e => setMtc(e.target.value)} placeholder="e.g. 25" min="0"
-              style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '14px', color: '#111827', boxSizing: 'border-box' }} />
+              style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', color: '#f0f4ff', boxSizing: 'border-box' }} />
           </div>
         </div>
       </Section>
 
       {/* Population PK */}
       <Section title="👥 Population PK Simulation" enabled={showPop} onToggle={() => setShowPop(!showPop)}>
-        <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '12px' }}>
+        <p style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)', marginBottom: '12px' }}>
           Log-normal IIV simulation. CV% for Vd applies to Vc and Vp. CV% for CL applies to CL, Q, and Vmax.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '10px', marginBottom: '12px' }}>
@@ -778,45 +780,13 @@ export default function Calculator() {
           style={{ padding: '8px 18px', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', fontWeight: '500' }}>
           Regenerate population
         </button>
-        <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '8px', marginBottom: 0 }}>
+        <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', marginTop: '8px', marginBottom: 0 }}>
           Individual curves semi-transparent. Solid line is the mean. Max 200 subjects.
         </p>
       </Section>
 
-      {/* Explain */}
-      <button onClick={getExplanation} disabled={loadingExplanation}
-        style={{ padding: '10px 24px', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', cursor: loadingExplanation ? 'not-allowed' : 'pointer', fontSize: '14px', marginBottom: '1.5rem', fontWeight: '500', opacity: loadingExplanation ? 0.7 : 1 }}>
-        {loadingExplanation ? 'Generating explanation...' : 'Explain these results →'}
-      </button>
 
-      {/* Explanation */}
-      {explanation && !explanation.error && (
-        <div style={{ border: '1px solid #bfdbfe', borderRadius: '12px', padding: '1.25rem', background: '#eff6ff' }}>
-          <p style={{ fontWeight: '600', color: '#1d4ed8', marginBottom: '1rem', fontSize: '15px' }}>{explanation.headline}</p>
-          {explanation.parameters?.map((p, i) => (
-            <div key={i} style={{ background: 'white', borderRadius: '8px', padding: '10px 12px', marginBottom: '8px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                <span style={{ fontSize: '13px', fontWeight: '600', color: '#111827' }}>{p.name}</span>
-                <span style={{ fontSize: '13px', color: '#2563eb', fontWeight: '600' }}>{p.value}</span>
-              </div>
-              <p style={{ fontSize: '13px', color: '#374151', margin: '0 0 4px' }}>{p.meaning}</p>
-              <p style={{ fontSize: '12px', color: '#6b7280', margin: 0, fontStyle: 'italic' }}>Exam tip: {p.exam_tip}</p>
-            </div>
-          ))}
-          {explanation.clinical_insight && (
-            <div style={{ background: 'white', borderRadius: '8px', padding: '10px 12px', marginBottom: '8px' }}>
-              <p style={{ fontSize: '12px', fontWeight: '600', color: '#374151', marginBottom: '4px' }}>Clinical insight</p>
-              <p style={{ fontSize: '13px', color: '#374151', margin: 0 }}>{explanation.clinical_insight}</p>
-            </div>
-          )}
-          {explanation.watch_out && (
-            <div style={{ background: '#fff7ed', borderRadius: '8px', padding: '10px 12px', border: '1px solid #fed7aa' }}>
-              <p style={{ fontSize: '12px', fontWeight: '600', color: '#92400e', marginBottom: '4px' }}>Watch out</p>
-              <p style={{ fontSize: '13px', color: '#92400e', margin: 0 }}>{explanation.watch_out}</p>
-            </div>
-          )}
-        </div>
-      )}
+
     </main>
   )
 }

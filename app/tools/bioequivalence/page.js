@@ -114,7 +114,7 @@ function CIPlot({ aucResult, cmaxResult }) {
     ctx.scale(dpr, dpr)
 
     ctx.clearRect(0, 0, W, H)
-    ctx.fillStyle = 'white'; ctx.fillRect(0, 0, W, H)
+    ctx.fillStyle = '#0a0f1e'; ctx.fillRect(0, 0, W, H)
 
     const pad   = { top: 20, right: 40, bottom: 40, left: 80 }
     const cW    = W - pad.left - pad.right
@@ -126,25 +126,25 @@ function CIPlot({ aucResult, cmaxResult }) {
 
     // Grid lines at key values
     const vLines = [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.25, 1.3, 1.4]
-    ctx.strokeStyle = 'rgba(0,0,0,0.07)'; ctx.lineWidth = 1
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 1
     vLines.forEach(v => {
       if (v < xMin || v > xMax) return
       ctx.beginPath(); ctx.moveTo(xS(v), pad.top); ctx.lineTo(xS(v), pad.top + cH); ctx.stroke()
     })
 
     // X-axis labels
-    ctx.fillStyle = '#6b7280'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center'
+    ctx.fillStyle = 'rgba(240,244,255,0.4)'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center'
     vLines.forEach(v => {
       if (v < xMin || v > xMax) return
       ctx.fillText((v * 100).toFixed(0) + '%', xS(v), pad.top + cH + 16)
     })
 
-    ctx.fillStyle = '#374151'; ctx.font = '11px sans-serif'
+    ctx.fillStyle = 'rgba(240,244,255,0.5)'; ctx.font = '11px sans-serif'
     ctx.textAlign = 'center'
     ctx.fillText('Ratio (Test / Reference)', pad.left + cW/2, H - 4)
 
     // Acceptance zone shading 80-125%
-    ctx.fillStyle = '#f0fdf4'
+    ctx.fillStyle = 'rgba(22,163,74,0.08)'
     ctx.fillRect(xS(0.80), pad.top, xS(1.25) - xS(0.80), cH)
 
     // 80% and 125% boundary lines
@@ -164,9 +164,9 @@ function CIPlot({ aucResult, cmaxResult }) {
 
 
     // Reference line at 100%
-    ctx.strokeStyle = '#374151'; ctx.lineWidth = 1.5
+    ctx.strokeStyle = 'rgba(240,244,255,0.4)'; ctx.lineWidth = 1.5
     ctx.beginPath(); ctx.moveTo(xS(1.0), pad.top + 20); ctx.lineTo(xS(1.0), pad.top + cH); ctx.stroke()
-    ctx.fillStyle = '#374151'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center'
+    ctx.fillStyle = 'rgba(240,244,255,0.6)'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center'
     ctx.fillText('100%', xS(1.0), pad.top + 14)
 
     // Draw CI bars
@@ -182,7 +182,7 @@ function CIPlot({ aucResult, cmaxResult }) {
       const xGMR  = xS(r.gmr)
 
       // Row label
-      ctx.fillStyle = '#374151'; ctx.font = '12px sans-serif'; ctx.textAlign = 'right'
+      ctx.fillStyle = 'rgba(240,244,255,0.7)'; ctx.font = '12px sans-serif'; ctx.textAlign = 'right'
       ctx.fillText(label, pad.left - 8, y + 4)
 
       // CI bar
@@ -207,7 +207,7 @@ function CIPlot({ aucResult, cmaxResult }) {
       ctx.closePath(); ctx.fill()
 
       // GMR label
-      ctx.fillStyle = '#374151'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center'
+      ctx.fillStyle = 'rgba(240,244,255,0.8)'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center'
       ctx.fillText((r.gmr * 100).toFixed(1) + '%', xGMR, y - 16)
 
       // CI values
@@ -226,7 +226,7 @@ function CIPlot({ aucResult, cmaxResult }) {
 
   return (
     <canvas ref={canvasRef}
-      style={{ width: '100%', height: '240px', borderRadius: '10px', border: '1px solid #e5e7eb', background: 'white' }} />
+      style={{ width: '100%', height: '240px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.07)', background: '#0a0f1e' }} />
   )
 }
 
@@ -268,32 +268,32 @@ export default function BioequivalencePage() {
   const overallBE = aucResult?.isBE && cmaxResult?.isBE
 
   const ResultRow = ({ label, value, good, bad }) => (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0', borderBottom: '1px solid #f3f4f6' }}>
-      <span style={{ fontSize: '12px', color: '#6b7280' }}>{label}</span>
-      <span style={{ fontSize: '13px', fontWeight: '600', fontFamily: 'ui-monospace, monospace', color: good ? '#16a34a' : bad ? '#dc2626' : '#111827' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+      <span style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)' }}>{label}</span>
+      <span style={{ fontSize: '13px', fontWeight: '600', fontFamily: 'ui-monospace, monospace', color: good ? '#86efac' : bad ? '#fca5a5' : '#f0f4ff' }}>
         {value}
       </span>
     </div>
   )
 
   const DataPane = ({ label, raw, setRaw, result, example }) => (
-    <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
+    <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-        <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>{label}</p>
+        <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>{label}</p>
         <button onClick={() => setRaw(example)}
           style={{ fontSize: '11px', color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer' }}>
           Load example
         </button>
       </div>
-      <p style={{ fontSize: '11px', color: '#9ca3af', marginBottom: '6px' }}>
+      <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', marginBottom: '6px' }}>
         Two columns: Test | Reference. One subject per row.
       </p>
       <textarea value={raw} onChange={e => setRaw(e.target.value)} rows={8}
-        style={{ width: '100%', fontFamily: 'ui-monospace, monospace', fontSize: '12px', padding: '8px 10px', borderRadius: '7px', border: '1px solid #d1d5db', resize: 'vertical', boxSizing: 'border-box', background: 'white', lineHeight: '1.6' }} />
-      <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '4px' }}>{result?.n ?? 0} subjects parsed</p>
+        style={{ width: '100%', fontFamily: 'ui-monospace, monospace', fontSize: '12px', padding: '8px 10px', borderRadius: '7px', border: '1px solid rgba(255,255,255,0.1)', resize: 'vertical', boxSizing: 'border-box', background: '#060b18', color: '#f0f4ff', lineHeight: '1.6' }} />
+      <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', marginTop: '4px' }}>{result?.n ?? 0} subjects parsed</p>
 
       {result && (
-        <div style={{ marginTop: '8px', background: 'white', borderRadius: '8px', padding: '10px 12px', border: `1px solid ${result.isBE ? '#bbf7d0' : '#fecaca'}` }}>
+        <div style={{ marginTop: '8px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', padding: '10px 12px', border: `1px solid ${result.isBE ? 'rgba(22,163,74,0.4)' : 'rgba(239,68,68,0.4)'}` }}>
           <ResultRow label="n subjects"          value={result.n} />
           <ResultRow label="GMR (Test/Reference)" value={(result.gmr * 100).toFixed(2) + '%'}
             good={result.gmr >= 0.9 && result.gmr <= 1.1}
@@ -303,7 +303,7 @@ export default function BioequivalencePage() {
           <ResultRow label="90% CI — upper"      value={(result.ciHigh * 100).toFixed(2) + '%'}
             good={result.ciHigh <= 1.25} bad={result.ciHigh > 1.25} />
           <div style={{ marginTop: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '12px', color: '#6b7280' }}>BE decision</span>
+            <span style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)' }}>BE decision</span>
             <span style={{ fontSize: '13px', fontWeight: '700', padding: '2px 12px', borderRadius: '999px', background: result.isBE ? '#16a34a' : '#dc2626', color: 'white' }}>
               {result.isBE ? '✓ PASS' : '✗ FAIL'}
             </span>
@@ -314,13 +314,15 @@ export default function BioequivalencePage() {
   )
 
   return (
-    <main style={{ maxWidth: '960px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#111827', margin: '0 0 4px' }}>Bioequivalence Analyser</h1>
-      <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '1.25rem', lineHeight: '1.6' }}>
+    <main style={{ maxWidth: '960px', margin: '0 auto', padding: '2rem 1rem', fontFamily: "'Inter',system-ui,sans-serif", background: '#0a0f1e', minHeight: '100vh', color: '#f0f4ff' }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'); * { box-sizing:border-box; } textarea::placeholder { color: rgba(240,244,255,0.25); }`}</style>
+      <a href="/tools" style={{ fontSize: '13px', color: 'rgba(240,244,255,0.4)', textDecoration: 'none', display: 'inline-block', marginBottom: '1rem' }}>← Tools</a>
+      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#f0f4ff', margin: '0 0 4px', letterSpacing: '-0.02em' }}>Bioequivalence Analyser</h1>
+      <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.5)', marginBottom: '1.25rem', lineHeight: '1.6' }}>
         Calculates 90% confidence intervals using the TOST (Two One-Sided t-Tests) procedure on log-transformed AUC and Cmax data. FDA/EMA standard: both 90% CIs must fall within 80.00–125.00% for bioequivalence.
       </p>
 
-      <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '10px 16px', marginBottom: '1.5rem', fontSize: '12px', color: '#374151', lineHeight: '1.6' }}>
+      <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 16px', marginBottom: '1.5rem', fontSize: '12px', color: 'rgba(240,244,255,0.65)', lineHeight: '1.6' }}>
         <strong>Study design assumption:</strong> This tool assumes a standard 2×2 crossover design — each subject receives both test and reference formulations. Enter matched pairs (same subject, Test vs Reference). For parallel design studies, the calculation differs.
       </div>
 
@@ -328,15 +330,15 @@ export default function BioequivalencePage() {
       {aucResult && cmaxResult && (
         <div style={{
           padding: '14px 18px', borderRadius: '12px', marginBottom: '1.5rem',
-          background: overallBE ? '#f0fdf4' : '#fef2f2',
-          border: `2px solid ${overallBE ? '#16a34a' : '#dc2626'}`,
+          background: overallBE ? 'rgba(22,163,74,0.12)' : 'rgba(239,68,68,0.12)',
+          border: `2px solid ${overallBE ? 'rgba(22,163,74,0.6)' : 'rgba(239,68,68,0.6)'}`,
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
           <div>
-            <div style={{ fontSize: '15px', fontWeight: '700', color: overallBE ? '#15803d' : '#dc2626' }}>
+            <div style={{ fontSize: '15px', fontWeight: '700', color: overallBE ? '#86efac' : '#fca5a5' }}>
               {overallBE ? '✓ Bioequivalent' : '✗ Not bioequivalent'}
             </div>
-            <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px' }}>
+            <div style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)', marginTop: '2px' }}>
               {overallBE
                 ? 'Both AUC and Cmax 90% CIs fall within the 80–125% acceptance zone'
                 : 'One or both parameters fail the 80–125% acceptance criterion'}
@@ -367,8 +369,8 @@ export default function BioequivalencePage() {
       </div>
 
       {/* Method explanation */}
-      <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px 16px', fontSize: '12px', color: '#374151', lineHeight: '1.7' }}>
-        <p style={{ margin: '0 0 8px', fontWeight: '600', fontSize: '13px' }}>How this is calculated</p>
+      <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '14px 16px', fontSize: '12px', color: 'rgba(240,244,255,0.65)', lineHeight: '1.7' }}>
+        <p style={{ margin: '0 0 8px', fontWeight: '600', fontSize: '13px', color: '#f0f4ff' }}>How this is calculated</p>
         <p style={{ margin: '0 0 6px' }}>
           <strong>Step 1 — Log transformation:</strong> AUC and Cmax are log-transformed before analysis. This is required by FDA/EMA guidelines because PK parameters are log-normally distributed.
         </p>

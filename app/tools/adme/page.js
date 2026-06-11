@@ -337,14 +337,14 @@ const FLOW_PATHS = [
 
 function ContentPanel({ zone, onClose }) {
   if (!zone) return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#4b5563', textAlign: 'center', padding: '2rem', gap: '16px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'rgba(240,244,255,0.4)', textAlign: 'center', padding: '2rem', gap: '16px' }}>
       <div style={{ fontSize: '48px', opacity: 0.4 }}>←</div>
       <p style={{ fontSize: '14px', lineHeight: '1.7', margin: 0 }}>
         Click any hotspot on the diagram to explore that stage of the ADME pathway.
       </p>
       <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '6px', width: '100%' }}>
         {Object.values(ZONES).map(z => (
-          <div key={z.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#9ca3af' }}>
+          <div key={z.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'rgba(240,244,255,0.35)' }}>
             <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: z.color, flexShrink: 0 }} />
             {z.label}
           </div>
@@ -363,7 +363,7 @@ function ContentPanel({ zone, onClose }) {
             <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: color, flexShrink: 0 }} />
             <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#f9fafb', margin: 0 }}>{content.title}</h2>
           </div>
-          <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>{content.subtitle}</p>
+          <p style={{ fontSize: '12px', color: 'rgba(240,244,255,0.35)', margin: 0 }}>{content.subtitle}</p>
         </div>
         <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '20px', cursor: 'pointer', padding: '0 0 0 12px', lineHeight: 1 }}>×</button>
       </div>
@@ -389,7 +389,7 @@ function ContentPanel({ zone, onClose }) {
               {s.formulaVars.map(v => (
                 <div key={v.sym} style={{ display: 'flex', gap: '8px', fontSize: '11px' }}>
                   <span style={{ fontFamily: 'monospace', color: color, minWidth: '50px', fontWeight: '600' }}>{v.sym}</span>
-                  <span style={{ color: '#9ca3af' }}>{v.desc}</span>
+                  <span style={{ color: 'rgba(240,244,255,0.35)' }}>{v.desc}</span>
                 </div>
               ))}
             </div>
@@ -412,7 +412,7 @@ function ContentPanel({ zone, onClose }) {
           )}
 
           {s.text && (
-            <p style={{ fontSize: '12px', color: '#d1d5db', margin: 0, lineHeight: '1.7', whiteSpace: 'pre-line' }}>{s.text}</p>
+            <p style={{ fontSize: '12px', color: 'rgba(240,244,255,0.6)', margin: 0, lineHeight: '1.7', whiteSpace: 'pre-line' }}>{s.text}</p>
           )}
         </div>
       ))}
@@ -450,17 +450,18 @@ export default function ADMEPage() {
   }
 
   return (
-    <main style={{ maxWidth: '1100px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
-      <a href="/tools" style={{ fontSize: '13px', color: '#6b7280', textDecoration: 'none' }}>← Tools</a>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#111827', margin: '1rem 0 4px' }}>Interactive ADME</h1>
-      <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '1.5rem', lineHeight: '1.6' }}>
+    <main style={{ maxWidth: '1100px', margin: '0 auto', padding: '2rem 1rem', fontFamily: "'Inter',system-ui,sans-serif", background: '#0a0f1e', minHeight: '100vh', color: '#f0f4ff' }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'); * { box-sizing:border-box; }`}</style>
+      <a href="/tools" style={{ fontSize: '13px', color: 'rgba(240,244,255,0.4)', textDecoration: 'none' }}>← Tools</a>
+      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#f0f4ff', margin: '1rem 0 4px', letterSpacing: '-0.02em' }}>Interactive ADME</h1>
+      <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.5)', marginBottom: '1.5rem', lineHeight: '1.6' }}>
         Click any labelled stage on the diagram to explore absorption, distribution, metabolism, and excretion in depth.
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: `${IMG_W}px 1fr`, gap: '1.5rem', alignItems: 'start' }}>
 
         {/* ── Left: body image + SVG overlay ── */}
-        <div style={{ position: 'relative', width: IMG_W, height: IMG_H, borderRadius: '16px', overflow: 'hidden', background: '#000', flexShrink: 0 }}>
+        <div style={{ position: 'relative', width: IMG_W, height: IMG_H, borderRadius: '16px', overflow: 'hidden', background: 'transparent', flexShrink: 0 }}>
 
           {/* Body image */}
           <Image
@@ -577,7 +578,7 @@ export default function ADMEPage() {
                   fontSize: '10px',
                   fontWeight: isActive ? '700' : '500',
                   color: isActive ? zone.color : '#e5e7eb',
-                  background: isActive ? `${zone.color}22` : 'rgba(0,0,0,0.6)',
+                  background: isActive ? `${zone.color}22` : 'rgba(10,15,30,0.75)',
                   padding: '2px 6px',
                   borderRadius: '4px',
                   whiteSpace: 'nowrap',
@@ -596,9 +597,9 @@ export default function ADMEPage() {
 
         {/* ── Right: info panel ── */}
         <div style={{
-          background: '#111827',
+          background: '#0f1629',
           borderRadius: '16px',
-          border: '1px solid #1f2937',
+          border: '1px solid rgba(255,255,255,0.07)',
           minHeight: `${IMG_H}px`,
           overflow: 'hidden',
           display: 'flex',
@@ -607,6 +608,11 @@ export default function ADMEPage() {
           <ContentPanel zone={activeZone} onClose={() => setActiveZone(null)} />
         </div>
       </div>
+
+      {/* Image attribution */}
+      <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.2)', marginTop: '0.5rem', marginBottom: '0.25rem' }}>
+        Anatomical illustration generated with ChatGPT (OpenAI)
+      </p>
 
       {/* Stage navigation pills below diagram */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '1rem' }}>
@@ -619,9 +625,9 @@ export default function ADMEPage() {
               borderRadius: '20px',
               fontSize: '12px',
               fontWeight: activeZone?.id === zone.id ? '600' : '400',
-              border: `1px solid ${activeZone?.id === zone.id ? zone.color : '#e5e7eb'}`,
-              background: activeZone?.id === zone.id ? `${zone.color}18` : 'white',
-              color: activeZone?.id === zone.id ? zone.color : '#374151',
+              border: `1px solid ${activeZone?.id === zone.id ? zone.color : 'rgba(255,255,255,0.1)'}`,
+              background: activeZone?.id === zone.id ? `${zone.color}18` : 'rgba(255,255,255,0.04)',
+              color: activeZone?.id === zone.id ? zone.color : 'rgba(240,244,255,0.55)',
               cursor: 'pointer',
               transition: 'all 0.15s ease',
             }}

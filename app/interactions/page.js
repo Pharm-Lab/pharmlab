@@ -17,77 +17,50 @@ export default function Interactions() {
       setInput('')
     }
   }
-
-  function removeDrug(drug) {
-    setDrugs(drugs.filter(d => d !== drug))
-    setResults(null)
-  }
-
-  function handleKeyDown(e) {
-    if (e.key === 'Enter') addDrug()
-  }
+  function removeDrug(drug) { setDrugs(drugs.filter(d => d !== drug)); setResults(null) }
+  function handleKeyDown(e) { if (e.key === 'Enter') addDrug() }
 
   async function checkInteractions() {
-    if (drugs.length < 2) {
-      setError('Add at least 2 drugs to check interactions.')
-      return
-    }
-    setLoading(true)
-    setError(null)
-    setResults(null)
-
+    if (drugs.length < 2) { setError('Add at least 2 drugs to check interactions.'); return }
+    setLoading(true); setError(null); setResults(null)
     try {
       const res = await fetch('/api/check-interaction', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ drugs })
       })
       const data = await res.json()
-      if (data.error) {
-        setError(data.error)
-      } else {
-        setResults(data)
-      }
-    } catch (err) {
-      setError('Something went wrong. Please try again.')
-    } finally {
-      setLoading(false)
-    }
+      if (data.error) { setError(data.error) } else { setResults(data) }
+    } catch (err) { setError('Something went wrong. Please try again.') }
+    finally { setLoading(false) }
   }
 
-  const severityColor = {
-    major: '#fee2e2',
-    moderate: '#fef9c3',
-    minor: '#dcfce7',
-    none: '#f3f4f6'
+  const SEV = {
+    major:    { bg: 'rgba(239,68,68,0.12)',    border: 'rgba(239,68,68,0.4)',    badge: '#ef4444', text: '#fca5a5' },
+    moderate: { bg: 'rgba(234,179,8,0.12)',    border: 'rgba(234,179,8,0.4)',    badge: '#eab308', text: '#fde047' },
+    minor:    { bg: 'rgba(34,197,94,0.10)',    border: 'rgba(34,197,94,0.35)',   badge: '#22c55e', text: '#86efac' },
+    none:     { bg: 'rgba(255,255,255,0.04)',  border: 'rgba(255,255,255,0.08)', badge: '#6b7280', text: 'rgba(240,244,255,0.5)' },
   }
 
-  const severityBorder = {
-    major: '#ef4444',
-    moderate: '#eab308',
-    minor: '#22c55e',
-    none: '#d1d5db'
+  const C = {
+    bg: '#0a0f1e', card: '#0f1629', border: 'rgba(255,255,255,0.07)',
+    blue: '#2a6fdb', blueLight: '#93b4f7',
+    text: '#f0f4ff', textMid: 'rgba(240,244,255,0.65)', textDim: 'rgba(240,244,255,0.4)',
   }
 
   return (
-    <main style={{ maxWidth: '720px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
-      <a href="/" style={{ fontSize: '14px', color: '#6b7280', textDecoration: 'none' }}>← Back to home</a>
-      <h1 style={{ fontSize: '24px', fontWeight: '600', margin: '1rem 0 0.25rem' }}>Drug Interaction Checker</h1>
-      <p style={{ color: '#6b7280', marginBottom: '1.5rem', fontSize: '14px' }}>Enter two or more drugs to check for interactions, mechanisms, and exam angles.</p>
+    <main style={{ maxWidth: '720px', margin: '0 auto', padding: '2rem 1rem', fontFamily: "'Inter',system-ui,sans-serif", background: C.bg, minHeight: '100vh', color: C.text }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'); * { box-sizing:border-box; } input::placeholder { color: rgba(240,244,255,0.25); }`}</style>
+
+      <a href="/tools" style={{ fontSize: '13px', color: C.textDim, textDecoration: 'none' }}>← Tools</a>
+      <h1 style={{ fontSize: '24px', fontWeight: '700', margin: '1rem 0 4px', letterSpacing: '-0.02em' }}>Drug Interaction Checker</h1>
+      <p style={{ color: C.textMid, marginBottom: '1.5rem', fontSize: '14px', lineHeight: '1.6' }}>Enter two or more drugs to check for interactions, mechanisms, and exam angles.</p>
 
       <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-        <input
-          type="text"
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
+        <input type="text" value={input} onChange={e => setInput(e.target.value)} onKeyDown={handleKeyDown}
           placeholder="Type a drug name and press Enter..."
-          style={{ flex: 1, padding: '10px 14px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '14px', outline: 'none' }}
-        />
-        <button
-          onClick={addDrug}
-          style={{ padding: '10px 18px', background: '#2563eb', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '14px' }}
-        >
+          style={{ flex: 1, padding: '10px 14px', borderRadius: '9px', border: `1px solid ${C.border}`, fontSize: '14px', outline: 'none', background: C.card, color: C.text }} />
+        <button onClick={addDrug}
+          style={{ padding: '10px 18px', background: C.blue, color: 'white', border: 'none', borderRadius: '9px', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}>
           Add
         </button>
       </div>
@@ -95,56 +68,54 @@ export default function Interactions() {
       {drugs.length > 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
           {drugs.map(drug => (
-            <span key={drug} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#eff6ff', color: '#1d4ed8', padding: '4px 12px', borderRadius: '999px', fontSize: '13px', border: '1px solid #bfdbfe' }}>
+            <span key={drug} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(42,111,219,0.15)', color: C.blueLight, padding: '4px 12px', borderRadius: '999px', fontSize: '13px', border: '1px solid rgba(42,111,219,0.3)' }}>
               {drug}
-              <button onClick={() => removeDrug(drug)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#93c5fd', fontSize: '16px', lineHeight: 1, padding: 0 }}>×</button>
+              <button onClick={() => removeDrug(drug)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(42,111,219,0.6)', fontSize: '16px', lineHeight: 1, padding: 0 }}>×</button>
             </span>
           ))}
         </div>
       )}
 
-      {error && (
-        <p style={{ color: '#ef4444', fontSize: '14px', marginBottom: '12px' }}>{error}</p>
-      )}
+      {error && <p style={{ color: '#fca5a5', fontSize: '14px', marginBottom: '12px' }}>{error}</p>}
 
-      <button
-        onClick={checkInteractions}
-        disabled={loading || drugs.length < 2}
-        style={{ width: '100%', padding: '12px', background: drugs.length < 2 ? '#e5e7eb' : '#2563eb', color: drugs.length < 2 ? '#9ca3af' : 'white', border: 'none', borderRadius: '8px', fontSize: '15px', fontWeight: '500', cursor: drugs.length < 2 ? 'not-allowed' : 'pointer', marginBottom: '2rem' }}
-      >
+      <button onClick={checkInteractions} disabled={loading || drugs.length < 2}
+        style={{ width: '100%', padding: '12px', background: drugs.length < 2 ? 'rgba(255,255,255,0.06)' : C.blue, color: drugs.length < 2 ? C.textDim : 'white', border: 'none', borderRadius: '9px', fontSize: '15px', fontWeight: '600', cursor: drugs.length < 2 ? 'not-allowed' : 'pointer', marginBottom: '2rem', letterSpacing: '-0.01em' }}>
         {loading ? 'Checking interactions...' : 'Check Interactions'}
       </button>
 
       {results && (
         <div>
-          <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '1rem', fontStyle: 'italic' }}>{results.summary}</p>
-          {results.pairs.map((pair, i) => (
-            <div key={i} style={{ background: severityColor[pair.severity], border: `1px solid ${severityBorder[pair.severity]}`, borderRadius: '12px', padding: '1.25rem', marginBottom: '1rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <span style={{ fontWeight: '600', fontSize: '15px' }}>{pair.drug_a} + {pair.drug_b}</span>
-                <span style={{ fontSize: '12px', fontWeight: '500', padding: '2px 10px', borderRadius: '999px', background: severityBorder[pair.severity], color: 'white', textTransform: 'uppercase' }}>{pair.severity}</span>
+          <p style={{ fontSize: '14px', color: C.textMid, marginBottom: '1rem', fontStyle: 'italic', lineHeight: '1.6' }}>{results.summary}</p>
+          {results.pairs.map((pair, i) => {
+            const s = SEV[pair.severity] ?? SEV.none
+            return (
+              <div key={i} style={{ background: s.bg, border: `1px solid ${s.border}`, borderRadius: '14px', padding: '1.25rem', marginBottom: '1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                  <span style={{ fontWeight: '700', fontSize: '15px', color: C.text, letterSpacing: '-0.01em' }}>{pair.drug_a} + {pair.drug_b}</span>
+                  <span style={{ fontSize: '11px', fontWeight: '700', padding: '3px 10px', borderRadius: '999px', background: s.badge, color: 'white', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{pair.severity}</span>
+                </div>
+                {pair.enzyme && <p style={{ fontSize: '12px', color: C.textDim, marginBottom: '10px' }}>Enzyme: {pair.enzyme}</p>}
+                {[
+                  { label: 'Mechanism',     value: pair.mechanism },
+                  { label: 'Clinical note', value: pair.clinical_note },
+                ].map(row => (
+                  <div key={row.label} style={{ marginBottom: '10px' }}>
+                    <p style={{ fontSize: '11px', fontWeight: '700', color: C.textDim, marginBottom: '3px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{row.label}</p>
+                    <p style={{ fontSize: '13px', color: C.text, margin: 0, lineHeight: '1.6' }}>{row.value}</p>
+                  </div>
+                ))}
+                {[
+                  { label: 'Memory hook', value: pair.memory_hook, italic: true },
+                  { label: 'Exam angle',  value: pair.exam_angle },
+                ].map(row => row.value && (
+                  <div key={row.label} style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '9px', padding: '10px 12px', marginBottom: '8px', border: `1px solid ${C.border}` }}>
+                    <p style={{ fontSize: '11px', fontWeight: '700', color: C.textDim, marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{row.label}</p>
+                    <p style={{ fontSize: '13px', color: C.text, margin: 0, fontStyle: row.italic ? 'italic' : 'normal', lineHeight: '1.6' }}>{row.value}</p>
+                  </div>
+                ))}
               </div>
-              {pair.enzyme && (
-                <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>Enzyme: {pair.enzyme}</p>
-              )}
-              <div style={{ marginBottom: '10px' }}>
-                <p style={{ fontSize: '12px', fontWeight: '600', color: '#374151', marginBottom: '3px' }}>Mechanism</p>
-                <p style={{ fontSize: '14px', color: '#1f2937', margin: 0 }}>{pair.mechanism}</p>
-              </div>
-              <div style={{ marginBottom: '10px' }}>
-                <p style={{ fontSize: '12px', fontWeight: '600', color: '#374151', marginBottom: '3px' }}>Clinical note</p>
-                <p style={{ fontSize: '14px', color: '#1f2937', margin: 0 }}>{pair.clinical_note}</p>
-              </div>
-              <div style={{ background: 'rgba(255,255,255,0.6)', borderRadius: '8px', padding: '10px 12px', marginBottom: '10px' }}>
-                <p style={{ fontSize: '12px', fontWeight: '600', color: '#374151', marginBottom: '3px' }}>Memory hook</p>
-                <p style={{ fontSize: '14px', color: '#1f2937', margin: 0, fontStyle: 'italic' }}>{pair.memory_hook}</p>
-              </div>
-              <div style={{ background: 'rgba(255,255,255,0.6)', borderRadius: '8px', padding: '10px 12px' }}>
-                <p style={{ fontSize: '12px', fontWeight: '600', color: '#374151', marginBottom: '3px' }}>Exam angle</p>
-                <p style={{ fontSize: '14px', color: '#1f2937', margin: 0 }}>{pair.exam_angle}</p>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </main>
