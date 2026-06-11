@@ -247,26 +247,27 @@ export default function CannabisCalculator() {
     padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px',
     fontWeight: active ? '600' : '400',
     border: active ? `2px solid ${color}` : '1px solid #d1d5db',
-    background: active ? color + '18' : 'white',
-    color: active ? color : '#374151',
+    background: active ? color + '18' : 'rgba(255,255,255,0.05)',
+    color: active ? color : 'rgba(240,244,255,0.65)',
   })
 
   const drivingLimit = CANNABIS_DRIVING_LIMITS[country]
 
   return (
     <main style={{ maxWidth: '980px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
-      <a href="/harm-reduction" style={{ fontSize: '13px', color: '#6b7280', textDecoration: 'none' }}>← Harm reduction</a>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#111827', margin: '1rem 0 4px' }}>Cannabis Pharmacokinetics</h1>
-      <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '1.25rem', lineHeight: '1.6' }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'); * { box-sizing:border-box; } select option { background:#0f1629; }`}</style>
+      <a href="/harm-reduction" style={{ fontSize: '13px', color: 'rgba(240,244,255,0.4)', textDecoration: 'none' }}>← Harm reduction</a>
+      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#f0f4ff', margin: '1rem 0 4px' }}>Cannabis Pharmacokinetics</h1>
+      <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.45)', marginBottom: '1.25rem', lineHeight: '1.6' }}>
         THC plasma concentration model for smoked and oral (edible) routes. The difference between the two curves is the most important harm reduction message for cannabis — especially for edibles.
       </p>
 
       {/* Key edible warning */}
-      <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', padding: '12px 16px', marginBottom: '12px', fontSize: '13px', color: '#991b1b' }}>
+      <div style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.35)', borderRadius: '10px', padding: '12px 16px', marginBottom: '12px', fontSize: '13px', color: '#fca5a5' }}>
         <strong>⚠ The edible delay is the most common cause of accidental cannabis overconsumption.</strong> Oral THC takes 30–120 minutes to feel. Many people redose because "it's not working" — then both doses hit simultaneously. Add an oral dose and a second oral dose below to see this modelled exactly.
       </div>
 
-      <div style={{ background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '10px', padding: '10px 14px', marginBottom: '1.5rem', fontSize: '12px', color: '#92400e' }}>
+      <div style={{ background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.35)', borderRadius: '10px', padding: '10px 14px', marginBottom: '1.5rem', fontSize: '12px', color: '#fdba74' }}>
         Cannabis PK is among the most variable of any drug. Tolerance, product potency, inhalation technique, individual metabolism, and body fat percentage all substantially affect results. These are population means — treat them as illustrative, not predictive.
       </div>
 
@@ -276,17 +277,17 @@ export default function CannabisCalculator() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
           {/* Personal + settings */}
-          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-            <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Personal details</p>
+          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Personal details</p>
 
             <div style={{ marginBottom: '10px' }}>
-              <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '4px' }}>Body weight</label>
+              <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Body weight</label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <input type="number" value={rawWeight} min={40} max={150}
                   onChange={e => { setRawWeight(e.target.value); const n = parseFloat(e.target.value); if (n >= 40 && n <= 150) setWeightKg(n) }}
                   onBlur={() => { const n = parseFloat(rawWeight); if (isNaN(n) || n < 40 || n > 150) { setWeightKg(70); setRawWeight('70') } }}
-                  style={{ width: '60px', padding: '4px 8px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '14px', fontWeight: '600', color: '#111827', textAlign: 'right', background: 'white' }} />
-                <span style={{ fontSize: '12px', color: '#6b7280' }}>kg</span>
+                  style={{ width: '60px', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', fontWeight: '600', color: '#f0f4ff', textAlign: 'right', background: 'rgba(255,255,255,0.04)' }} />
+                <span style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)' }}>kg</span>
                 <input type="range" min={40} max={150} step={1} value={weightKg}
                   onChange={e => { setWeightKg(parseInt(e.target.value)); setRawWeight(e.target.value) }}
                   style={{ flex: 1, accentColor: '#16a34a' }} />
@@ -294,23 +295,23 @@ export default function CannabisCalculator() {
             </div>
 
             <div>
-              <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '4px' }}>For oral doses — taken with food?</label>
+              <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>For oral doses — taken with food?</label>
               <div style={{ display: 'flex', gap: '6px' }}>
                 <button onClick={() => setWithFood(false)} style={btn(!withFood, '#16a34a')}>Empty stomach</button>
                 <button onClick={() => setWithFood(true)}  style={btn(withFood,  '#16a34a')}>With food (~2.5× higher peak)</button>
               </div>
-              <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '4px' }}>
+              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', marginTop: '4px' }}>
                 Fatty food dramatically increases oral THC bioavailability. This is why edibles from a restaurant hit harder than homemade ones.
               </p>
             </div>
           </div>
 
           {/* Country + driving */}
-          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-            <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Driving limits</p>
+          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Driving limits</p>
 
             <div style={{ marginBottom: '10px' }}>
-              <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '4px' }}>Country</label>
+              <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Country</label>
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                 {Object.keys(CANNABIS_DRIVING_LIMITS).map(k => (
                   <button key={k} onClick={() => setCountry(k)}
@@ -322,7 +323,7 @@ export default function CannabisCalculator() {
             </div>
 
             <div style={{ marginBottom: '8px' }}>
-              <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '4px' }}>Driver type</label>
+              <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Driver type</label>
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                 <button onClick={() => setDriverType('standard')} style={btn(driverType === 'standard', '#16a34a')}>
                   Driving ({drivingLimit.limit === 0 ? 'zero tolerance' : drivingLimit.limit + ' ng/mL blood'})
@@ -334,36 +335,36 @@ export default function CannabisCalculator() {
             </div>
 
             {drivingLimit.note && driverType !== 'none' && (
-              <div style={{ padding: '7px 10px', background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '6px', fontSize: '11px', color: '#92400e' }}>
+              <div style={{ padding: '7px 10px', background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.35)', borderRadius: '6px', fontSize: '11px', color: '#fdba74' }}>
                 ⚠ {drivingLimit.note}
               </div>
             )}
             {driverType === 'none' && (
-              <div style={{ padding: '7px 10px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '6px', fontSize: '11px', color: '#15803d' }}>
+              <div style={{ padding: '7px 10px', background: 'rgba(22,163,74,0.1)', border: '1px solid rgba(22,163,74,0.3)', borderRadius: '6px', fontSize: '11px', color: '#86efac' }}>
                 ✓ Not driving — no legal limit shown.
               </div>
             )}
-            <div style={{ marginTop: '8px', padding: '7px 10px', background: '#fef9c3', border: '1px solid #fde047', borderRadius: '6px', fontSize: '11px', color: '#854d0e' }}>
+            <div style={{ marginTop: '8px', padding: '7px 10px', background: 'rgba(234,179,8,0.1)', border: '1px solid rgba(234,179,8,0.35)', borderRadius: '6px', fontSize: '11px', color: '#fde047' }}>
               ⚠ Legal limits are in blood THC. This graph shows plasma THC (approximately 2× blood). Regular users may be above the legal limit for days after last use without acute impairment — tolerance is not a legal defence.
             </div>
           </div>
 
           {/* Doses */}
-          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-            <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Dose schedule</p>
+          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Dose schedule</p>
 
             {doses.map((d, idx) => (
-              <div key={d.id} style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '10px 12px', marginBottom: '8px' }}>
+              <div key={d.id} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 12px', marginBottom: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#374151' }}>
+                  <span style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(240,244,255,0.75)' }}>
                     {idx === 0 ? 'First dose' : `Dose ${idx + 1}`}
-                    <span style={{ marginLeft: '6px', fontSize: '11px', color: d.route === 'smoked' ? '#6b7280' : '#92400e', fontWeight: '400' }}>
+                    <span style={{ marginLeft: '6px', fontSize: '11px', color: d.route === 'smoked' ? 'rgba(240,244,255,0.4)' : '#fdba74', fontWeight: '400' }}>
                       {d.route === 'smoked' ? '🚬 smoked/vaped' : '🍫 oral/edible'}
                     </span>
                   </span>
                   {doses.length > 1 && (
                     <button onClick={() => removeDose(d.id)}
-                      style={{ fontSize: '18px', color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1, padding: 0 }}>×</button>
+                      style={{ fontSize: '18px', color: 'rgba(240,244,255,0.3)', background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1, padding: 0 }}>×</button>
                   )}
                 </div>
 
@@ -375,16 +376,16 @@ export default function CannabisCalculator() {
 
                 {/* THC amount */}
                 <div style={{ marginBottom: idx === 0 ? 0 : '8px' }}>
-                    <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '3px' }}>
+                    <label style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', display: 'block', marginBottom: '3px' }}>
                         THC dose: {d.thcMg} mg
-                        <span style={{ color: '#9ca3af', marginLeft: '4px' }}>
+                        <span style={{ color: 'rgba(240,244,255,0.3)', marginLeft: '4px' }}>
                             {d.route === 'smoked' ? '(absorbed amount)' : '(total in edible)'}
                         </span>
                     </label>
                     <input type="range" min={1} max={d.route === 'smoked' ? 80 : 200} step={0.5} value={d.thcMg}
                         onChange={e => updateDose(d.id, 'thcMg', parseFloat(e.target.value))}
                         style={{ width: '100%', accentColor: '#16a34a' }} />
-                    <div style={{ fontSize: '11px', color: '#9ca3af', marginTop: '3px', lineHeight: '1.5' }}>
+                    <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', marginTop: '3px', lineHeight: '1.5' }}>
                         {d.route === 'smoked'
                             ? 'Absorbed THC — typically 20–37% of total in joint. A 0.5g joint at 20% THC contains ~100mg total, ~20–37mg absorbed. Strong strains (25–30%) or larger joints push this higher.'
                             : 'Total THC in the edible. Standard commercial dose = 5–10mg. Home edibles are highly variable. The model applies ~10% oral bioavailability (higher with food).'}
@@ -394,20 +395,20 @@ export default function CannabisCalculator() {
                 {/* Timing */}
                 {idx > 0 && (
                   <div>
-                    <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '3px' }}>
+                    <label style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', display: 'block', marginBottom: '3px' }}>
                       Time: +{d.timeh}h after first dose
                     </label>
                     <input type="range" min={0} max={12} step={0.25} value={d.timeh}
                       onChange={e => updateDose(d.id, 'timeh', parseFloat(e.target.value))}
                       style={{ width: '100%', accentColor: '#16a34a' }} />
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#d1d5db' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'rgba(240,244,255,0.2)' }}>
                       <span>0h</span><span>+12h</span>
                     </div>
                   </div>
                 )}
 
                 {d.route === 'oral' && (
-                  <div style={{ marginTop: '6px', padding: '5px 8px', background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '6px', fontSize: '10px', color: '#92400e' }}>
+                  <div style={{ marginTop: '6px', padding: '5px 8px', background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.35)', borderRadius: '6px', fontSize: '10px', color: '#fdba74' }}>
                     Onset: 30–120 min. Effects peak 1–3h. Do not redose before 2h.
                   </div>
                 )}
@@ -416,16 +417,16 @@ export default function CannabisCalculator() {
 
             <div style={{ display: 'flex', gap: '6px' }}>
               <button onClick={() => addDose('smoked')}
-                style={{ flex: 1, padding: '8px', border: '1px dashed #d1d5db', borderRadius: '8px', background: 'transparent', fontSize: '12px', color: '#6b7280', cursor: 'pointer' }}>
+                style={{ flex: 1, padding: '8px', border: '1px dashed rgba(255,255,255,0.15)', borderRadius: '8px', background: 'transparent', fontSize: '12px', color: 'rgba(240,244,255,0.45)', cursor: 'pointer' }}>
                 + Add smoked dose
               </button>
               <button onClick={() => addDose('oral')}
-                style={{ flex: 1, padding: '8px', border: '1px dashed #fed7aa', borderRadius: '8px', background: 'transparent', fontSize: '12px', color: '#92400e', cursor: 'pointer' }}>
+                style={{ flex: 1, padding: '8px', border: '1px dashed rgba(249,115,22,0.35)', borderRadius: '8px', background: 'transparent', fontSize: '12px', color: '#fdba74', cursor: 'pointer' }}>
                 + Add oral dose
               </button>
             </div>
 
-            <div style={{ marginTop: '10px', padding: '8px 12px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', fontSize: '12px', color: '#15803d' }}>
+            <div style={{ marginTop: '10px', padding: '8px 12px', background: 'rgba(22,163,74,0.1)', border: '1px solid rgba(22,163,74,0.3)', borderRadius: '8px', fontSize: '12px', color: '#86efac' }}>
               Total THC: <strong>{totalThcMg.toFixed(1)} mg</strong>
             </div>
           </div>
@@ -437,18 +438,18 @@ export default function CannabisCalculator() {
           {/* Canvas */}
           <div style={{ position: 'relative', width: '100%', height: '360px' }}>
             <canvas ref={canvasRef}
-              style={{ width: '100%', height: '100%', borderRadius: '12px', border: '1px solid #e5e7eb', background: 'white' }} />
+              style={{ width: '100%', height: '100%', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)' }} />
           </div>
 
           {/* Graph controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '12px' }}>
-            <span style={{ fontSize: '11px', fontWeight: '500', color: '#9ca3af', whiteSpace: 'nowrap' }}>SHOW</span>
+            <span style={{ fontSize: '11px', fontWeight: '500', color: 'rgba(240,244,255,0.3)', whiteSpace: 'nowrap' }}>SHOW</span>
             <input type="range" min={4} max={48} step={4} value={timeScale}
               onChange={e => setTimeScale(parseInt(e.target.value))}
               style={{ flex: 1, accentColor: '#16a34a' }} />
-            <span style={{ fontWeight: '600', color: '#374151', minWidth: '28px' }}>{timeScale}h</span>
+            <span style={{ fontWeight: '600', color: 'rgba(240,244,255,0.75)', minWidth: '28px' }}>{timeScale}h</span>
             <button onClick={exportGraph}
-              style={{ padding: '5px 12px', background: '#111827', color: 'white', border: 'none', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              style={{ padding: '5px 12px', background: '#2a6fdb', color: 'white', border: 'none', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
               ↓ Export PNG
             </button>
           </div>
@@ -471,10 +472,10 @@ export default function CannabisCalculator() {
                 { label: 'Sub-threshold at',value: metrics.subThresholdTime != null ? formatHours(metrics.subThresholdTime) : '>48h', sub: 'below 1 ng/mL plasma' },
                 { label: 'Safe to drive',   value: driverType === 'none' ? 'Not driving' : metrics.safeToDriveTime != null ? formatHours(metrics.safeToDriveTime) : '>48h', sub: driverType === 'none' ? 'No limit applied' : `Below legal limit` },
               ].map(m => (
-                <div key={m.label} style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '10px 12px' }}>
-                  <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '2px' }}>{m.label}</div>
-                  <div style={{ fontSize: '17px', fontWeight: '700', color: m.color ?? '#111827' }}>{m.value}</div>
-                  {m.sub && <div style={{ fontSize: '10px', color: m.color ?? '#9ca3af' }}>{m.sub}</div>}
+                <div key={m.label} style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 12px' }}>
+                  <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', marginBottom: '2px' }}>{m.label}</div>
+                  <div style={{ fontSize: '17px', fontWeight: '700', color: m.color ?? '#f0f4ff' }}>{m.value}</div>
+                  {m.sub && <div style={{ fontSize: '10px', color: m.color ?? 'rgba(240,244,255,0.35)' }}>{m.sub}</div>}
                 </div>
               ))}
             </div>
@@ -482,13 +483,13 @@ export default function CannabisCalculator() {
 
           {/* Edible warning if oral dose present */}
           {hasOral && (
-            <div style={{ background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: '#92400e' }}>
+            <div style={{ background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.35)', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: '#fdba74' }}>
               <strong>You have oral doses in your schedule.</strong> Notice the delayed peak compared to smoked. The plateau can last 4–8 hours. Many people feel "nothing is happening" at 45 minutes and take more — the curve shows why this leads to overconsumption.
             </div>
           )}
 
           {/* PK education */}
-          <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: '#15803d' }}>
+          <div style={{ background: 'rgba(22,163,74,0.1)', border: '1px solid rgba(22,163,74,0.3)', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: '#86efac' }}>
             <p style={{ margin: '0 0 6px' }}>
               <strong>Smoked vs oral — why they feel so different:</strong> Smoked THC reaches the brain in seconds and peaks in minutes. Oral THC undergoes extensive first-pass metabolism, converting to 11-OH-THC — an active metabolite that is more potent and crosses the blood-brain barrier more readily. This is why edibles produce a qualitatively different, more intense, and longer-lasting effect.
             </p>
@@ -501,22 +502,22 @@ export default function CannabisCalculator() {
           </div>
 
           {/* Dangerous interactions */}
-          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px 14px' }}>
-            <p style={{ fontSize: '13px', fontWeight: '600', color: '#111827', margin: '0 0 10px' }}>Dangerous combinations</p>
+          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '12px 14px' }}>
+            <p style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4ff', margin: '0 0 10px' }}>Dangerous combinations</p>
             {CANNABIS_INTERACTIONS.map(inter => (
               <div key={inter.substance} style={{ marginBottom: '8px', padding: '8px 10px', background: inter.color + '11', border: `1px solid ${inter.color}33`, borderRadius: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#111827' }}>{inter.substance}</span>
+                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#f0f4ff' }}>{inter.substance}</span>
                   <span style={{ fontSize: '10px', fontWeight: '600', padding: '1px 8px', borderRadius: '999px', background: inter.color, color: 'white' }}>{inter.severity}</span>
                 </div>
-                <p style={{ fontSize: '11px', color: '#6b7280', margin: 0, lineHeight: '1.5' }}>{inter.mechanism}</p>
+                <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', margin: 0, lineHeight: '1.5' }}>{inter.mechanism}</p>
               </div>
             ))}
           </div>
 
           {/* Support */}
-          <div style={{ padding: '10px 14px', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', fontSize: '12px', color: '#6b7280' }}>
-            Concerned about cannabis use? <a href="https://www.jellinek.nl" target="_blank" rel="noopener noreferrer" style={{ color: '#16a34a' }}>Jellinek.nl</a> and <a href="https://www.trimbos.nl" target="_blank" rel="noopener noreferrer" style={{ color: '#16a34a' }}>Trimbos.nl</a> offer free, confidential support.
+          <div style={{ padding: '10px 14px', background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', fontSize: '12px', color: 'rgba(240,244,255,0.45)' }}>
+            Concerned about cannabis use? <a href="https://www.jellinek.nl" target="_blank" rel="noopener noreferrer" style={{ color: '#86efac' }}>Jellinek.nl</a> and <a href="https://www.trimbos.nl" target="_blank" rel="noopener noreferrer" style={{ color: '#86efac' }}>Trimbos.nl</a> offer free, confidential support.
           </div>
         </div>
       </div>

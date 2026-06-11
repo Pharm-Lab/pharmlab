@@ -242,24 +242,25 @@ export default function MDMACalculator() {
     padding: '5px 12px', borderRadius: '7px', cursor: 'pointer', fontSize: '12px',
     fontWeight: active ? '600' : '400',
     border: active ? '2px solid #7c3aed' : '1px solid #d1d5db',
-    background: active ? '#f5f3ff' : 'white',
-    color: active ? '#6d28d9' : '#374151',
+    background: active ? 'rgba(109,40,217,0.18)' : 'rgba(255,255,255,0.05)',
+    color: active ? '#c4b5fd' : 'rgba(240,244,255,0.65)',
   })
 
   return (
     <main style={{ maxWidth: '980px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
-      <a href="/harm-reduction" style={{ fontSize: '13px', color: '#6b7280', textDecoration: 'none' }}>← Harm reduction</a>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#111827', margin: '1rem 0 4px' }}>MDMA Pharmacokinetics</h1>
-      <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '1.25rem', lineHeight: '1.6' }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'); * { box-sizing:border-box; }`}</style>
+      <a href="/harm-reduction" style={{ fontSize: '13px', color: 'rgba(240,244,255,0.4)', textDecoration: 'none' }}>← Harm reduction</a>
+      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#f0f4ff', margin: '1rem 0 4px' }}>MDMA Pharmacokinetics</h1>
+      <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.45)', marginBottom: '1.25rem', lineHeight: '1.6' }}>
         Plasma concentration model based on published population PK parameters. Shows how dose, body weight, and redosing affect concentration over time.
       </p>
 
       {/* Test kit disclaimer */}
-      <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', padding: '12px 16px', marginBottom: '12px', fontSize: '13px', color: '#991b1b' }}>
+      <div style={{ background: 'rgba(185,28,28,0.2)', border: '1px solid rgba(239,68,68,0.55)', borderRadius: '10px', padding: '12px 16px', marginBottom: '12px', fontSize: '13px', color: '#fca5a5' }}>
         <strong>⚠ Always test your substance before use.</strong> Street MDMA is frequently adulterated with dangerous compounds including methamphetamine, synthetic cathinones, and PMA/PMMA — which have caused deaths at doses people considered safe. PMA has a much lower lethal dose and slower onset than MDMA, causing people to redose thinking it is not working. A reagent test kit (Marquis, Mecke, Simon's) takes 30 seconds and can save your life. Available for example from <a href="https://dancesafe.org" target="_blank" rel="noopener noreferrer" style={{ color: '#dc2626' }}>DanceSafe</a>.
       </div>
 
-      <div style={{ background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '10px', padding: '10px 14px', marginBottom: '1.5rem', fontSize: '12px', color: '#92400e' }}>
+      <div style={{ background: 'rgba(120,53,15,0.25)', border: '1px solid rgba(249,115,22,0.5)', borderRadius: '10px', padding: '10px 14px', marginBottom: '1.5rem', fontSize: '12px', color: '#fdba74' }}>
         Population-average PK model. ~7% of Europeans are CYP2D6 poor metabolisers and reach 2–3× higher concentrations at the same dose. This is not a safety guarantee.
       </div>
 
@@ -269,41 +270,41 @@ export default function MDMACalculator() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
           {/* Body weight */}
-          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-            <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Personal details</p>
-            <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '4px' }}>Body weight</label>
+          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Personal details</p>
+            <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Body weight</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <input type="number" value={rawWeight} min={40} max={150}
                 onChange={e => { setRawWeight(e.target.value); const n = parseFloat(e.target.value); if (n >= 40 && n <= 150) setWeightKg(n) }}
                 onBlur={() => { const n = parseFloat(rawWeight); if (isNaN(n) || n < 40 || n > 150) { setWeightKg(70); setRawWeight('70') } }}
-                style={{ width: '60px', padding: '4px 8px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '14px', fontWeight: '600', color: '#111827', textAlign: 'right', background: 'white' }} />
-              <span style={{ fontSize: '12px', color: '#6b7280' }}>kg</span>
+                style={{ width: '60px', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', fontWeight: '600', color: '#f0f4ff', textAlign: 'right', background: 'rgba(255,255,255,0.04)' }} />
+              <span style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)' }}>kg</span>
               <input type="range" min={40} max={150} step={1} value={weightKg}
                 onChange={e => { setWeightKg(parseInt(e.target.value)); setRawWeight(e.target.value) }}
                 style={{ flex: 1, accentColor: '#7c3aed' }} />
             </div>
-            <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '6px' }}>
+            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', marginTop: '6px' }}>
               Vd scales with body weight (~7 L/kg). Lighter individuals reach higher concentrations at the same dose.
             </p>
           </div>
 
           {/* Pill details */}
-          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-            <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pill details</p>
+          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pill details</p>
 
             <div style={{ marginBottom: '12px' }}>
-              <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '4px' }}>Pill weight (mg)</label>
+              <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Pill weight (mg)</label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <input type="number" value={rawPillMg} min={50} max={500}
                   onChange={e => { setRawPillMg(e.target.value); const n = parseFloat(e.target.value); if (n >= 50 && n <= 500) setPillMg(n) }}
                   onBlur={() => { const n = parseFloat(rawPillMg); const clamped = Math.min(Math.max(isNaN(n) ? 150 : n, 50), 500); setPillMg(clamped); setRawPillMg(String(clamped)) }}
-                  style={{ width: '72px', padding: '4px 8px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '14px', fontWeight: '600', color: '#111827', textAlign: 'right', background: 'white' }} />
-                <span style={{ fontSize: '12px', color: '#6b7280' }}>mg</span>
+                  style={{ width: '72px', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', fontWeight: '600', color: '#f0f4ff', textAlign: 'right', background: 'rgba(255,255,255,0.04)' }} />
+                <span style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)' }}>mg</span>
                 <input type="range" min={50} max={500} step={5} value={pillMg}
                   onChange={e => { setPillMg(parseInt(e.target.value)); setRawPillMg(e.target.value) }}
                   style={{ flex: 1, accentColor: '#7c3aed' }} />
               </div>
-              <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '4px' }}>
+              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', marginTop: '4px' }}>
                 Dutch pills commonly range 100–250mg. High-dose pills (&gt;200mg) carry significantly higher risk.
               </p>
             </div>
@@ -314,7 +315,7 @@ export default function MDMACalculator() {
                 <input type="checkbox" id="purity-check" checked={knownPurity}
                   onChange={e => setKnownPurity(e.target.checked)}
                   style={{ accentColor: '#7c3aed', width: '14px', height: '14px' }} />
-                <label htmlFor="purity-check" style={{ fontSize: '12px', color: '#374151', cursor: 'pointer' }}>
+                <label htmlFor="purity-check" style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', cursor: 'pointer' }}>
                   I know the purity (from test result)
                 </label>
               </div>
@@ -323,8 +324,8 @@ export default function MDMACalculator() {
                   <input type="number" value={rawPurity} min={1} max={100}
                     onChange={e => { setRawPurity(e.target.value); const n = parseFloat(e.target.value); if (n >= 1 && n <= 100) setPurity(n) }}
                     onBlur={() => { const n = parseFloat(rawPurity); const c = Math.min(Math.max(isNaN(n) ? 100 : n, 1), 100); setPurity(c); setRawPurity(String(c)) }}
-                    style={{ width: '60px', padding: '4px 8px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '14px', fontWeight: '600', color: '#111827', textAlign: 'right', background: 'white' }} />
-                  <span style={{ fontSize: '12px', color: '#6b7280' }}>% pure</span>
+                    style={{ width: '60px', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', fontWeight: '600', color: '#f0f4ff', textAlign: 'right', background: 'rgba(255,255,255,0.04)' }} />
+                  <span style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)' }}>% pure</span>
                   <input type="range" min={1} max={100} step={1} value={purity}
                     onChange={e => { setPurity(parseInt(e.target.value)); setRawPurity(e.target.value) }}
                     style={{ flex: 1, accentColor: '#7c3aed' }} />
@@ -335,30 +336,30 @@ export default function MDMACalculator() {
                   ⚠ Assuming 100% purity. Actual content may differ significantly. Test your substance.
                 </p>
               )}
-              <div style={{ marginTop: '8px', padding: '8px 12px', background: '#f5f3ff', border: '1px solid #ddd6fe', borderRadius: '8px', fontSize: '12px', color: '#5b21b6' }}>
+              <div style={{ marginTop: '8px', padding: '8px 12px', background: 'rgba(109,40,217,0.15)', border: '1px solid rgba(124,58,237,0.4)', borderRadius: '8px', fontSize: '12px', color: '#c4b5fd' }}>
                 Effective MDMA per pill: <strong>{effectivePillMg.toFixed(1)} mg</strong>
-                {knownPurity && purity < 100 && <span style={{ color: '#9ca3af' }}> ({purity}% of {pillMg}mg)</span>}
+                {knownPurity && purity < 100 && <span style={{ color: 'rgba(240,244,255,0.3)' }}> ({purity}% of {pillMg}mg)</span>}
               </div>
             </div>
           </div>
 
           {/* Dose schedule */}
-          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-            <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Dose schedule</p>
+          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Dose schedule</p>
 
             {doseEntries.map((d, idx) => {
               const doseMg = effectivePillMg * DOSE_OPTIONS[d.fraction].fraction
               return (
-                <div key={d.id} style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '10px 12px', marginBottom: '8px' }}>
+                <div key={d.id} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 12px', marginBottom: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: '600', color: '#374151' }}>
+                    <span style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(240,244,255,0.75)' }}>
                       {idx === 0 ? 'First dose' : `Dose ${idx + 1}`}
                     </span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '11px', color: '#9ca3af' }}>{doseMg.toFixed(1)}mg</span>
+                      <span style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)' }}>{doseMg.toFixed(1)}mg</span>
                       {doseEntries.length > 1 && (
                         <button onClick={() => removeDose(d.id)}
-                          style={{ fontSize: '18px', color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1, padding: 0 }}>×</button>
+                          style={{ fontSize: '18px', color: 'rgba(240,244,255,0.3)', background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1, padding: 0 }}>×</button>
                       )}
                     </div>
                   </div>
@@ -375,20 +376,20 @@ export default function MDMACalculator() {
                   {/* Timing — only for doses after first */}
                   {idx > 0 && (
                     <div>
-                      <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '3px' }}>
+                      <label style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', display: 'block', marginBottom: '3px' }}>
                         Time: +{d.timeh}h after first dose
                       </label>
                       <input type="range" min={0.5} max={12} step={0.5} value={d.timeh}
                         onChange={e => updateDose(d.id, 'timeh', parseFloat(e.target.value))}
                         style={{ width: '100%', accentColor: '#7c3aed' }} />
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#d1d5db' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'rgba(240,244,255,0.2)' }}>
                         <span>+0.5h</span><span>+12h</span>
                       </div>
                     </div>
                   )}
 
                   {doseMg > 150 && (
-                    <div style={{ marginTop: '6px', padding: '5px 8px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '6px', fontSize: '10px', color: '#991b1b' }}>
+                    <div style={{ marginTop: '6px', padding: '5px 8px', background: 'rgba(185,28,28,0.2)', border: '1px solid rgba(239,68,68,0.5)', borderRadius: '6px', fontSize: '10px', color: '#fca5a5' }}>
                       ⚠ This dose exceeds 150mg — risk increases non-linearly
                     </div>
                   )}
@@ -397,19 +398,19 @@ export default function MDMACalculator() {
             })}
 
             <button onClick={addDose}
-              style={{ width: '100%', padding: '8px', border: '1px dashed #d1d5db', borderRadius: '8px', background: 'transparent', fontSize: '13px', color: '#6b7280', cursor: 'pointer' }}>
+              style={{ width: '100%', padding: '8px', border: '1px dashed rgba(255,255,255,0.15)', borderRadius: '8px', background: 'transparent', fontSize: '13px', color: 'rgba(240,244,255,0.45)', cursor: 'pointer' }}>
               + Add another dose
             </button>
 
-            <div style={{ marginTop: '10px', padding: '8px 12px', background: '#f5f3ff', border: '1px solid #ddd6fe', borderRadius: '8px', fontSize: '12px', color: '#5b21b6' }}>
+            <div style={{ marginTop: '10px', padding: '8px 12px', background: 'rgba(109,40,217,0.15)', border: '1px solid rgba(124,58,237,0.4)', borderRadius: '8px', fontSize: '12px', color: '#c4b5fd' }}>
               Total: <strong>{totalDoseMg.toFixed(1)} mg</strong> MDMA
-              <span style={{ fontSize: '11px', color: '#9ca3af', marginLeft: '6px' }}>
+              <span style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', marginLeft: '6px' }}>
                 ({(totalDoseMg / weightKg).toFixed(2)} mg/kg)
               </span>
             </div>
 
             {doseEntries.length > 1 && (
-              <div style={{ marginTop: '8px', padding: '7px 10px', background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '6px', fontSize: '11px', color: '#92400e' }}>
+              <div style={{ marginTop: '8px', padding: '7px 10px', background: 'rgba(120,53,15,0.25)', border: '1px solid rgba(249,115,22,0.5)', borderRadius: '6px', fontSize: '11px', color: '#fdba74' }}>
                 ⚠ Multiple doses significantly extend the time at high concentration and increase next-day neurotoxicity risk. The curve shows exactly why.
               </div>
             )}
@@ -422,18 +423,18 @@ export default function MDMACalculator() {
           {/* Canvas */}
           <div style={{ position: 'relative', width: '100%', height: '360px' }}>
             <canvas ref={canvasRef}
-              style={{ width: '100%', height: '100%', borderRadius: '12px', border: '1px solid #e5e7eb', background: 'white' }} />
+              style={{ width: '100%', height: '100%', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)' }} />
           </div>
 
           {/* Graph controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '12px' }}>
-            <span style={{ fontSize: '11px', fontWeight: '500', color: '#9ca3af', whiteSpace: 'nowrap' }}>SHOW</span>
+            <span style={{ fontSize: '11px', fontWeight: '500', color: 'rgba(240,244,255,0.3)', whiteSpace: 'nowrap' }}>SHOW</span>
             <input type="range" min={8} max={48} step={4} value={timeScale}
               onChange={e => setTimeScale(parseInt(e.target.value))}
               style={{ flex: 1, accentColor: '#7c3aed' }} />
-            <span style={{ fontWeight: '600', color: '#374151', minWidth: '28px' }}>{timeScale}h</span>
+            <span style={{ fontWeight: '600', color: 'rgba(240,244,255,0.75)', minWidth: '28px' }}>{timeScale}h</span>
             <button onClick={exportGraph}
-              style={{ padding: '5px 12px', background: '#111827', color: 'white', border: 'none', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              style={{ padding: '5px 12px', background: '#2a6fdb', color: 'white', border: 'none', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
               ↓ Export PNG
             </button>
           </div>
@@ -456,23 +457,23 @@ export default function MDMACalculator() {
                 { label: 'Sub-threshold at',    value: metrics.clearTime     != null ? formatHours(metrics.clearTime)     : '>48h', sub: 'below 50 ng/mL' },
                 { label: 'Essentially clear',   value: metrics.fullClearTime != null ? formatHours(metrics.fullClearTime) : '>48h', sub: 'below 10 ng/mL' },
               ].map(m => (
-                <div key={m.label} style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '10px 12px' }}>
-                  <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '2px' }}>{m.label}</div>
-                  <div style={{ fontSize: '17px', fontWeight: '700', color: m.color ?? '#111827' }}>{m.value}</div>
-                  {m.sub && <div style={{ fontSize: '10px', color: m.color ?? '#9ca3af' }}>{m.sub}</div>}
+                <div key={m.label} style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 12px' }}>
+                  <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', marginBottom: '2px' }}>{m.label}</div>
+                  <div style={{ fontSize: '17px', fontWeight: '700', color: m.color ?? '#f0f4ff' }}>{m.value}</div>
+                  {m.sub && <div style={{ fontSize: '10px', color: m.color ?? 'rgba(240,244,255,0.35)' }}>{m.sub}</div>}
                 </div>
               ))}
             </div>
           )}
 
           {metrics && (
-            <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '8px', padding: '8px 12px', fontSize: '11px', color: '#1e40af' }}>
+            <div style={{ background: 'rgba(42,111,219,0.12)', border: '1px solid rgba(42,111,219,0.35)', borderRadius: '8px', padding: '8px 12px', fontSize: '11px', color: '#93b4f7' }}>
              <strong>Note on peak concentration:</strong> The peak on the graph shows when plasma concentration is highest — not necessarily when subjective effects feel strongest. MDMA's psychoactive effects depend on serotonin release in the brain, which precedes plasma peak and diminishes as acute tolerance develops. You may feel effects intensely before the curve peaks, and feel little at plasma concentrations that look high on the graph.
             </div>
         )}
 
           {/* PK education */}
-          <div style={{ background: '#f5f3ff', border: '1px solid #ddd6fe', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: '#5b21b6' }}>
+          <div style={{ background: 'rgba(109,40,217,0.15)', border: '1px solid rgba(124,58,237,0.4)', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: '#c4b5fd' }}>
             <p style={{ margin: '0 0 6px' }}>
               <strong>Why higher doses are disproportionately dangerous:</strong> MDMA inhibits CYP2D6 — the enzyme that metabolises it — at higher concentrations (autoinhibition). Clearance slows as concentration rises, so doubling the dose more than doubles peak concentration.
             </p>
@@ -485,22 +486,22 @@ export default function MDMACalculator() {
           </div>
 
           {/* Dangerous interactions */}
-          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px 14px' }}>
-            <p style={{ fontSize: '13px', fontWeight: '600', color: '#111827', margin: '0 0 10px' }}>Dangerous combinations</p>
+          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '12px 14px' }}>
+            <p style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4ff', margin: '0 0 10px' }}>Dangerous combinations</p>
             {MDMA_INTERACTIONS.map(inter => (
               <div key={inter.substance} style={{ marginBottom: '8px', padding: '8px 10px', background: inter.color + '11', border: `1px solid ${inter.color}33`, borderRadius: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#111827' }}>{inter.substance}</span>
+                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#f0f4ff' }}>{inter.substance}</span>
                   <span style={{ fontSize: '10px', fontWeight: '600', padding: '1px 8px', borderRadius: '999px', background: inter.color, color: 'white' }}>{inter.severity}</span>
                 </div>
-                <p style={{ fontSize: '11px', color: '#6b7280', margin: 0, lineHeight: '1.5' }}>{inter.mechanism}</p>
+                <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', margin: 0, lineHeight: '1.5' }}>{inter.mechanism}</p>
               </div>
             ))}
           </div>
 
           {/* Support */}
-          <div style={{ padding: '10px 14px', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', fontSize: '12px', color: '#6b7280' }}>
-            Struggling with MDMA use? <a href="https://www.jellinek.nl" target="_blank" rel="noopener noreferrer" style={{ color: '#7c3aed' }}>Jellinek.nl</a> and <a href="https://www.trimbos.nl" target="_blank" rel="noopener noreferrer" style={{ color: '#7c3aed' }}>Trimbos.nl</a> offer free, confidential support.
+          <div style={{ padding: '10px 14px', background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', fontSize: '12px', color: 'rgba(240,244,255,0.45)' }}>
+            Struggling with MDMA use? <a href="https://www.jellinek.nl" target="_blank" rel="noopener noreferrer" style={{ color: '#c4b5fd' }}>Jellinek.nl</a> and <a href="https://www.trimbos.nl" target="_blank" rel="noopener noreferrer" style={{ color: '#c4b5fd' }}>Trimbos.nl</a> offer free, confidential support.
           </div>
         </div>
       </div>

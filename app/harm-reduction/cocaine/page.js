@@ -194,23 +194,24 @@ export default function CocaineCalculator() {
     fontWeight: active ? '600' : '400',
     border: active ? '2px solid #dc2626' : '1px solid #d1d5db',
     background: active ? '#fef2f2' : 'white',
-    color: active ? '#dc2626' : '#374151',
+    color: active ? '#fca5a5' : 'rgba(240,244,255,0.65)',
   })
 
   return (
     <main style={{ maxWidth: '980px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
-      <a href="/harm-reduction" style={{ fontSize: '13px', color: '#6b7280', textDecoration: 'none' }}>← Harm reduction</a>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#111827', margin: '1rem 0 4px' }}>Cocaine Pharmacokinetics</h1>
-      <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '1.25rem', lineHeight: '1.6' }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'); * { box-sizing:border-box; }`}</style>
+      <a href="/harm-reduction" style={{ fontSize: '13px', color: 'rgba(240,244,255,0.4)', textDecoration: 'none' }}>← Harm reduction</a>
+      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#f0f4ff', margin: '1rem 0 4px' }}>Cocaine Pharmacokinetics</h1>
+      <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.45)', marginBottom: '1.25rem', lineHeight: '1.6' }}>
         Plasma concentration model for intranasal cocaine. The short half-life (~1.25h) is the pharmacological basis of the compulsion to redose — add multiple doses to see exactly why.
       </p>
 
       {/* Test kit warning */}
-      <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', padding: '12px 16px', marginBottom: '12px', fontSize: '13px', color: '#991b1b' }}>
-        <strong>⚠ Test your substance.</strong> The majority of European cocaine samples contain levamisole (a veterinary antiparasitic associated with dangerous immune suppression with repeated use) and/or caffeine, phenacetin, or other cutting agents. Fentanyl contamination, while less common in Europe than North America, has been detected. A reagent test and fentanyl test strips are the minimum. Available from <a href="https://dancesafe.org" target="_blank" rel="noopener noreferrer" style={{ color: '#dc2626' }}>DanceSafe</a>.
+      <div style={{ background: 'rgba(185,28,28,0.2)', border: '1px solid rgba(239,68,68,0.5)', borderRadius: '10px', padding: '12px 16px', marginBottom: '12px', fontSize: '13px', color: '#fca5a5' }}>
+        <strong>⚠ Test your substance.</strong> The majority of European cocaine samples contain levamisole (a veterinary antiparasitic associated with dangerous immune suppression with repeated use) and/or caffeine, phenacetin, or other cutting agents. Fentanyl contamination, while less common in Europe than North America, has been detected. A reagent test and fentanyl test strips are the minimum. Available from <a href="https://dancesafe.org" target="_blank" rel="noopener noreferrer" style={{ color: '#fca5a5' }}>DanceSafe</a>.
       </div>
 
-      <div style={{ background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '10px', padding: '10px 14px', marginBottom: '1.5rem', fontSize: '12px', color: '#92400e' }}>
+      <div style={{ background: 'rgba(120,53,15,0.25)', border: '1px solid rgba(249,115,22,0.5)', borderRadius: '10px', padding: '10px 14px', marginBottom: '1.5rem', fontSize: '12px', color: '#fdba74' }}>
         Population-average PK model. Individual variation in cocaine metabolism (via plasma cholinesterase and liver esterases) is significant. Cardiovascular risk zones are indicative — underlying heart conditions, stimulant tolerance, and concurrent substance use all shift risk substantially.
       </div>
 
@@ -220,15 +221,15 @@ export default function CocaineCalculator() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
           {/* Body weight */}
-          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-            <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Personal details</p>
-            <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '4px' }}>Body weight</label>
+          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Personal details</p>
+            <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Body weight</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <input type="number" value={rawWeight} min={40} max={150}
                 onChange={e => { setRawWeight(e.target.value); const n = parseFloat(e.target.value); if (n >= 40 && n <= 150) setWeightKg(n) }}
                 onBlur={() => { const n = parseFloat(rawWeight); if (isNaN(n) || n < 40 || n > 150) { setWeightKg(70); setRawWeight('70') } }}
-                style={{ width: '60px', padding: '4px 8px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '14px', fontWeight: '600', color: '#111827', textAlign: 'right', background: 'white' }} />
-              <span style={{ fontSize: '12px', color: '#6b7280' }}>kg</span>
+                style={{ width: '60px', padding: '4px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', fontWeight: '600', color: '#f0f4ff', textAlign: 'right', background: 'rgba(255,255,255,0.04)' }} />
+              <span style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)' }}>kg</span>
               <input type="range" min={40} max={150} step={1} value={weightKg}
                 onChange={e => { setWeightKg(parseInt(e.target.value)); setRawWeight(e.target.value) }}
                 style={{ flex: 1, accentColor: '#dc2626' }} />
@@ -236,36 +237,36 @@ export default function CocaineCalculator() {
           </div>
 
           {/* Dose schedule */}
-          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-            <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Dose schedule</p>
+          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Dose schedule</p>
 
             {doses.map((d, idx) => (
-              <div key={d.id} style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '10px 12px', marginBottom: '8px' }}>
+              <div key={d.id} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 12px', marginBottom: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#374151' }}>
+                  <span style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(240,244,255,0.75)' }}>
                     {idx === 0 ? 'First line' : `Line ${idx + 1}`}
                   </span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '11px', color: '#9ca3af' }}>{d.doseMg}mg</span>
+                    <span style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)' }}>{d.doseMg}mg</span>
                     {doses.length > 1 && (
                       <button onClick={() => removeDose(d.id)}
-                        style={{ fontSize: '18px', color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1, padding: 0 }}>×</button>
+                        style={{ fontSize: '18px', color: 'rgba(240,244,255,0.3)', background: 'none', border: 'none', cursor: 'pointer', lineHeight: 1, padding: 0 }}>×</button>
                     )}
                   </div>
                 </div>
 
                 {/* Dose amount */}
                 <div style={{ marginBottom: idx === 0 ? 0 : '8px' }}>
-                  <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '3px' }}>
+                  <label style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', display: 'block', marginBottom: '3px' }}>
                     Amount: {d.doseMg}mg
-                    <span style={{ color: '#9ca3af', marginLeft: '4px' }}>
+                    <span style={{ color: 'rgba(240,244,255,0.3)', marginLeft: '4px' }}>
                       (a typical line ~25–75mg)
                     </span>
                   </label>
                   <input type="range" min={10} max={200} step={5} value={d.doseMg}
                     onChange={e => updateDose(d.id, 'doseMg', parseInt(e.target.value))}
                     style={{ width: '100%', accentColor: '#dc2626' }} />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#d1d5db' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'rgba(240,244,255,0.2)' }}>
                     <span>10mg</span><span>200mg</span>
                   </div>
                 </div>
@@ -273,13 +274,13 @@ export default function CocaineCalculator() {
                 {/* Timing */}
                 {idx > 0 && (
                   <div>
-                    <label style={{ fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '3px' }}>
+                    <label style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', display: 'block', marginBottom: '3px' }}>
                       Time: +{d.timeh}h after first line
                     </label>
                     <input type="range" min={0.25} max={10} step={0.25} value={d.timeh}
                       onChange={e => updateDose(d.id, 'timeh', parseFloat(e.target.value))}
                       style={{ width: '100%', accentColor: '#dc2626' }} />
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#d1d5db' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'rgba(240,244,255,0.2)' }}>
                       <span>+0.25h</span><span>+10h</span>
                     </div>
                   </div>
@@ -288,19 +289,19 @@ export default function CocaineCalculator() {
             ))}
 
             <button onClick={addDose}
-              style={{ width: '100%', padding: '8px', border: '1px dashed #fecaca', borderRadius: '8px', background: 'transparent', fontSize: '13px', color: '#dc2626', cursor: 'pointer' }}>
+              style={{ width: '100%', padding: '8px', border: '1px dashed rgba(239,68,68,0.4)', borderRadius: '8px', background: 'transparent', fontSize: '13px', color: '#fca5a5', cursor: 'pointer' }}>
               + Add another line
             </button>
 
-            <div style={{ marginTop: '10px', padding: '8px 12px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', fontSize: '12px', color: '#991b1b' }}>
+            <div style={{ marginTop: '10px', padding: '8px 12px', background: 'rgba(185,28,28,0.2)', border: '1px solid rgba(239,68,68,0.5)', borderRadius: '8px', fontSize: '12px', color: '#fca5a5' }}>
               Total: <strong>{totalDoseMg}mg</strong>
-              <span style={{ fontSize: '11px', color: '#9ca3af', marginLeft: '6px' }}>
+              <span style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', marginLeft: '6px' }}>
                 ({(totalDoseMg / weightKg).toFixed(2)} mg/kg)
               </span>
             </div>
 
             {doses.length >= 3 && (
-              <div style={{ marginTop: '8px', padding: '7px 10px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '6px', fontSize: '11px', color: '#991b1b' }}>
+              <div style={{ marginTop: '8px', padding: '7px 10px', background: 'rgba(185,28,28,0.2)', border: '1px solid rgba(239,68,68,0.4)', borderRadius: '6px', fontSize: '11px', color: '#fca5a5' }}>
                 ⚠ The curve shows cumulative cardiac load. Notice how the concentration never fully drops to zero between lines — this is the pharmacological basis of a binge session. Cardiovascular risk is not just about peak concentration but time spent at elevated levels.
               </div>
             )}
@@ -313,18 +314,18 @@ export default function CocaineCalculator() {
           {/* Canvas */}
           <div style={{ position: 'relative', width: '100%', height: '360px' }}>
             <canvas ref={canvasRef}
-              style={{ width: '100%', height: '100%', borderRadius: '12px', border: '1px solid #e5e7eb', background: 'white' }} />
+              style={{ width: '100%', height: '100%', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)' }} />
           </div>
 
           {/* Graph controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '12px' }}>
-            <span style={{ fontSize: '11px', fontWeight: '500', color: '#9ca3af', whiteSpace: 'nowrap' }}>SHOW</span>
+            <span style={{ fontSize: '11px', fontWeight: '500', color: 'rgba(240,244,255,0.3)', whiteSpace: 'nowrap' }}>SHOW</span>
             <input type="range" min={2} max={24} step={1} value={timeScale}
               onChange={e => setTimeScale(parseInt(e.target.value))}
               style={{ flex: 1, accentColor: '#dc2626' }} />
-            <span style={{ fontWeight: '600', color: '#374151', minWidth: '28px' }}>{timeScale}h</span>
+            <span style={{ fontWeight: '600', color: 'rgba(240,244,255,0.75)', minWidth: '28px' }}>{timeScale}h</span>
             <button onClick={exportGraph}
-              style={{ padding: '5px 12px', background: '#111827', color: 'white', border: 'none', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              style={{ padding: '5px 12px', background: '#2a6fdb', color: 'white', border: 'none', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
               ↓ Export PNG
             </button>
           </div>
@@ -347,17 +348,17 @@ export default function CocaineCalculator() {
                 { label: 'Essentially clear',   value: metrics.clearTime != null ? formatHours(metrics.clearTime) : '>12h', sub: 'below 10 ng/mL' },
                 { label: 'Total dose',          value: totalDoseMg + 'mg', sub: (totalDoseMg / weightKg).toFixed(2) + ' mg/kg' },
               ].map(m => (
-                <div key={m.label} style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '10px 12px' }}>
-                  <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '2px' }}>{m.label}</div>
-                  <div style={{ fontSize: '17px', fontWeight: '700', color: m.color ?? '#111827' }}>{m.value}</div>
-                  {m.sub && <div style={{ fontSize: '10px', color: m.color ?? '#9ca3af' }}>{m.sub}</div>}
+                <div key={m.label} style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 12px' }}>
+                  <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', marginBottom: '2px' }}>{m.label}</div>
+                  <div style={{ fontSize: '17px', fontWeight: '700', color: m.color ?? '#f0f4ff' }}>{m.value}</div>
+                  {m.sub && <div style={{ fontSize: '10px', color: m.color ?? 'rgba(240,244,255,0.35)' }}>{m.sub}</div>}
                 </div>
               ))}
             </div>
           )}
 
           {/* PK education */}
-          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: '#991b1b' }}>
+          <div style={{ background: 'rgba(185,28,28,0.2)', border: '1px solid rgba(239,68,68,0.5)', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: '#fca5a5' }}>
             <p style={{ margin: '0 0 6px' }}>
               <strong>Why cocaine is so compulsive — it's in the PK:</strong> With a half-life of ~1.25 hours, plasma concentration drops sharply within 1–2 hours. The rapid dopamine release followed by rapid crash creates a powerful neurobiological urge to redose before the previous line has cleared. Each additional line adds to cumulative cardiac load. Add 3–4 lines at realistic intervals and watch the curve — the heart is under continuous elevated stress.
             </p>
@@ -367,21 +368,21 @@ export default function CocaineCalculator() {
           </div>
 
           {/* Dangerous interactions */}
-          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px 14px' }}>
-            <p style={{ fontSize: '13px', fontWeight: '600', color: '#111827', margin: '0 0 10px' }}>Dangerous combinations</p>
+          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '12px 14px' }}>
+            <p style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4ff', margin: '0 0 10px' }}>Dangerous combinations</p>
             {COCAINE_INTERACTIONS.map(inter => (
               <div key={inter.substance} style={{ marginBottom: '8px', padding: '8px 10px', background: inter.color + '11', border: `1px solid ${inter.color}33`, borderRadius: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#111827' }}>{inter.substance}</span>
+                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#f0f4ff' }}>{inter.substance}</span>
                   <span style={{ fontSize: '10px', fontWeight: '600', padding: '1px 8px', borderRadius: '999px', background: inter.color, color: 'white' }}>{inter.severity}</span>
                 </div>
-                <p style={{ fontSize: '11px', color: '#6b7280', margin: 0, lineHeight: '1.5' }}>{inter.mechanism}</p>
+                <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', margin: 0, lineHeight: '1.5' }}>{inter.mechanism}</p>
               </div>
             ))}
           </div>
 
           {/* Support */}
-          <div style={{ padding: '10px 14px', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', fontSize: '12px', color: '#6b7280' }}>
+          <div style={{ padding: '10px 14px', background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', fontSize: '12px', color: 'rgba(240,244,255,0.45)' }}>
             Concerned about cocaine use? <a href="https://www.jellinek.nl" target="_blank" rel="noopener noreferrer" style={{ color: '#dc2626' }}>Jellinek.nl</a> and <a href="https://www.trimbos.nl" target="_blank" rel="noopener noreferrer" style={{ color: '#dc2626' }}>Trimbos.nl</a> offer free, confidential support.
           </div>
         </div>
