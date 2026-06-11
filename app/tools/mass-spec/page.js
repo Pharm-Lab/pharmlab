@@ -369,14 +369,14 @@ function SpectrumCanvas({ peaks }) {
     const minMz = Math.max(0, Math.min(...peaks.map(p => p.mz)) * 0.9)
 
     ctx.clearRect(0, 0, W, H)
-    ctx.fillStyle = 'white'
+    ctx.fillStyle = '#0a0f1e'
     ctx.fillRect(0, 0, W, H)
 
     const xS = mz => pad.left + ((mz - minMz) / (maxMz - minMz)) * cW
     const yS = pct => pad.top + cH - (pct / 100) * cH
 
     // Grid
-    ctx.strokeStyle = 'rgba(0,0,0,0.06)'
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)'
     ctx.lineWidth = 1
     for (let y = 0; y <= 100; y += 25) {
       ctx.beginPath()
@@ -386,12 +386,12 @@ function SpectrumCanvas({ peaks }) {
     }
 
     // Axes
-    ctx.strokeStyle = '#d1d5db'
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)'
     ctx.lineWidth = 1
     ctx.strokeRect(pad.left, pad.top, cW, cH)
 
     // Y labels
-    ctx.fillStyle = '#374151'
+    ctx.fillStyle = 'rgba(240,244,255,0.5)'
     ctx.font = '10px sans-serif'
     ctx.textAlign = 'right'
     for (let y = 0; y <= 100; y += 25) {
@@ -412,7 +412,7 @@ function SpectrumCanvas({ peaks }) {
     peaks.forEach(peak => {
       const x = xS(peak.mz)
       const isBase = peak.mz === basePeak.mz
-      ctx.strokeStyle = isBase ? '#2563eb' : '#6b7280'
+      ctx.strokeStyle = isBase ? '#2a6fdb' : 'rgba(240,244,255,0.4)'
       ctx.lineWidth = isBase ? 2 : 1.5
       ctx.beginPath()
       ctx.moveTo(x, pad.top + cH)
@@ -420,7 +420,7 @@ function SpectrumCanvas({ peaks }) {
       ctx.stroke()
 
       // m/z label above bar
-      ctx.fillStyle = isBase ? '#2563eb' : '#374151'
+      ctx.fillStyle = isBase ? '#93b4f7' : 'rgba(240,244,255,0.6)'
       ctx.font = isBase ? 'bold 10px sans-serif' : '10px sans-serif'
       ctx.textAlign = 'center'
       ctx.fillText(peak.mz, x, yS(peak.intensity) - 4)
@@ -429,7 +429,7 @@ function SpectrumCanvas({ peaks }) {
     // X tick marks
     const xRange = maxMz - minMz
     const tickStep = xRange > 400 ? 100 : xRange > 200 ? 50 : xRange > 100 ? 20 : 10
-    ctx.fillStyle = '#374151'
+    ctx.fillStyle = 'rgba(240,244,255,0.5)'
     ctx.font = '10px sans-serif'
     ctx.textAlign = 'center'
     for (let mz = Math.ceil(minMz / tickStep) * tickStep; mz <= maxMz; mz += tickStep) {
@@ -440,7 +440,7 @@ function SpectrumCanvas({ peaks }) {
 
   return (
     <canvas ref={canvasRef}
-      style={{ width: '100%', height: '220px', borderRadius: '8px', border: '1px solid #e5e7eb', background: 'white' }} />
+      style={{ width: '100%', height: '220px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.07)', background: '#0a0f1e' }} />
   )
 }
 
@@ -506,25 +506,26 @@ export default function MassSpecPage() {
 
   const btn = active => ({
     padding: '6px 16px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: active ? '600' : '400',
-    border: active ? '2px solid #2563eb' : '1px solid #d1d5db',
-    background: active ? '#eff6ff' : 'white', color: active ? '#1d4ed8' : '#374151',
+    border: active ? '2px solid #2a6fdb' : '1px solid rgba(255,255,255,0.1)',
+    background: active ? 'rgba(42,111,219,0.18)' : 'rgba(255,255,255,0.04)', color: active ? '#93b4f7' : 'rgba(240,244,255,0.6)',
   })
 
   const tabBtn = active => ({
     padding: '8px 20px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: active ? '600' : '400',
-    border: 'none', background: active ? '#111827' : 'transparent', color: active ? 'white' : '#6b7280',
+    border: 'none', background: active ? '#f0f4ff' : 'transparent', color: active ? '#0a0f1e' : 'rgba(240,244,255,0.45)',
   })
 
   return (
-    <main style={{ maxWidth: '980px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
-      <a href="/tools" style={{ fontSize: '13px', color: '#6b7280', textDecoration: 'none' }}>← Tools</a>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#111827', margin: '1rem 0 4px' }}>Mass Spectrometry Interpreter</h1>
-      <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '1.5rem', lineHeight: '1.6' }}>
+    <main style={{ maxWidth: '980px', margin: '0 auto', padding: '2rem 1rem', fontFamily: "'Inter',system-ui,sans-serif", background: '#0a0f1e', minHeight: '100vh', color: '#f0f4ff' }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'); * { box-sizing:border-box; } textarea::placeholder,input::placeholder { color:rgba(240,244,255,0.25); }`}</style>
+      <a href="/tools" style={{ fontSize: '13px', color: 'rgba(240,244,255,0.4)', textDecoration: 'none' }}>← Tools</a>
+      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#f0f4ff', margin: '1rem 0 4px', letterSpacing: '-0.02em' }}>Mass Spectrometry Interpreter</h1>
+      <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.5)', marginBottom: '1.5rem', lineHeight: '1.6' }}>
         Enter a molecular formula and m/z peaks to identify neutral losses, characteristic ions, and isotope patterns. Designed for pharmaceutical and biopharmaceutical sciences students.
       </p>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '4px', background: '#f3f4f6', borderRadius: '10px', padding: '4px', marginBottom: '1.5rem', width: 'fit-content' }}>
+      <div style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '10px', padding: '4px', marginBottom: '1.5rem', width: 'fit-content' }}>
         {[['analyser', 'Spectrum Analyser'], ['rules', 'Fragmentation Rules'], ['practice', 'Practice Mode']].map(([key, label]) => (
           <button key={key} onClick={() => setTab(key)} style={tabBtn(tab === key)}>{label}</button>
         ))}
@@ -537,22 +538,22 @@ export default function MassSpecPage() {
           {/* Left: Inputs */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-              <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Compound</p>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Compound</p>
 
               <div style={{ marginBottom: '10px' }}>
-                <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '4px' }}>Molecular formula</label>
+                <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.6)', display: 'block', marginBottom: '4px' }}>Molecular formula</label>
                 <input
                   value={formulaInput}
                   onChange={e => setFormulaInput(e.target.value)}
                   placeholder="e.g. C9H8O4"
-                  style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '14px', fontWeight: '600', boxSizing: 'border-box', background: 'white' }}
+                  style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', fontWeight: '600', boxSizing: 'border-box', background: '#060b18', color: '#f0f4ff' }}
                 />
-                <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '3px' }}>Use standard notation: C9H8O4, C17H19ClN2S, etc.</p>
+                <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', marginTop: '3px' }}>Use standard notation: C9H8O4, C17H19ClN2S, etc.</p>
               </div>
 
               <div>
-                <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '4px' }}>Ionisation mode</label>
+                <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.6)', display: 'block', marginBottom: '4px' }}>Ionisation mode</label>
                 <div style={{ display: 'flex', gap: '6px' }}>
                   <button onClick={() => setMode('EI')} style={btn(mode === 'EI')}>EI (electron ionisation)</button>
                   <button onClick={() => setMode('ESI')} style={btn(mode === 'ESI')}>ESI</button>
@@ -560,34 +561,34 @@ export default function MassSpecPage() {
               </div>
             </div>
 
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-              <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Peaks</p>
-              <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '4px' }}>m/z and relative intensity (one per line)</label>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Peaks</p>
+              <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.6)', display: 'block', marginBottom: '4px' }}>m/z and relative intensity (one per line)</label>
               <textarea
                 value={peakText}
                 onChange={e => setPeakText(e.target.value)}
                 placeholder={'180 30\n138 100\n120 50\n92 35'}
                 rows={8}
-                style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '13px', fontFamily: 'monospace', boxSizing: 'border-box', background: 'white', resize: 'vertical' }}
+                style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '13px', fontFamily: 'monospace', boxSizing: 'border-box', background: '#060b18', color: '#f0f4ff', resize: 'vertical' }}
               />
-              <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '3px' }}>Format: <code style={{ background: '#f3f4f6', padding: '1px 4px', borderRadius: '4px' }}>mz intensity</code> — intensity as 0–100 (relative). Base peak = 100.</p>
+              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', marginTop: '3px' }}>Format: <code style={{ background: 'rgba(255,255,255,0.08)', padding: '1px 4px', borderRadius: '4px', color: '#93b4f7' }}>mz intensity</code> — intensity as 0–100 (relative). Base peak = 100.</p>
             </div>
 
             <button onClick={runAnalysis}
-              style={{ padding: '10px', background: '#111827', color: 'white', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>
+              style={{ padding: '10px', background: '#2a6fdb', color: 'white', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>
               Analyse spectrum →
             </button>
 
             {/* Quick-load examples */}
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '12px 14px' }}>
-              <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Quick-load examples</p>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '12px 14px' }}>
+              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Quick-load examples</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 {PRACTICE_COMPOUNDS.slice(0, 4).map(c => (
                   <button key={c.name} onClick={() => {
                     setFormulaInput(c.formula.replace(/[₀-₉]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0x2080 + 48)))
                     setPeakText(c.peaks.map(p => `${p.mz} ${p.intensity}`).join('\n'))
                   }}
-                    style={{ padding: '6px 10px', background: 'white', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '12px', color: '#374151', cursor: 'pointer', textAlign: 'left' }}>
+                    style={{ padding: '6px 10px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '6px', fontSize: '12px', color: 'rgba(240,244,255,0.65)', cursor: 'pointer', textAlign: 'left' }}>
                     {c.name}
                   </button>
                 ))}
@@ -609,24 +610,24 @@ export default function MassSpecPage() {
                     { label: 'Degrees of unsaturation', value: result.dbe % 1 === 0 ? result.dbe : result.dbe.toFixed(1) },
                     { label: 'Base peak', value: 'm/z ' + result.basePeak?.mz },
                   ].map(m => (
-                    <div key={m.label} style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '10px 12px' }}>
-                      <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '2px' }}>{m.label}</div>
-                      <div style={{ fontSize: '17px', fontWeight: '700', color: '#111827' }}>{m.value}</div>
+                    <div key={m.label} style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 12px' }}>
+                      <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.4)', marginBottom: '2px' }}>{m.label}</div>
+                      <div style={{ fontSize: '17px', fontWeight: '700', color: '#f0f4ff' }}>{m.value}</div>
                     </div>
                   ))}
                 </div>
 
                 {/* Adduct ions */}
-                <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '12px 14px' }}>
-                  <p style={{ fontSize: '12px', fontWeight: '600', color: '#111827', margin: '0 0 8px' }}>Expected molecular ions ({mode})</p>
+                <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '12px 14px' }}>
+                  <p style={{ fontSize: '12px', fontWeight: '600', color: '#f0f4ff', margin: '0 0 8px' }}>Expected molecular ions ({mode})</p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     {result.adducts.filter(a => mode === 'EI' ? a.label === '[M]⁺•' : !a.label.includes('⁺•')).map(a => {
                       const found = peaks.find(p => Math.abs(p.mz - a.mz) < 0.5)
                       return (
-                        <div key={a.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 8px', background: found ? '#f0fdf4' : 'white', border: `1px solid ${found ? '#bbf7d0' : '#e5e7eb'}`, borderRadius: '6px' }}>
-                          <span style={{ fontSize: '13px', fontWeight: '600', color: '#111827' }}>{a.label}</span>
-                          <span style={{ fontSize: '13px', color: '#6b7280' }}>{a.mz}</span>
-                          <span style={{ fontSize: '11px', color: found ? '#16a34a' : '#9ca3af' }}>{found ? `✓ found (${found.intensity}%)` : a.note}</span>
+                        <div key={a.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 8px', background: found ? 'rgba(22,163,74,0.1)' : 'rgba(255,255,255,0.03)', border: `1px solid ${found ? 'rgba(22,163,74,0.35)' : 'rgba(255,255,255,0.07)'}`, borderRadius: '6px' }}>
+                          <span style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4ff' }}>{a.label}</span>
+                          <span style={{ fontSize: '13px', color: 'rgba(240,244,255,0.45)' }}>{a.mz}</span>
+                          <span style={{ fontSize: '11px', color: found ? '#86efac' : 'rgba(240,244,255,0.3)' }}>{found ? `✓ found (${found.intensity}%)` : a.note}</span>
                         </div>
                       )
                     })}
@@ -634,10 +635,10 @@ export default function MassSpecPage() {
                       const found = peaks.find(p => Math.abs(p.mz - a.mz) < 0.5)
                       if (!found || a.label === '[M]⁺•') return null
                       return (
-                        <div key={a.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 8px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '6px' }}>
-                          <span style={{ fontSize: '13px', fontWeight: '600', color: '#111827' }}>{a.label}</span>
-                          <span style={{ fontSize: '13px', color: '#6b7280' }}>{a.mz}</span>
-                          <span style={{ fontSize: '11px', color: '#16a34a' }}>✓ found ({found.intensity}%)</span>
+                        <div key={a.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 8px', background: 'rgba(22,163,74,0.1)', border: '1px solid rgba(22,163,74,0.35)', borderRadius: '6px' }}>
+                          <span style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4ff' }}>{a.label}</span>
+                          <span style={{ fontSize: '13px', color: 'rgba(240,244,255,0.45)' }}>{a.mz}</span>
+                          <span style={{ fontSize: '11px', color: '#86efac' }}>✓ found ({found.intensity}%)</span>
                         </div>
                       )
                     })}
@@ -646,18 +647,18 @@ export default function MassSpecPage() {
 
                 {/* Neutral losses */}
                 {result.matchedLosses.length > 0 && (
-                  <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '12px 14px' }}>
-                    <p style={{ fontSize: '12px', fontWeight: '600', color: '#111827', margin: '0 0 8px' }}>Identified neutral losses</p>
+                  <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '12px 14px' }}>
+                    <p style={{ fontSize: '12px', fontWeight: '600', color: '#f0f4ff', margin: '0 0 8px' }}>Identified neutral losses</p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                       {result.matchedLosses.slice(0, 8).map((m, i) => (
-                        <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '8px', padding: '6px 8px', background: 'white', border: '1px solid #e5e7eb', borderRadius: '6px', alignItems: 'center' }}>
+                        <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '8px', padding: '6px 8px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '6px', alignItems: 'center' }}>
                           <div>
-                            <div style={{ fontSize: '12px', fontWeight: '600', color: '#111827' }}>
+                            <div style={{ fontSize: '12px', fontWeight: '600', color: '#f0f4ff' }}>
                               {m.fromMz} → {m.toMz} <span style={{ color: '#ef4444' }}>−{m.loss}</span> ({m.formula})
                             </div>
-                            <div style={{ fontSize: '11px', color: '#6b7280' }}>{m.label} · suggests: {m.groups.join(', ')}</div>
+                            <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)' }}>{m.label} · suggests: {m.groups.join(', ')}</div>
                           </div>
-                          <div style={{ fontSize: '11px', color: '#9ca3af', textAlign: 'right' }}>{m.intensity}%</div>
+                          <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', textAlign: 'right' }}>{m.intensity}%</div>
                         </div>
                       ))}
                     </div>
@@ -665,7 +666,7 @@ export default function MassSpecPage() {
                 )}
 
                 {/* Isotope notes */}
-                <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: '#1e40af' }}>
+                <div style={{ background: 'rgba(42,111,219,0.1)', border: '1px solid rgba(42,111,219,0.3)', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: '#93b4f7' }}>
                   <strong>Isotope pattern:</strong>
                   <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
                     {result.isotopeNotes.map((n, i) => <li key={i} style={{ marginBottom: '2px' }}>{n}</li>)}
@@ -674,9 +675,9 @@ export default function MassSpecPage() {
 
               </>
             ) : (
-              <div style={{ background: '#f9fafb', border: '1px dashed #d1d5db', borderRadius: '12px', padding: '3rem', textAlign: 'center', color: '#9ca3af' }}>
+              <div style={{ background: '#0f1629', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '12px', padding: '3rem', textAlign: 'center', color: 'rgba(240,244,255,0.3)' }}>
                 <div style={{ fontSize: '32px', marginBottom: '12px' }}>⚗️</div>
-                <p style={{ fontSize: '14px', margin: '0 0 4px', color: '#6b7280' }}>Enter a formula and peaks, then click Analyse</p>
+                <p style={{ fontSize: '14px', margin: '0 0 4px', color: 'rgba(240,244,255,0.5)' }}>Enter a formula and peaks, then click Analyse</p>
                 <p style={{ fontSize: '12px', margin: 0 }}>Try loading one of the examples on the left</p>
               </div>
             )}
@@ -690,13 +691,13 @@ export default function MassSpecPage() {
 
           {/* Group list */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Functional group</p>
+            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Functional group</p>
             {FRAG_GROUPS.map((g, i) => (
               <button key={g.name} onClick={() => setSelectedGroup(i)}
                 style={{ padding: '8px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', textAlign: 'left', fontWeight: selectedGroup === i ? '600' : '400',
-                  border: selectedGroup === i ? `2px solid ${g.color}` : '1px solid #e5e7eb',
-                  background: selectedGroup === i ? g.color + '15' : 'white',
-                  color: selectedGroup === i ? g.color : '#374151' }}>
+                  border: selectedGroup === i ? `2px solid ${g.color}` : '1px solid rgba(255,255,255,0.08)',
+                  background: selectedGroup === i ? g.color + '18' : 'rgba(255,255,255,0.03)',
+                  color: selectedGroup === i ? g.color : 'rgba(240,244,255,0.65)' }}>
                 {g.name}
               </button>
             ))}
@@ -707,37 +708,37 @@ export default function MassSpecPage() {
             const g = FRAG_GROUPS[selectedGroup]
             return (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ background: '#f9fafb', border: `2px solid ${g.color}`, borderRadius: '12px', padding: '16px 18px' }}>
+                <div style={{ background: '#0f1629', border: `2px solid ${g.color}`, borderRadius: '12px', padding: '16px 18px' }}>
                   <h2 style={{ fontSize: '18px', fontWeight: '700', color: g.color, margin: '0 0 6px' }}>{g.name}</h2>
-                  <p style={{ fontSize: '13px', color: '#374151', margin: '0 0 12px', lineHeight: '1.6' }}><strong>Characteristic ions:</strong> {g.characteristic}</p>
+                  <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.7)', margin: '0 0 12px', lineHeight: '1.6' }}><strong>Characteristic ions:</strong> {g.characteristic}</p>
 
-                  <p style={{ fontSize: '12px', fontWeight: '600', color: '#374151', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Common losses / fragments</p>
+                  <p style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(240,244,255,0.5)', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Common losses / fragments</p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginBottom: '12px' }}>
                     {g.losses.map((l, i) => (
-                      <div key={i} style={{ display: 'flex', gap: '10px', padding: '6px 10px', background: 'white', border: '1px solid #e5e7eb', borderRadius: '6px', alignItems: 'center' }}>
+                      <div key={i} style={{ display: 'flex', gap: '10px', padding: '6px 10px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '6px', alignItems: 'center' }}>
                         <span style={{ fontSize: '13px', fontWeight: '700', color: g.color, minWidth: '80px', fontFamily: 'monospace' }}>{l.mz}</span>
-                        <span style={{ fontSize: '12px', color: '#374151' }}>{l.label}</span>
+                        <span style={{ fontSize: '12px', color: 'rgba(240,244,255,0.7)' }}>{l.label}</span>
                       </div>
                     ))}
                   </div>
 
-                  <div style={{ padding: '10px 12px', background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '8px', marginBottom: '10px' }}>
-                    <p style={{ fontSize: '12px', color: '#92400e', margin: '0 0 2px', fontWeight: '600' }}>Example</p>
-                    <p style={{ fontSize: '12px', color: '#92400e', margin: 0 }}>{g.example}</p>
+                  <div style={{ padding: '10px 12px', background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.3)', borderRadius: '8px', marginBottom: '10px' }}>
+                    <p style={{ fontSize: '12px', color: '#fdba74', margin: '0 0 2px', fontWeight: '600' }}>Example</p>
+                    <p style={{ fontSize: '12px', color: '#fdba74', margin: 0 }}>{g.example}</p>
                   </div>
 
-                  <div style={{ padding: '10px 12px', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '8px' }}>
-                    <p style={{ fontSize: '12px', color: '#1e40af', margin: '0 0 2px', fontWeight: '600' }}>Exam tip</p>
-                    <p style={{ fontSize: '12px', color: '#1e40af', margin: 0 }}>{g.examTip}</p>
+                  <div style={{ padding: '10px 12px', background: 'rgba(42,111,219,0.1)', border: '1px solid rgba(42,111,219,0.3)', borderRadius: '8px' }}>
+                    <p style={{ fontSize: '12px', color: '#93b4f7', margin: '0 0 2px', fontWeight: '600' }}>Exam tip</p>
+                    <p style={{ fontSize: '12px', color: '#93b4f7', margin: 0 }}>{g.examTip}</p>
                   </div>
                 </div>
 
                 {/* Nitrogen rule reminder */}
-                <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px 14px', fontSize: '12px', color: '#374151' }}>
-                  <p style={{ fontWeight: '600', margin: '0 0 6px', color: '#111827' }}>The nitrogen rule (always useful)</p>
+                <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '12px 14px', fontSize: '12px', color: 'rgba(240,244,255,0.65)' }}>
+                  <p style={{ fontWeight: '600', margin: '0 0 6px', color: '#f0f4ff' }}>The nitrogen rule (always useful)</p>
                   <p style={{ margin: '0 0 4px' }}>An odd molecular weight in EI indicates an <strong>odd number of nitrogen atoms</strong>. An even MW indicates zero or an even number of N atoms.</p>
                   <p style={{ margin: '0 0 4px' }}>Examples: MW 151 (paracetamol, 1N = odd ✓) · MW 194 (caffeine, 4N = even ✓) · MW 284 (diazepam, 2N = even ✓)</p>
-                  <p style={{ margin: 0, color: '#6b7280' }}>Caveat: only applies to EI where the molecular ion is a radical cation M⁺•. In ESI, [M+H]⁺ shifts the rule by 1.</p>
+                  <p style={{ margin: 0, color: 'rgba(240,244,255,0.4)' }}>Caveat: only applies to EI where the molecular ion is a radical cation M⁺•. In ESI, [M+H]⁺ shifts the rule by 1.</p>
                 </div>
               </div>
             )
@@ -754,9 +755,9 @@ export default function MassSpecPage() {
               <button key={i} onClick={() => { setPracticeIdx(i); setShowHint(false); setShowAnswer(false); setPracticeGuess('') }}
                 style={{ padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px',
                   fontWeight: practiceIdx === i ? '600' : '400',
-                  border: practiceIdx === i ? '2px solid #2563eb' : '1px solid #d1d5db',
-                  background: practiceIdx === i ? '#eff6ff' : 'white',
-                  color: practiceIdx === i ? '#1d4ed8' : '#374151' }}>
+                  border: practiceIdx === i ? '2px solid #2a6fdb' : '1px solid rgba(255,255,255,0.1)',
+                  background: practiceIdx === i ? 'rgba(42,111,219,0.18)' : 'rgba(255,255,255,0.04)',
+                  color: practiceIdx === i ? '#93b4f7' : 'rgba(240,244,255,0.6)' }}>
                 Compound {i + 1}
               </button>
             ))}
@@ -766,17 +767,17 @@ export default function MassSpecPage() {
 
             {/* Left: spectrum data */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-                <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Spectrum data</p>
+              <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+                <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Spectrum data</p>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
-                  <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '8px 10px' }}>
-                    <div style={{ fontSize: '11px', color: '#6b7280' }}>Molecular formula</div>
-                    <div style={{ fontSize: '15px', fontWeight: '700', color: '#111827' }}>{compound.formula}</div>
+                  <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '8px', padding: '8px 10px' }}>
+                    <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.4)' }}>Molecular formula</div>
+                    <div style={{ fontSize: '15px', fontWeight: '700', color: '#f0f4ff' }}>{compound.formula}</div>
                   </div>
-                  <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '8px 10px' }}>
-                    <div style={{ fontSize: '11px', color: '#6b7280' }}>MW (nominal)</div>
-                    <div style={{ fontSize: '15px', fontWeight: '700', color: '#111827' }}>{compound.mw}</div>
+                  <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '8px', padding: '8px 10px' }}>
+                    <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.4)' }}>MW (nominal)</div>
+                    <div style={{ fontSize: '15px', fontWeight: '700', color: '#f0f4ff' }}>{compound.mw}</div>
                   </div>
                 </div>
 
@@ -785,35 +786,35 @@ export default function MassSpecPage() {
                 {/* Peak table */}
                 <table style={{ width: '100%', fontSize: '12px', marginTop: '10px', borderCollapse: 'collapse' }}>
                   <thead>
-                    <tr style={{ background: '#f3f4f6' }}>
-                      <th style={{ padding: '5px 8px', textAlign: 'left', fontWeight: '600', color: '#374151' }}>m/z</th>
-                      <th style={{ padding: '5px 8px', textAlign: 'right', fontWeight: '600', color: '#374151' }}>Intensity</th>
-                      <th style={{ padding: '5px 8px', textAlign: 'left', fontWeight: '600', color: '#374151', paddingLeft: '12px' }}>Note</th>
+                    <tr style={{ background: 'rgba(255,255,255,0.06)' }}>
+                      <th style={{ padding: '5px 8px', textAlign: 'left', fontWeight: '600', color: 'rgba(240,244,255,0.6)' }}>m/z</th>
+                      <th style={{ padding: '5px 8px', textAlign: 'right', fontWeight: '600', color: 'rgba(240,244,255,0.6)' }}>Intensity</th>
+                      <th style={{ padding: '5px 8px', textAlign: 'left', fontWeight: '600', color: 'rgba(240,244,255,0.6)', paddingLeft: '12px' }}>Note</th>
                     </tr>
                   </thead>
                   <tbody>
                     {compound.peaks.map((p, i) => (
-                      <tr key={i} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                      <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                         <td style={{ padding: '5px 8px', fontWeight: '600', fontFamily: 'monospace' }}>{p.mz}</td>
-                        <td style={{ padding: '5px 8px', textAlign: 'right', color: p.intensity === 100 ? '#2563eb' : '#374151', fontWeight: p.intensity === 100 ? '600' : '400' }}>{p.intensity}%</td>
-                        <td style={{ padding: '5px 8px', color: '#6b7280', paddingLeft: '12px' }}>{p.label}</td>
+                        <td style={{ padding: '5px 8px', textAlign: 'right', color: p.intensity === 100 ? '#93b4f7' : 'rgba(240,244,255,0.7)', fontWeight: p.intensity === 100 ? '600' : '400' }}>{p.intensity}%</td>
+                        <td style={{ padding: '5px 8px', color: 'rgba(240,244,255,0.4)', paddingLeft: '12px' }}>{p.label}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
 
-                <div style={{ marginTop: '10px', padding: '7px 10px', background: '#f3f4f6', borderRadius: '6px', fontSize: '11px', color: '#6b7280' }}>
+                <div style={{ marginTop: '10px', padding: '7px 10px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', fontSize: '11px', color: 'rgba(240,244,255,0.4)' }}>
                   Functional groups present: {compound.groups.join(' · ')}
                 </div>
               </div>
 
               {/* Hint */}
               <button onClick={() => setShowHint(!showHint)}
-                style={{ padding: '8px 14px', background: 'white', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '12px', color: '#6b7280', cursor: 'pointer', textAlign: 'left' }}>
+                style={{ padding: '8px 14px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', fontSize: '12px', color: 'rgba(240,244,255,0.5)', cursor: 'pointer', textAlign: 'left' }}>
                 {showHint ? '▲ Hide hint' : '▼ Show hint'}
               </button>
               {showHint && (
-                <div style={{ padding: '10px 14px', background: '#fef9c3', border: '1px solid #fde047', borderRadius: '8px', fontSize: '12px', color: '#854d0e', lineHeight: '1.6' }}>
+                <div style={{ padding: '10px 14px', background: 'rgba(234,179,8,0.1)', border: '1px solid rgba(234,179,8,0.3)', borderRadius: '8px', fontSize: '12px', color: '#fde047', lineHeight: '1.6' }}>
                   {compound.hint}
                 </div>
               )}
@@ -821,9 +822,9 @@ export default function MassSpecPage() {
 
             {/* Right: guess + answer */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-                <p style={{ fontSize: '12px', fontWeight: '600', color: '#111827', margin: '0 0 10px' }}>Your interpretation</p>
-                <p style={{ fontSize: '12px', color: '#6b7280', margin: '0 0 8px', lineHeight: '1.6' }}>
+              <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+                <p style={{ fontSize: '12px', fontWeight: '600', color: '#f0f4ff', margin: '0 0 10px' }}>Your interpretation</p>
+                <p style={{ fontSize: '12px', color: 'rgba(240,244,255,0.5)', margin: '0 0 8px', lineHeight: '1.6' }}>
                   Based on the molecular formula, MW, and fragmentation pattern — what drug or compound do you think this is?
                 </p>
                 <textarea
@@ -831,27 +832,27 @@ export default function MassSpecPage() {
                   onChange={e => setPracticeGuess(e.target.value)}
                   placeholder="Type your interpretation here. Consider: MW, nitrogen rule, key neutral losses, base peak, DBE..."
                   rows={5}
-                  style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '13px', boxSizing: 'border-box', background: 'white', resize: 'vertical' }}
+                  style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '13px', boxSizing: 'border-box', background: '#060b18', color: '#f0f4ff', resize: 'vertical' }}
                 />
                 <button onClick={() => setShowAnswer(true)}
-                  style={{ marginTop: '8px', width: '100%', padding: '8px', background: '#111827', color: 'white', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>
+                  style={{ marginTop: '8px', width: '100%', padding: '8px', background: '#2a6fdb', color: 'white', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>
                   Reveal answer →
                 </button>
               </div>
 
               {showAnswer && (
-                <div style={{ background: '#f0fdf4', border: '2px solid #bbf7d0', borderRadius: '12px', padding: '14px 16px' }}>
-                  <p style={{ fontSize: '14px', fontWeight: '700', color: '#15803d', margin: '0 0 8px' }}>
+                <div style={{ background: 'rgba(22,163,74,0.12)', border: '2px solid rgba(22,163,74,0.5)', borderRadius: '12px', padding: '14px 16px' }}>
+                  <p style={{ fontSize: '14px', fontWeight: '700', color: '#86efac', margin: '0 0 8px' }}>
                     ✓ {compound.name}
                   </p>
-                  <p style={{ fontSize: '12px', color: '#374151', lineHeight: '1.65', margin: 0 }}>{compound.explanation}</p>
+                  <p style={{ fontSize: '12px', color: 'rgba(240,244,255,0.7)', lineHeight: '1.65', margin: 0 }}>{compound.explanation}</p>
                 </div>
               )}
 
               {/* Reference quick-access */}
-              <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: '#374151' }}>
-                <p style={{ fontWeight: '600', margin: '0 0 6px', color: '#111827' }}>Quick reference while solving</p>
-                <ul style={{ margin: 0, padding: '0 0 0 16px', color: '#6b7280', lineHeight: '1.8' }}>
+              <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: 'rgba(240,244,255,0.65)' }}>
+                <p style={{ fontWeight: '600', margin: '0 0 6px', color: '#f0f4ff' }}>Quick reference while solving</p>
+                <ul style={{ margin: 0, padding: '0 0 0 16px', color: 'rgba(240,244,255,0.5)', lineHeight: '1.8' }}>
                   <li>Odd MW → odd number of N atoms (nitrogen rule)</li>
                   <li>M:M+2 ≈ 3:1 → one Cl; ≈ 1:1 → one Br</li>
                   <li>m/z 91 → tropylium (benzyl); m/z 77 → phenyl</li>

@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 
 // ─── NCA Math ─────────────────────────────────────────────────────
 
@@ -7,7 +7,7 @@ function parseData(raw) {
   const lines = raw.trim().split(/[\n\r]+/)
   const points = []
   for (const line of lines) {
-    const parts = line.trim().split(/[\t,;]+/)
+    const parts = line.trim().split(/[\	,;]+/)
     if (parts.length < 2) continue
     const t = parseFloat(parts[0].replace(',', '.'))
     const c = parseFloat(parts[1].replace(',', '.'))
@@ -34,7 +34,7 @@ function calcAUC(pts) {
   return auc
 }
 
-// AUMC (first moment) — linear trapezoidal
+// AUMC (first moment) \u2014 linear trapezoidal
 function calcAUMC(pts) {
   let aumc = 0
   for (let i = 1; i < pts.length; i++) {
@@ -46,7 +46,7 @@ function calcAUMC(pts) {
   return aumc
 }
 
-// Log-linear regression on terminal points → λz
+// Log-linear regression on terminal points \u2192 λz
 function calcLambdaZ(pts) {
   if (pts.length < 3) return null
   const n    = pts.length
@@ -133,8 +133,9 @@ function calcNCA(pts, dose, nTerminal, route) {
 
 // ─── Canvas ───────────────────────────────────────────────────────
 
-function NCACanvas({ pts, result, nTerminal, logScale }) {
+const NCACanvas = React.forwardRef(function NCACanvas({ pts, result, nTerminal, logScale }, ref) {
   const canvasRef = useRef(null)
+  React.useImperativeHandle(ref, () => canvasRef.current)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -214,7 +215,7 @@ function NCACanvas({ pts, result, nTerminal, logScale }) {
     ctx.restore()
     ctx.textAlign = 'center'; ctx.fillStyle = '#374151'
     ctx.fillText('Time (h)', pad.left + cW/2, H - 6)
-    ctx.strokeStyle = '#d1d5db'; ctx.lineWidth = 1
+    ctx.strokeStyle = 'rgba(240,244,255,0.2)'; ctx.lineWidth = 1
     ctx.strokeRect(pad.left, pad.top, cW, cH)
 
     // AUC shading
@@ -231,7 +232,7 @@ function NCACanvas({ pts, result, nTerminal, logScale }) {
     // Terminal regression line
     if (result?.termReg && result.terminalPts?.length >= 2) {
       const { slope, intercept: intRaw } = result.termReg
-      // intercept is already exp'd — use original
+      // intercept is already exp'd \u2014 use original
       const logIntercept = Math.log(intRaw)
       const tFirst = result.terminalPts[0].t
       const tLast  = pts[pts.length-1].t * 1.15
@@ -273,52 +274,43 @@ function NCACanvas({ pts, result, nTerminal, logScale }) {
 
     // Cmax marker
     if (result) {
-        const cx = xS(result.tmax)
-        const cy = yS(logScale ? Math.max(result.cmax, minC*0.1) : result.cmax)
-        ctx.fillStyle = '#10b981'
-        ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI*2); ctx.fill()
-        ctx.fillStyle = '#111827'; ctx.font = 'bold 10px sans-serif'
-        // Place label to the right if near left edge, otherwise above
-        const labelX = cx + (cx < pad.left + cW * 0.4 ? 28 : 0)
-        const labelY = cy + (cx < pad.left + cW * 0.4 ? 4 : -10)
-        ctx.textAlign = cx < pad.left + cW * 0.4 ? 'left' : 'center'
-        ctx.fillText('Cmax', labelX, labelY)
+      const cx = xS(result.tmax); const cy = yS(logScale ? Math.max(result.cmax, minC*0.1) : result.cmax)
+      ctx.fillStyle = '#10b981'
+      ctx.beginPath(); ctx.arc(cx, cy, 5, 0, Math.PI*2); ctx.fill()
+      ctx.fillStyle = '#f0f4ff'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'center'
+      ctx.fillText('Cmax', cx, cy - 10)
     }
 
     // Legend
-    ctx.font = '10px sans-serif'; ctx.textAlign = 'right'
-    const lx = pad.left + cW - 4
-    ctx.fillStyle = '#2563eb'
-    ctx.fillRect(lx - 46, pad.top + 4, 12, 2)
-    ctx.fillStyle = '#374151'
-    ctx.fillText('Data', lx, pad.top + 8)
+    ctx.font = '10px sans-serif'; ctx.textAlign = 'left'
+    ctx.fillStyle = '#2563eb'; ctx.fillRect(pad.left+4, pad.top+4, 12, 2)
+    ctx.fillStyle = '#374151'; ctx.fillText('Data', pad.left+18, pad.top+8)
     ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 1.5; ctx.setLineDash([4,2])
-    ctx.beginPath(); ctx.moveTo(lx - 46, pad.top + 16); ctx.lineTo(lx - 34, pad.top + 16); ctx.stroke()
+    ctx.beginPath(); ctx.moveTo(pad.left+4, pad.top+16); ctx.lineTo(pad.left+16, pad.top+16); ctx.stroke()
     ctx.setLineDash([])
-    ctx.fillStyle = '#374151'
-    ctx.fillText('λz fit', lx, pad.top + 19)
+    ctx.fillStyle = '#374151'; ctx.fillText('λz regression', pad.left+18, pad.top+19)
 
   }, [pts, result, nTerminal, logScale])
 
   return (
     <canvas ref={canvasRef}
-      style={{ width: '100%', height: '300px', borderRadius: '10px', border: '1px solid #e5e7eb', background: 'white' }} />
+      style={{ width: '100%', height: '300px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.15)', background: 'white' }} />
   )
-}
+})
 
 // ─── Main page ────────────────────────────────────────────────────
 
-const EXAMPLE_DATA = `0\t0
-0.25\t8.2
-0.5\t14.1
-1\t21.3
-2\t18.7
-3\t14.2
-4\t10.8
-6\t6.3
-8\t3.7
-12\t1.3
-24\t0.18`
+const EXAMPLE_DATA = `0, 0
+0.25, 8.2
+0.5, 14.1
+1, 21.3
+2, 18.7
+3, 14.2
+4, 10.8
+6, 6.3
+8, 3.7
+12, 1.3
+24, 0.18`
 
 export default function NCAPage() {
   const [raw,        setRaw]        = useState(EXAMPLE_DATA)
@@ -331,31 +323,42 @@ export default function NCAPage() {
   const pts    = useMemo(() => parseData(raw), [raw])
   const result = useMemo(() => pts.length >= 3 ? calcNCA(pts, dose, nTerminal, route) : null, [pts, dose, nTerminal, route])
 
-  const maxTerminal = Math.max(3, pts.length - 1)
+  const canvasRef = useRef(null)
+
+  function exportPNG() {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const link = document.createElement('a')
+    link.download = 'nca-plot.png'
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+  }
 
   const btn = active => ({
     padding: '5px 14px', borderRadius: '7px', cursor: 'pointer', fontSize: '12px',
     fontWeight: active ? '600' : '400',
     border: active ? '2px solid #2563eb' : '1px solid #d1d5db',
-    background: active ? '#eff6ff' : 'white',
-    color: active ? '#1d4ed8' : '#374151',
+    background: active ? 'rgba(42,111,219,0.18)' : 'rgba(255,255,255,0.04)',
+    color: active ? '#1d4ed8' : 'rgba(240,244,255,0.75)',
   })
 
   const MetricCard = ({ label, value, unit, highlight, note }) => (
-    <div style={{ background: highlight ? '#eff6ff' : '#f9fafb', border: `1px solid ${highlight ? '#bfdbfe' : '#e5e7eb'}`, borderRadius: '10px', padding: '10px 12px' }}>
-      <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '2px' }}>{label}</div>
-      <div style={{ fontSize: '18px', fontWeight: '700', color: highlight ? '#1d4ed8' : '#111827' }}>
-        {value != null ? value : <span style={{ color: '#d1d5db' }}>—</span>}
+    <div style={{ background: highlight ? 'rgba(42,111,219,0.12)' : '#0f1629', border: `1px solid ${highlight ? 'rgba(42,111,219,0.35)' : 'rgba(255,255,255,0.07)'}`, borderRadius: '10px', padding: '10px 12px' }}>
+      <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', marginBottom: '2px' }}>{label}</div>
+      <div style={{ fontSize: '18px', fontWeight: '700', color: highlight ? '#1d4ed8' : '#f0f4ff' }}>
+        {value != null ? value : <span style={{ color: 'rgba(240,244,255,0.2)' }}>\u2014</span>}
       </div>
-      {unit && <div style={{ fontSize: '10px', color: '#9ca3af' }}>{unit}</div>}
+      {unit && <div style={{ fontSize: '10px', color: 'rgba(240,244,255,0.3)' }}>{unit}</div>}
       {note && <div style={{ fontSize: '10px', color: '#f59e0b', marginTop: '2px' }}>{note}</div>}
     </div>
   )
 
   return (
-    <main style={{ maxWidth: '960px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#111827', margin: '0 0 4px' }}>Non-Compartmental Analysis (NCA)</h1>
-      <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '1.5rem', lineHeight: '1.6' }}>
+    <main style={{ maxWidth: '960px', margin: '0 auto', padding: '2rem 1rem', fontFamily: "'Inter',system-ui,sans-serif", background: '#0a0f1e', minHeight: '100vh', color: '#f0f4ff' }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'); * { box-sizing:border-box; } input[type=range]{ accent-color:#2a6fdb; } textarea::placeholder{ color:rgba(240,244,255,0.25); }`}</style>
+      <a href="/tools" style={{ fontSize: '13px', color: 'rgba(240,244,255,0.4)', textDecoration: 'none', display: 'inline-block', marginBottom: '1rem' }}>← Tools</a>
+      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#f0f4ff', margin: '0 0 4px' }}>Non-Compartmental Analysis (NCA)</h1>
+      <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.45)', marginBottom: '1.5rem', lineHeight: '1.6' }}>
         Paste concentration-time data to calculate PK parameters without assuming a compartmental model. Uses linear-up/log-down trapezoidal AUC and log-linear terminal regression for λz.
       </p>
 
@@ -365,11 +368,11 @@ export default function NCAPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
           {/* Settings */}
-          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-            <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Settings</p>
+          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Settings</p>
 
             <div style={{ marginBottom: '10px' }}>
-              <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '4px' }}>Route</label>
+              <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Route</label>
               <div style={{ display: 'flex', gap: '6px' }}>
                 <button onClick={() => setRoute('iv')}   style={btn(route === 'iv')}>IV</button>
                 <button onClick={() => setRoute('oral')} style={btn(route === 'oral')}>Oral / extravascular</button>
@@ -377,15 +380,15 @@ export default function NCAPage() {
             </div>
 
             <div style={{ marginBottom: '10px' }}>
-              <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '4px' }}>Dose (for CL/F and Vd/F)</label>
+              <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Dose (for CL/F and Vd/F)</label>
               <input type="number" value={dose} min={0} step={0.1}
                 onChange={e => setDose(parseFloat(e.target.value) || 0)}
-                style={{ width: '100%', padding: '7px 10px', borderRadius: '7px', border: '1px solid #d1d5db', fontSize: '14px', fontWeight: '600', color: '#111827', boxSizing: 'border-box', background: 'white' }} />
-              <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '3px' }}>Set to 0 to skip CL/F and Vd/F</p>
+                style={{ width: '100%', padding: '7px 10px', borderRadius: '7px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', fontWeight: '600', color: '#f0f4ff', boxSizing: 'border-box', background: '#0f1629' }} />
+              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', marginTop: '3px' }}>Set to 0 to skip CL/F and Vd/F</p>
             </div>
 
             <div style={{ marginBottom: '10px' }}>
-              <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '4px' }}>
+              <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>
                 Terminal points for λz: <strong>{nTerminal}</strong>
                 {result?.r2 != null && (
                   <span style={{ marginLeft: '8px', fontSize: '11px', color: result.r2 >= 0.99 ? '#22c55e' : result.r2 >= 0.95 ? '#f59e0b' : '#ef4444', fontWeight: '600' }}>
@@ -396,10 +399,10 @@ export default function NCAPage() {
               <input type="range" min={3} max={Math.max(3, pts.length - 1)} step={1} value={Math.min(nTerminal, Math.max(3, pts.length - 1))}
                 onChange={e => setNTerminal(parseInt(e.target.value))}
                 style={{ width: '100%', accentColor: '#2563eb' }} />
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#d1d5db' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'rgba(240,244,255,0.2)' }}>
                 <span>3</span><span>{Math.max(3, pts.length - 1)}</span>
               </div>
-              <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '2px' }}>
+              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', marginTop: '2px' }}>
                 Red points + dashed line show the terminal regression. Maximise R² while including only the true terminal phase.
               </p>
             </div>
@@ -407,19 +410,19 @@ export default function NCAPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <input type="checkbox" id="log-scale" checked={logScale} onChange={e => setLogScale(e.target.checked)}
                 style={{ accentColor: '#2563eb', width: '14px', height: '14px' }} />
-              <label htmlFor="log-scale" style={{ fontSize: '12px', color: '#374151', cursor: 'pointer' }}>
+              <label htmlFor="log-scale" style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', cursor: 'pointer' }}>
                 Log scale (semi-log plot)
               </label>
             </div>
           </div>
 
           {/* Data paste */}
-          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-            <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Concentration-time data
             </p>
-            <p style={{ fontSize: '11px', color: '#9ca3af', marginBottom: '8px', lineHeight: '1.5' }}>
-              Paste two columns from Excel — time (h) and concentration. Tab, comma, or semicolon separated. BQL values: enter 0.
+            <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', marginBottom: '8px', lineHeight: '1.5' }}>
+              Paste two columns from Excel \u2014 time (h) and concentration. Tab, comma, or semicolon separated. BQL values: enter 0.
             </p>
             <textarea
               value={raw}
@@ -427,13 +430,13 @@ export default function NCAPage() {
               rows={14}
               style={{
                 width: '100%', fontFamily: 'ui-monospace, monospace', fontSize: '12px',
-                padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db',
-                resize: 'vertical', color: '#111827', background: 'white', boxSizing: 'border-box',
+                padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)',
+                resize: 'vertical', color: '#f0f4ff', background: '#0f1629', boxSizing: 'border-box',
                 lineHeight: '1.6',
               }}
               placeholder="0&#9;0&#10;0.5&#9;12.3&#10;1&#9;18.4&#10;2&#9;15.1&#10;..."
             />
-            <div style={{ marginTop: '6px', display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#9ca3af' }}>
+            <div style={{ marginTop: '6px', display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'rgba(240,244,255,0.3)' }}>
               <span>{pts.length} valid data points parsed</span>
               <button onClick={() => setRaw(EXAMPLE_DATA)}
                 style={{ fontSize: '11px', color: '#2563eb', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
@@ -447,40 +450,48 @@ export default function NCAPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
           {pts.length < 3 ? (
-            <div style={{ textAlign: 'center', padding: '3rem', color: '#9ca3af', fontSize: '14px', background: '#f9fafb', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
+            <div style={{ textAlign: 'center', padding: '3rem', color: 'rgba(240,244,255,0.3)', fontSize: '14px', background: '#0f1629', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.07)' }}>
               Enter at least 3 data points to calculate NCA parameters
             </div>
           ) : (
             <>
-              {/* Graph */}
-              <NCACanvas pts={pts} result={result} nTerminal={nTerminal} logScale={logScale} />
+              {/* Graph + export */}
+              <div>
+                <NCACanvas ref={canvasRef} pts={pts} result={result} nTerminal={nTerminal} logScale={logScale} />
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '6px' }}>
+                  <button onClick={exportPNG}
+                    style={{ fontSize: '12px', padding: '5px 12px', borderRadius: '7px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'rgba(240,244,255,0.55)', cursor: 'pointer' }}>
+                    ↓ Export PNG
+                  </button>
+                </div>
+              </div>
 
               {/* Primary metrics */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
                 <MetricCard label="Cmax"   value={result?.cmax}   unit="conc. units"   highlight />
                 <MetricCard label="Tmax"   value={result?.tmax}   unit="h" />
-                <MetricCard label="AUC₀₋ₜ" value={result?.auc0t}  unit="conc·h"        highlight />
+                <MetricCard label="AUC\u2080\u208b\u209c" value={result?.auc0t}  unit="conc\u00b7h"        highlight />
               </div>
 
               {/* Terminal phase */}
-              <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', padding: '12px 14px' }}>
-                <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <div style={{ background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.35)', borderRadius: '10px', padding: '12px 14px' }}>
+                <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   Terminal phase ({nTerminal} points)
                 </p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
                   <MetricCard label="λz"    value={result?.lambdaZ}  unit="h⁻¹" />
-                  <MetricCard label="t½"    value={result?.thalf}    unit="h"   highlight />
+                  <MetricCard label="t\u00bd"    value={result?.thalf}    unit="h"   highlight />
                   <MetricCard label="R²"    value={result?.r2}       unit="(fit quality)"
-                    note={result?.r2 != null && result.r2 < 0.95 ? 'R² < 0.95 — consider adjusting terminal points' : null} />
+                    note={result?.r2 != null && result.r2 < 0.95 ? 'R² < 0.95 \u2014 consider adjusting terminal points' : null} />
                 </div>
               </div>
 
               {/* Extrapolated */}
               {result?.auc0inf != null && (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-                  <MetricCard label="AUC₀₋∞"   value={result.auc0inf}   unit="conc·h"   highlight />
+                  <MetricCard label="AUC\u2080\u208b\u221e"   value={result.auc0inf}   unit="conc\u00b7h"   highlight />
                   <MetricCard label="% extrapolated" value={result.pctExtrap} unit="%"
-                    note={result.pctExtrap > 20 ? '>20% — extrapolation unreliable' : null} />
+                    note={result.pctExtrap > 20 ? '>20% \u2014 extrapolation unreliable' : null} />
                   <MetricCard label="MRT"       value={result.mrt}       unit="h" />
                 </div>
               )}
@@ -494,18 +505,18 @@ export default function NCAPage() {
               )}
 
               {/* Data table */}
-              <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px 14px' }}>
-                <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Parsed data — {pts.length} points
+              <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '12px 14px' }}>
+                <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Parsed data \u2014 {pts.length} points
                 </p>
                 <div style={{ maxHeight: '180px', overflowY: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
                     <thead>
-                      <tr style={{ background: '#f3f4f6' }}>
-                        <th style={{ padding: '4px 8px', textAlign: 'left', color: '#6b7280', fontWeight: '600' }}>#</th>
-                        <th style={{ padding: '4px 8px', textAlign: 'right', color: '#6b7280', fontWeight: '600' }}>Time (h)</th>
-                        <th style={{ padding: '4px 8px', textAlign: 'right', color: '#6b7280', fontWeight: '600' }}>Conc.</th>
-                        <th style={{ padding: '4px 8px', textAlign: 'center', color: '#6b7280', fontWeight: '600' }}>Terminal</th>
+                      <tr style={{ background: 'rgba(255,255,255,0.06)' }}>
+                        <th style={{ padding: '4px 8px', textAlign: 'left', color: 'rgba(240,244,255,0.45)', fontWeight: '600' }}>#</th>
+                        <th style={{ padding: '4px 8px', textAlign: 'right', color: 'rgba(240,244,255,0.45)', fontWeight: '600' }}>Time (h)</th>
+                        <th style={{ padding: '4px 8px', textAlign: 'right', color: 'rgba(240,244,255,0.45)', fontWeight: '600' }}>Conc.</th>
+                        <th style={{ padding: '4px 8px', textAlign: 'center', color: 'rgba(240,244,255,0.45)', fontWeight: '600' }}>Terminal</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -513,11 +524,11 @@ export default function NCAPage() {
                         const isTerminal = result?.terminalPts?.some(tp => tp.t === p.t)
                         return (
                           <tr key={i} style={{ background: isTerminal ? '#fff1f2' : 'transparent', borderTop: '1px solid #f3f4f6' }}>
-                            <td style={{ padding: '3px 8px', color: '#9ca3af' }}>{i+1}</td>
-                            <td style={{ padding: '3px 8px', textAlign: 'right', fontFamily: 'ui-monospace', color: '#374151' }}>{p.t}</td>
-                            <td style={{ padding: '3px 8px', textAlign: 'right', fontFamily: 'ui-monospace', color: '#374151' }}>{p.c}</td>
+                            <td style={{ padding: '3px 8px', color: 'rgba(240,244,255,0.3)' }}>{i+1}</td>
+                            <td style={{ padding: '3px 8px', textAlign: 'right', fontFamily: 'ui-monospace', color: 'rgba(240,244,255,0.75)' }}>{p.t}</td>
+                            <td style={{ padding: '3px 8px', textAlign: 'right', fontFamily: 'ui-monospace', color: 'rgba(240,244,255,0.75)' }}>{p.c}</td>
                             <td style={{ padding: '3px 8px', textAlign: 'center' }}>
-                              {isTerminal && <span style={{ color: '#ef4444', fontSize: '14px' }}>●</span>}
+                              {isTerminal && <span style={{ color: '#ef4444', fontSize: '14px' }}>\u25cf</span>}
                             </td>
                           </tr>
                         )
@@ -528,8 +539,8 @@ export default function NCAPage() {
               </div>
 
               {/* Method note */}
-              <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '10px 14px', fontSize: '12px', color: '#6b7280', lineHeight: '1.6' }}>
-                <strong>Method:</strong> AUC₀₋ₜ by linear-up/log-down trapezoidal rule. λz by unweighted log-linear least-squares regression on selected terminal points. AUC₀₋∞ = AUC₀₋ₜ + Clast/λz. MRT = AUMC₀₋∞ / AUC₀₋∞{route === 'oral' ? ' − 1/λz (MAT correction)' : ''}.
+              <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '8px', padding: '10px 14px', fontSize: '12px', color: 'rgba(240,244,255,0.45)', lineHeight: '1.6' }}>
+                <strong>Method:</strong> AUC\u2080\u208b\u209c by linear-up/log-down trapezoidal rule. λz by unweighted log-linear least-squares regression on selected terminal points. AUC\u2080\u208b\u221e = AUC\u2080\u208b\u209c + Clast/λz. MRT = AUMC\u2080\u208b\u221e / AUC\u2080\u208b\u221e{route === 'oral' ? ' \u2212 1/λz (MAT correction)' : ''}.
               </div>
             </>
           )}

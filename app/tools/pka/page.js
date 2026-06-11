@@ -12,7 +12,7 @@ const FUNCTIONAL_GROUPS = [
     pKaRange: '3.5 – 5.0',
     type: 'acid',
     category: 'Oxygen acids',
-    color: '#dc2626',
+    color: '#fca5a5',
     bg: '#fef2f2',
     border: '#fecaca',
     dark: '#991b1b',
@@ -219,7 +219,7 @@ const FUNCTIONAL_GROUPS = [
 ]
 
 const DRUG_TYPES = [
-  { id: 'weak_acid', label: 'Weak acid', color: '#dc2626', example: 'aspirin, ibuprofen, warfarin' },
+  { id: 'weak_acid', label: 'Weak acid', color: '#fca5a5', example: 'aspirin, ibuprofen, warfarin' },
   { id: 'weak_base', label: 'Weak base', color: '#2563eb', example: 'morphine, amphetamine, chloroquine' },
   { id: 'zwitterion', label: 'Zwitterion (amino acid-like)', color: '#7c3aed', example: 'amino acids, some antibiotics' },
 ]
@@ -270,7 +270,7 @@ function IonisationCanvas({ pKa, drugType, highlightPHs }) {
     const yS = f  => pad.top  + (1 - f) * cH
 
     ctx.clearRect(0, 0, W, H)
-    ctx.fillStyle = 'white'
+    ctx.fillStyle = '#0a0f1e'
     ctx.fillRect(0, 0, W, H)
 
     // Coloured background zones
@@ -288,7 +288,7 @@ function IonisationCanvas({ pKa, drugType, highlightPHs }) {
     })
 
     // Grid
-    ctx.strokeStyle = 'rgba(0,0,0,0.06)'; ctx.lineWidth = 1
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 1
     for (let i = 0; i <= 7; i++) {
       const ph = i * 2
       ctx.beginPath(); ctx.moveTo(xS(ph), pad.top); ctx.lineTo(xS(ph), pad.top + cH); ctx.stroke()
@@ -299,7 +299,7 @@ function IonisationCanvas({ pKa, drugType, highlightPHs }) {
     }
 
     // Axis labels
-    ctx.fillStyle = '#374151'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right'
+    ctx.fillStyle = 'rgba(240,244,255,0.5)'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right'
     for (let i = 0; i <= 4; i++) {
       ctx.fillText((100 - i * 25) + '%', pad.left - 3, pad.top + (i / 4) * cH + 3)
     }
@@ -312,13 +312,13 @@ function IonisationCanvas({ pKa, drugType, highlightPHs }) {
     ctx.save()
     ctx.translate(10, pad.top + cH / 2)
     ctx.rotate(-Math.PI / 2)
-    ctx.textAlign = 'center'; ctx.font = '9px sans-serif'; ctx.fillStyle = '#9ca3af'
+    ctx.textAlign = 'center'; ctx.font = '9px sans-serif'; ctx.fillStyle = 'rgba(240,244,255,0.3)'
     ctx.fillText('% unionised form', 0, 0)
     ctx.restore()
-    ctx.textAlign = 'center'; ctx.font = '9px sans-serif'; ctx.fillStyle = '#9ca3af'
+    ctx.textAlign = 'center'; ctx.font = '9px sans-serif'; ctx.fillStyle = 'rgba(240,244,255,0.3)'
     ctx.fillText('pH', pad.left + cW / 2, H - 6)
 
-    ctx.strokeStyle = '#d1d5db'; ctx.lineWidth = 1
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 1
     ctx.strokeRect(pad.left, pad.top, cW, cH)
 
     // pKa vertical line
@@ -365,7 +365,7 @@ function IonisationCanvas({ pKa, drugType, highlightPHs }) {
 
     // Highlight pH markers
     const markers = [
-      { ph: 1.5,  label: 'Stomach',   color: '#dc2626' },
+      { ph: 1.5,  label: 'Stomach',   color: '#fca5a5' },
       { ph: 6.5,  label: 'Intestine', color: '#16a34a' },
       { ph: 7.4,  label: 'Blood',     color: '#2563eb' },
     ]
@@ -397,7 +397,7 @@ function IonisationCanvas({ pKa, drugType, highlightPHs }) {
 
   return (
     <canvas ref={canvasRef}
-      style={{ width: '100%', height: '260px', borderRadius: '10px', border: '1px solid #e5e7eb', background: 'white' }} />
+      style={{ width: '100%', height: '260px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.07)', background: '#0a0f1e' }} />
   )
 }
 
@@ -416,7 +416,7 @@ export default function PKAPage() {
   const [drugType, setDrugType] = useState('weak_acid')
 
   const keyPHs = [
-    { ph: 1.5, label: 'Stomach (fasted)', color: '#dc2626' },
+    { ph: 1.5, label: 'Stomach (fasted)', color: '#fca5a5' },
     { ph: 3.5, label: 'Stomach (fed)',    color: '#f97316' },
     { ph: 6.5, label: 'Small intestine', color: '#16a34a' },
     { ph: 7.4, label: 'Blood / plasma',  color: '#2563eb' },
@@ -440,29 +440,31 @@ export default function PKAPage() {
     padding: '8px 20px', cursor: 'pointer', fontSize: '13px',
     fontWeight: tab === active ? '600' : '400',
     border: 'none',
-    borderBottom: tab === active ? '2px solid #2563eb' : '2px solid transparent',
+    borderBottom: tab === active ? '2px solid #2a6fdb' : '2px solid transparent',
     background: 'transparent',
-    color: tab === active ? '#1d4ed8' : '#6b7280',
+    color: tab === active ? '#93b4f7' : 'rgba(240,244,255,0.4)',
     marginBottom: '-1px',
   })
 
   const btn = (isActive, color = '#2563eb') => ({
     padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px',
     fontWeight: isActive ? '600' : '400',
-    border: isActive ? `2px solid ${color}` : '1px solid #e5e7eb',
-    background: isActive ? color + '15' : 'white',
-    color: isActive ? color : '#374151',
+    border: isActive ? `2px solid ${color}` : '1px solid rgba(255,255,255,0.1)',
+    background: isActive ? color + '18' : 'rgba(255,255,255,0.04)',
+    color: isActive ? color : 'rgba(240,244,255,0.75)',
     transition: 'all 0.12s',
   })
 
   return (
-    <main style={{ maxWidth: '1060px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'system-ui, sans-serif' }}>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#111827', margin: '0 0 4px' }}>pKa, Ionisation & Membrane Permeability</h1>
-      <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '1.5rem', lineHeight: '1.6' }}>
+    <main style={{ maxWidth: '1060px', margin: '0 auto', padding: '2rem 1rem', fontFamily: "'Inter',system-ui,sans-serif", background: '#0a0f1e', minHeight: '100vh', color: '#f0f4ff' }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'); * { box-sizing:border-box; } input[type=range]{ accent-color:#2a6fdb; } input::placeholder,textarea::placeholder{ color:rgba(240,244,255,0.25); }`}</style>
+      <a href="/tools" style={{ fontSize: '13px', color: 'rgba(240,244,255,0.4)', textDecoration: 'none', display: 'inline-block', marginBottom: '1rem' }}>← Tools</a>
+      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#f0f4ff', margin: '0 0 4px', letterSpacing: '-0.02em' }}>pKa, Ionisation & Membrane Permeability</h1>
+      <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.5)', marginBottom: '1.5rem', lineHeight: '1.6' }}>
         Understand why functional groups have the pKa values they do, and how ionisation at different pH values determines drug absorption and distribution.
       </p>
 
-      <div style={{ borderBottom: '1px solid #e5e7eb', marginBottom: '1.5rem', display: 'flex', gap: 0 }}>
+      <div style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', marginBottom: '1.5rem', display: 'flex', gap: 0 }}>
         <button onClick={() => setTab('explorer')} style={tabBtn('explorer')}>pKa explorer</button>
         <button onClick={() => setTab('calculator')} style={tabBtn('calculator')}>Ionisation calculator</button>
       </div>
@@ -477,9 +479,9 @@ export default function PKAPage() {
                 style={{
                   padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px',
                   fontWeight: selected === f.id ? '600' : '400',
-                  border: selected === f.id ? `2px solid ${f.color}` : '1px solid #e5e7eb',
-                  background: selected === f.id ? f.bg : 'white',
-                  color: selected === f.id ? f.dark : '#374151',
+                  border: selected === f.id ? `2px solid ${f.color}` : '1px solid rgba(255,255,255,0.1)',
+                  background: selected === f.id ? `${f.color}18` : 'rgba(255,255,255,0.04)',
+                  color: selected === f.id ? f.color : 'rgba(240,244,255,0.75)',
                   transition: 'all 0.12s',
                 }}>
                 {f.name}
@@ -492,11 +494,11 @@ export default function PKAPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
 
                 {/* Header */}
-                <div style={{ background: fg.bg, border: `1px solid ${fg.border}`, borderRadius: '12px', padding: '14px 16px' }}>
+                <div style={{ background: `${fg.color}10`, border: `1px solid ${fg.color}33`, borderRadius: '12px', padding: '14px 16px' }}>
                     <div style={{ marginBottom: '8px' }}>
                         <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap', marginBottom: '3px' }}>
-                            <span style={{ fontSize: '20px', fontWeight: '700', fontFamily: 'ui-monospace, monospace', color: fg.dark }}>{fg.formula}</span>
-                            <span style={{ fontSize: '13px', color: fg.dark, opacity: 0.7 }}>{fg.name}</span>
+                            <span style={{ fontSize: '20px', fontWeight: '700', fontFamily: 'ui-monospace, monospace', color: fg.color }}>{fg.formula}</span>
+                            <span style={{ fontSize: '13px', color: fg.color, opacity: 0.7 }}>{fg.name}</span>
                         </div>
                         <span style={{ fontSize: '18px', fontWeight: '700', color: fg.color }}>pKa {fg.pKaRange}</span>
                     </div>
@@ -504,32 +506,32 @@ export default function PKAPage() {
                         <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', background: fg.color, color: 'white', fontWeight: '600' }}>
                             {fg.type === 'acid' ? 'Acid' : fg.type === 'base' ? 'Base (pKa of BH⁺)' : 'Acid + Base'}
                         </span>
-                        <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', background: '#f3f4f6', color: '#6b7280', border: '1px solid #e5e7eb' }}>
+                        <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '999px', background: 'rgba(255,255,255,0.06)', color: 'rgba(240,244,255,0.45)', border: '1px solid rgba(255,255,255,0.07)' }}>
                             {fg.category}
                         </span>
                     </div>
-                    <p style={{ fontSize: '13px', color: '#374151', margin: 0, lineHeight: 1.65 }}>{fg.plain}</p>
+                    <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.7)', margin: 0, lineHeight: 1.65 }}>{fg.plain}</p>
                 </div>
 
                 {/* Why */}
-                <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px 14px' }}>
+                <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '12px 14px' }}>
                   <p style={{ fontSize: '11px', fontWeight: '600', color: fg.color, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 6px' }}>Why this pKa — the reasoning</p>
-                  <p style={{ fontSize: '13px', color: '#374151', margin: 0, lineHeight: 1.7 }}>{fg.reason}</p>
+                  <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.75)', margin: 0, lineHeight: 1.7 }}>{fg.reason}</p>
                 </div>
 
                 {/* Substituent effects */}
                 {fg.effects.length > 0 && (
-                  <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px 14px' }}>
-                    <p style={{ fontSize: '11px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px' }}>Substituent effects</p>
+                  <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '12px 14px' }}>
+                    <p style={{ fontSize: '11px', fontWeight: '600', color: 'rgba(240,244,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px' }}>Substituent effects</p>
                     {fg.effects.map((e, i) => (
                       <div key={i} style={{ marginBottom: i < fg.effects.length - 1 ? '10px' : 0, paddingBottom: i < fg.effects.length - 1 ? '10px' : 0, borderBottom: i < fg.effects.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '3px' }}>
-                          <span style={{ fontSize: '12px', fontWeight: '500', color: '#374151' }}>{e.group}</span>
+                          <span style={{ fontSize: '12px', fontWeight: '500', color: 'rgba(240,244,255,0.75)' }}>{e.group}</span>
                           <span style={{ fontSize: '11px', padding: '1px 8px', borderRadius: '999px', background: e.effect.includes('decreases') ? '#fef2f2' : '#f0fdf4', color: e.effect.includes('decreases') ? '#dc2626' : '#16a34a', border: `1px solid ${e.effect.includes('decreases') ? '#fecaca' : '#bbf7d0'}` }}>
                             pKa {e.effect.includes('decreases') ? '↓' : '↑'}
                           </span>
                         </div>
-                        <p style={{ fontSize: '12px', color: '#6b7280', margin: 0, lineHeight: 1.5 }}>{e.why}</p>
+                        <p style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)', margin: 0, lineHeight: 1.5 }}>{e.why}</p>
                       </div>
                     ))}
                   </div>
@@ -538,8 +540,8 @@ export default function PKAPage() {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {/* Examples */}
-                <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px 14px' }}>
-                  <p style={{ fontSize: '11px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 10px' }}>pKa values — {fg.name}</p>
+                <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '12px 14px' }}>
+                  <p style={{ fontSize: '11px', fontWeight: '600', color: 'rgba(240,244,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 10px' }}>pKa values — {fg.name}</p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     {fg.examples.map(ex => {
                       const maxPKa  = Math.max(...fg.examples.map(e => parseFloat(e.pKa) || 0))
@@ -547,8 +549,8 @@ export default function PKAPage() {
                       const pct     = isNaN(pkaVal) ? 50 : Math.min(pkaVal / Math.max(maxPKa, 1) * 100, 100)
                       return (
                         <div key={ex.name} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <span style={{ fontSize: '12px', color: '#374151', width: '160px', flexShrink: 0 }}>{ex.name}</span>
-                          <div style={{ flex: 1, background: '#e5e7eb', borderRadius: '4px', height: '18px', overflow: 'hidden' }}>
+                          <span style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', width: '160px', flexShrink: 0 }}>{ex.name}</span>
+                          <div style={{ flex: 1, background: 'rgba(255,255,255,0.1)', borderRadius: '4px', height: '18px', overflow: 'hidden' }}>
                             <div style={{ width: pct + '%', height: '100%', background: fg.color, borderRadius: '4px', minWidth: '24px', display: 'flex', alignItems: 'center', paddingLeft: '6px' }}>
                               <span style={{ fontSize: '10px', color: 'white', fontWeight: '600', whiteSpace: 'nowrap' }}>{ex.pKa}</span>
                             </div>
@@ -560,14 +562,14 @@ export default function PKAPage() {
                 </div>
 
                 {/* Pharma relevance */}
-                <div style={{ background: fg.bg, border: `1px solid ${fg.border}`, borderRadius: '10px', padding: '12px 14px' }}>
-                  <p style={{ fontSize: '11px', fontWeight: '600', color: fg.dark, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 6px' }}>Pharmaceutical relevance</p>
-                  <p style={{ fontSize: '13px', color: '#374151', margin: 0, lineHeight: 1.7 }}>{fg.pharmaLink}</p>
+                <div style={{ background: `${fg.color}10`, border: `1px solid ${fg.color}33`, borderRadius: '10px', padding: '12px 14px' }}>
+                  <p style={{ fontSize: '11px', fontWeight: '600', color: fg.color, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 6px' }}>Pharmaceutical relevance</p>
+                  <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.75)', margin: 0, lineHeight: 1.7 }}>{fg.pharmaLink}</p>
                 </div>
 
                 {/* pKa comparison strip */}
-                <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px 14px' }}>
-                    <p style={{ fontSize: '11px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 10px' }}>
+                <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '12px 14px' }}>
+                    <p style={{ fontSize: '11px', fontWeight: '600', color: 'rgba(240,244,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 10px' }}>
                         pKa in context — sorted weakest to strongest acid
                     </p>
                     {[
@@ -578,7 +580,7 @@ export default function PKAPage() {
                         { label: 'Ammonium ions',    pKa: 10,   color: '#2563eb' },
                         { label: 'Imidazolium',      pKa: 6.5,  color: '#7c3aed' },
                         { label: 'Carboxylic acids', pKa: 4.8,  color: '#f97316' },
-                        { label: 'Strong acids',     pKa: 0,    color: '#dc2626' },
+                        { label: 'Strong acids',     pKa: 0,    color: '#fca5a5' },
                     ].sort((a, b) => b.pKa - a.pKa).map(item => {
                         const groupMap = {
                             'Alcohols':         ['alcohol'],
@@ -594,19 +596,19 @@ export default function PKAPage() {
                         const barWidth = Math.min(100, Math.max(4, (item.pKa / 18) * 100))
                         return (
                         <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '5px' }}>
-                            <span style={{ fontSize: '11px', color: isCurrent ? item.color : '#374151', fontWeight: isCurrent ? '600' : '400', width: '120px', flexShrink: 0 }}>
+                            <span style={{ fontSize: '11px', color: isCurrent ? item.color : 'rgba(240,244,255,0.75)', fontWeight: isCurrent ? '600' : '400', width: '120px', flexShrink: 0 }}>
                                 {item.label}
                             </span>
-                            <div style={{ flex: 1, background: '#e5e7eb', borderRadius: '3px', height: '8px' }}>
+                            <div style={{ flex: 1, background: 'rgba(255,255,255,0.1)', borderRadius: '3px', height: '8px' }}>
                                 <div style={{ width: barWidth + '%', height: '100%', background: item.color, borderRadius: '3px', opacity: isCurrent ? 1 : 0.5 }} />
                             </div>
-                            <span style={{ fontSize: '11px', fontFamily: 'ui-monospace, monospace', color: isCurrent ? item.color : '#9ca3af', fontWeight: isCurrent ? '700' : '400', minWidth: '52px', textAlign: 'right' }}>
+                            <span style={{ fontSize: '11px', fontFamily: 'ui-monospace, monospace', color: isCurrent ? item.color : 'rgba(240,244,255,0.3)', fontWeight: isCurrent ? '700' : '400', minWidth: '52px', textAlign: 'right' }}>
                                 {item.pKa === 0 ? '< 0' : '~' + item.pKa}
                             </span>
                         </div>
                         )
                     })}
-                    <p style={{ fontSize: '10px', color: '#9ca3af', margin: '8px 0 0', lineHeight: 1.4 }}>
+                    <p style={{ fontSize: '10px', color: 'rgba(240,244,255,0.3)', margin: '8px 0 0', lineHeight: 1.4 }}>
                         Higher pKa = weaker acid (harder to lose a proton). Bar length proportional to pKa value.
                     </p>
                 </div>
@@ -623,31 +625,31 @@ export default function PKAPage() {
           {/* Inputs */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-              <p style={{ fontSize: '11px', fontWeight: '600', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 10px' }}>Drug type</p>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+              <p style={{ fontSize: '11px', fontWeight: '600', color: 'rgba(240,244,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 10px' }}>Drug type</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 {DRUG_TYPES.map(dt => (
                   <button key={dt.id} onClick={() => setDrugType(dt.id === 'zwitterion' ? 'weak_acid' : dt.id)}
                     style={{ ...btn(drugType === dt.id, dt.color), textAlign: 'left', display: 'block' }}>
                     <span style={{ fontWeight: '600' }}>{dt.label}</span>
-                    <span style={{ fontSize: '10px', color: '#9ca3af', display: 'block', marginTop: '1px' }}>{dt.example}</span>
+                    <span style={{ fontSize: '10px', color: 'rgba(240,244,255,0.3)', display: 'block', marginTop: '1px' }}>{dt.example}</span>
                   </button>
                 ))}
               </div>
             </div>
 
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-              <p style={{ fontSize: '11px', fontWeight: '600', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 10px' }}>Drug pKa</p>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+              <p style={{ fontSize: '11px', fontWeight: '600', color: 'rgba(240,244,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 10px' }}>Drug pKa</p>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                 <input type="number" value={rawPKa} min={0} max={14} step={0.1}
                   onChange={e => { setRawPKa(e.target.value); const n = parseFloat(e.target.value); if (!isNaN(n) && n >= 0 && n <= 14) setPKa(n) }}
                   onBlur={() => { const n = parseFloat(rawPKa); if (isNaN(n) || n < 0 || n > 14) { setPKa(4.4); setRawPKa('4.4') } }}
-                  style={{ width: '70px', padding: '5px 8px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '16px', fontWeight: '700', color: '#111827', textAlign: 'right', background: 'white' }} />
+                  style={{ width: '70px', padding: '5px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '16px', fontWeight: '700', color: '#f0f4ff', textAlign: 'right', background: '#0f1629' }} />
                 <input type="range" min={0} max={14} step={0.1} value={pKa}
                   onChange={e => { const n = parseFloat(e.target.value); setPKa(n); setRawPKa(n.toFixed(1)) }}
                   style={{ flex: 1, accentColor: '#2563eb' }} />
               </div>
-              <p style={{ fontSize: '11px', color: '#9ca3af', margin: 0 }}>
+              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', margin: 0 }}>
                 {drugType === 'weak_acid'
                   ? 'pKa of the drug (HA ⇌ H⁺ + A⁻)'
                   : 'pKa of conjugate acid (BH⁺ ⇌ H⁺ + B)'}
@@ -655,7 +657,7 @@ export default function PKAPage() {
 
               {/* Quick-load common drugs */}
               <div style={{ marginTop: '10px' }}>
-                <p style={{ fontSize: '10px', color: '#9ca3af', margin: '0 0 5px' }}>Quick load:</p>
+                <p style={{ fontSize: '10px', color: 'rgba(240,244,255,0.3)', margin: '0 0 5px' }}>Quick load:</p>
                 <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                   {[
                     { name: 'Aspirin', pKa: 3.5, type: 'weak_acid' },
@@ -666,7 +668,7 @@ export default function PKAPage() {
                     { name: 'Warfarin', pKa: 5.1, type: 'weak_acid' },
                   ].map(d => (
                     <button key={d.name} onClick={() => { setPKa(d.pKa); setRawPKa(String(d.pKa)); setDrugType(d.type) }}
-                      style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '5px', cursor: 'pointer', border: '1px solid #e5e7eb', background: 'white', color: '#374151' }}>
+                      style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '5px', cursor: 'pointer', border: '1px solid rgba(255,255,255,0.07)', background: '#0f1629', color: 'rgba(240,244,255,0.75)' }}>
                       {d.name}
                     </button>
                   ))}
@@ -675,15 +677,15 @@ export default function PKAPage() {
             </div>
 
             {/* pH breakdown table */}
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-              <p style={{ fontSize: '11px', fontWeight: '600', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 10px' }}>Ionisation at key pH values</p>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+              <p style={{ fontSize: '11px', fontWeight: '600', color: 'rgba(240,244,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 10px' }}>Ionisation at key pH values</p>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
                 <thead>
-                  <tr style={{ background: '#f3f4f6' }}>
-                    <th style={{ padding: '5px 8px', textAlign: 'left', color: '#6b7280', fontWeight: '600', borderRadius: '4px 0 0 4px' }}>Site</th>
-                    <th style={{ padding: '5px 8px', textAlign: 'center', color: '#6b7280', fontWeight: '600' }}>pH</th>
+                  <tr style={{ background: 'rgba(255,255,255,0.06)' }}>
+                    <th style={{ padding: '5px 8px', textAlign: 'left', color: 'rgba(240,244,255,0.45)', fontWeight: '600', borderRadius: '4px 0 0 4px' }}>Site</th>
+                    <th style={{ padding: '5px 8px', textAlign: 'center', color: 'rgba(240,244,255,0.45)', fontWeight: '600' }}>pH</th>
                     <th style={{ padding: '5px 8px', textAlign: 'right', color: '#2563eb', fontWeight: '600' }}>Unionised</th>
-                    <th style={{ padding: '5px 8px', textAlign: 'right', color: '#dc2626', fontWeight: '600', borderRadius: '0 4px 4px 0' }}>Ionised</th>
+                    <th style={{ padding: '5px 8px', textAlign: 'right', color: '#fca5a5', fontWeight: '600', borderRadius: '0 4px 4px 0' }}>Ionised</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -693,14 +695,14 @@ export default function PKAPage() {
                     const pct_i = (ionised   * 100).toFixed(1)
                     const dominant = unionised > 0.5 ? 'unionised' : 'ionised'
                     return (
-                      <tr key={item.ph} style={{ borderTop: '1px solid #f3f4f6' }}>
+                      <tr key={item.ph} style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                         <td style={{ padding: '5px 8px', color: item.color, fontWeight: '500' }}>
                           <span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', background: item.color, marginRight: '5px', verticalAlign: 'middle' }} />
                           {item.label}
                         </td>
-                        <td style={{ padding: '5px 8px', textAlign: 'center', fontFamily: 'ui-monospace, monospace', color: '#374151' }}>{item.ph}</td>
-                        <td style={{ padding: '5px 8px', textAlign: 'right', fontWeight: dominant === 'unionised' ? '700' : '400', color: dominant === 'unionised' ? '#1d4ed8' : '#374151' }}>{pct_u}%</td>
-                        <td style={{ padding: '5px 8px', textAlign: 'right', fontWeight: dominant === 'ionised' ? '700' : '400', color: dominant === 'ionised' ? '#dc2626' : '#374151' }}>{pct_i}%</td>
+                        <td style={{ padding: '5px 8px', textAlign: 'center', fontFamily: 'ui-monospace, monospace', color: 'rgba(240,244,255,0.6)' }}>{item.ph}</td>
+                        <td style={{ padding: '5px 8px', textAlign: 'right', fontWeight: dominant === 'unionised' ? '700' : '400', color: dominant === 'unionised' ? '#93b4f7' : 'rgba(240,244,255,0.55)' }}>{pct_u}%</td>
+                        <td style={{ padding: '5px 8px', textAlign: 'right', fontWeight: dominant === 'ionised' ? '700' : '400', color: dominant === 'ionised' ? '#dc2626' : 'rgba(240,244,255,0.75)' }}>{pct_i}%</td>
                       </tr>
                     )
                   })}
@@ -729,31 +731,31 @@ export default function PKAPage() {
             </div>
 
             {/* Absorption interpretation */}
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px 14px' }}>
-              <p style={{ fontSize: '11px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px' }}>Absorption interpretation</p>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '12px 14px' }}>
+              <p style={{ fontSize: '11px', fontWeight: '600', color: 'rgba(240,244,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px' }}>Absorption interpretation</p>
               {(() => {
                 const stomach    = calcFractions(1.5)
                 const intestine  = calcFractions(6.5)
                 const blood      = calcFractions(7.4)
                 const items = [
-                  { label: 'Stomach',       ...stomach,   ph: 1.5, color: '#dc2626' },
+                  { label: 'Stomach',       ...stomach,   ph: 1.5, color: '#fca5a5' },
                   { label: 'Sm. intestine', ...intestine, ph: 6.5, color: '#16a34a' },
                   { label: 'Blood',         ...blood,     ph: 7.4, color: '#2563eb' },
                 ]
                 return items.map(item => (
-                  <div key={item.label} style={{ marginBottom: '8px', padding: '8px 10px', background: 'white', borderRadius: '8px', border: '1px solid #f3f4f6' }}>
+                  <div key={item.label} style={{ marginBottom: '8px', padding: '8px 10px', background: 'rgba(255,255,255,0.04)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                       <span style={{ fontSize: '12px', fontWeight: '500', color: item.color }}>
                         {item.label} (pH {item.ph})
                       </span>
-                      <span style={{ fontSize: '12px', fontWeight: '700', color: item.unionised > 0.5 ? '#1d4ed8' : '#dc2626' }}>
+                      <span style={{ fontSize: '12px', fontWeight: '700', color: item.unionised > 0.5 ? '#93b4f7' : '#fca5a5' }}>
                         {(item.unionised * 100).toFixed(1)}% unionised
                       </span>
                     </div>
-                    <div style={{ height: '6px', background: '#e5e7eb', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div style={{ height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
                       <div style={{ width: (item.unionised * 100) + '%', height: '100%', background: '#2563eb', borderRadius: '3px' }} />
                     </div>
-                    <p style={{ fontSize: '11px', color: '#6b7280', margin: '4px 0 0' }}>
+                    <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.4)', margin: '4px 0 0' }}>
                       {item.unionised > 0.9
                         ? 'Predominantly unionised → can cross membranes readily'
                         : item.unionised > 0.5
@@ -768,8 +770,8 @@ export default function PKAPage() {
             </div>
 
             {/* Urine pH trapping */}
-            <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '10px', padding: '12px 14px' }}>
-              <p style={{ fontSize: '11px', fontWeight: '600', color: '#1e40af', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 6px' }}>Urine pH trapping</p>
+            <div style={{ background: 'rgba(42,111,219,0.1)', border: '1px solid rgba(42,111,219,0.3)', borderRadius: '10px', padding: '12px 14px' }}>
+              <p style={{ fontSize: '11px', fontWeight: '600', color: '#93b4f7', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 6px' }}>Urine pH trapping</p>
               {(() => {
                 const acidicUrine   = calcFractions(5.0)
                 const alkalineUrine = calcFractions(8.0)
@@ -777,7 +779,7 @@ export default function PKAPage() {
                   ? (alkalineUrine.ionised > acidicUrine.ionised ? 'alkaline' : 'acidic')
                   : (acidicUrine.ionised > alkalineUrine.ionised ? 'acidic' : 'alkaline')
                 return (
-                  <p style={{ fontSize: '13px', color: '#374151', margin: 0, lineHeight: 1.65 }}>
+                  <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.7)', margin: 0, lineHeight: 1.65 }}>
                     {drugType === 'weak_acid'
                       ? `In acidic urine (pH 5): ${(acidicUrine.ionised * 100).toFixed(1)}% ionised. In alkaline urine (pH 8): ${(alkalineUrine.ionised * 100).toFixed(1)}% ionised.`
                       : `In acidic urine (pH 5): ${(acidicUrine.ionised * 100).toFixed(1)}% ionised. In alkaline urine (pH 8): ${(alkalineUrine.ionised * 100).toFixed(1)}% ionised.`}

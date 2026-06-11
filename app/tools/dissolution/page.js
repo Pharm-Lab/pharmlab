@@ -76,10 +76,10 @@ function DissolutionCanvas({ curves, yLabel, xLabel, xMax, yMax, threshold }) {
     const yS = y => pad.top  + cH - (Math.min(y, yMax) / yMax) * cH
 
     ctx.clearRect(0, 0, W, H)
-    ctx.fillStyle = 'white'; ctx.fillRect(0, 0, W, H)
+    ctx.fillStyle = '#0a0f1e'; ctx.fillRect(0, 0, W, H)
 
     // Grid
-    ctx.strokeStyle = 'rgba(0,0,0,0.06)'; ctx.lineWidth = 1
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)'; ctx.lineWidth = 1
     for (let i = 0; i <= 5; i++) {
       ctx.beginPath(); ctx.moveTo(pad.left, pad.top + (i / 5) * cH); ctx.lineTo(pad.left + cW, pad.top + (i / 5) * cH); ctx.stroke()
     }
@@ -98,7 +98,7 @@ function DissolutionCanvas({ curves, yLabel, xLabel, xMax, yMax, threshold }) {
     }
 
     // Axis labels
-    ctx.fillStyle = '#374151'; ctx.font = '10px sans-serif'
+    ctx.fillStyle = 'rgba(240,244,255,0.5)'; ctx.font = '10px sans-serif'
     ctx.textAlign = 'right'
     for (let i = 0; i <= 5; i++) {
       const v = yMax * (1 - i / 5)
@@ -110,11 +110,11 @@ function DissolutionCanvas({ curves, yLabel, xLabel, xMax, yMax, threshold }) {
     }
 
     ctx.save(); ctx.translate(12, pad.top + cH / 2); ctx.rotate(-Math.PI / 2)
-    ctx.textAlign = 'center'; ctx.font = '9px sans-serif'; ctx.fillStyle = '#9ca3af'
+    ctx.textAlign = 'center'; ctx.font = '9px sans-serif'; ctx.fillStyle = 'rgba(240,244,255,0.3)'
     ctx.fillText(yLabel, 0, 0); ctx.restore()
-    ctx.textAlign = 'center'; ctx.font = '9px sans-serif'; ctx.fillStyle = '#9ca3af'
+    ctx.textAlign = 'center'; ctx.font = '9px sans-serif'; ctx.fillStyle = 'rgba(240,244,255,0.3)'
     ctx.fillText(xLabel, pad.left + cW / 2, H - 6)
-    ctx.strokeStyle = '#d1d5db'; ctx.lineWidth = 1
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 1
     ctx.strokeRect(pad.left, pad.top, cW, cH)
 
     // Curves
@@ -140,7 +140,7 @@ function DissolutionCanvas({ curves, yLabel, xLabel, xMax, yMax, threshold }) {
 
   return (
     <canvas ref={canvasRef}
-      style={{ width: '100%', height: '240px', borderRadius: '10px', border: '1px solid #e5e7eb', background: 'white' }} />
+      style={{ width: '100%', height: '240px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.07)', background: '#0a0f1e' }} />
   )
 }
 
@@ -232,31 +232,33 @@ export default function DissolutionPage() {
   const tabBtn = active => ({
     padding: '8px 20px', cursor: 'pointer', fontSize: '13px',
     fontWeight: tab === active ? '600' : '400',
-    border: 'none', borderBottom: tab === active ? '2px solid #2563eb' : '2px solid transparent',
-    background: 'transparent', color: tab === active ? '#1d4ed8' : '#6b7280', marginBottom: '-1px',
+    border: 'none', borderBottom: tab === active ? '2px solid #2a6fdb' : '2px solid transparent',
+    background: 'transparent', color: tab === active ? '#93b4f7' : 'rgba(240,244,255,0.4)', marginBottom: '-1px',
   })
 
   const sliderRow = (label, value, setValue, min, max, step, unit, hint) => (
     <div style={{ marginBottom: '10px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px' }}>
-        <label style={{ fontSize: '12px', color: '#374151', fontWeight: '500' }}>{label}</label>
-        <span style={{ fontSize: '12px', fontFamily: 'ui-monospace, monospace', color: '#2563eb', fontWeight: '600' }}>{value} {unit}</span>
+        <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.7)', fontWeight: '500' }}>{label}</label>
+        <span style={{ fontSize: '12px', fontFamily: 'ui-monospace, monospace', color: '#93b4f7', fontWeight: '600' }}>{value} {unit}</span>
       </div>
       <input type="range" min={min} max={max} step={step} value={value}
         onChange={e => setValue(parseFloat(e.target.value))}
         style={{ width: '100%', accentColor: '#2563eb' }} />
-      {hint && <p style={{ fontSize: '10px', color: '#9ca3af', margin: '2px 0 0' }}>{hint}</p>}
+      {hint && <p style={{ fontSize: '10px', color: 'rgba(240,244,255,0.3)', margin: '2px 0 0' }}>{hint}</p>}
     </div>
   )
 
   return (
-    <main style={{ maxWidth: '1060px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'system-ui, sans-serif' }}>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#111827', margin: '0 0 4px' }}>Dissolution & Drug Release</h1>
-      <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '1.5rem', lineHeight: '1.6' }}>
+    <main style={{ maxWidth: '1060px', margin: '0 auto', padding: '2rem 1rem', fontFamily: "'Inter',system-ui,sans-serif", background: '#0a0f1e', minHeight: '100vh', color: '#f0f4ff' }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'); * { box-sizing:border-box; } input[type=range] { accent-color: #2a6fdb; }`}</style>
+      <a href="/tools" style={{ fontSize: '13px', color: 'rgba(240,244,255,0.4)', textDecoration: 'none', display: 'inline-block', marginBottom: '1rem' }}>← Tools</a>
+      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#f0f4ff', margin: '0 0 4px', letterSpacing: '-0.02em' }}>Dissolution & Drug Release</h1>
+      <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.5)', marginBottom: '1.5rem', lineHeight: '1.6' }}>
         Simulate how drugs dissolve and are released from formulations. The key insight: for BCS Class II drugs (the majority of new chemical entities), dissolution rate — not membrane permeability — is the bottleneck for absorption. Formulation decisions like particle size, crystallinity, and dosage form design directly determine bioavailability.
     </p>
 
-      <div style={{ borderBottom: '1px solid #e5e7eb', marginBottom: '1.5rem', display: 'flex' }}>
+      <div style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', marginBottom: '1.5rem', display: 'flex' }}>
         <button onClick={() => setTab('dissolution')} style={tabBtn('dissolution')}>Dissolution simulator</button>
         <button onClick={() => setTab('release')}     style={tabBtn('release')}>Release profiles</button>
         <button onClick={() => setTab('bcs')}         style={tabBtn('bcs')}>BCS classification</button>
@@ -267,8 +269,8 @@ export default function DissolutionPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '1.5rem', alignItems: 'start' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-              <p style={{ fontSize: '11px', fontWeight: '600', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 12px' }}>Noyes-Whitney parameters</p>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+              <p style={{ fontSize: '11px', fontWeight: '600', color: 'rgba(240,244,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 12px' }}>Noyes-Whitney parameters</p>
               {sliderRow('Particle radius', particleSize, setParticleSize, 1, 500, 1, 'μm', 'Smaller = faster dissolution. Micronised = ~1–10μm, conventional = 50–200μm.')}
               {sliderRow('Saturation solubility Cs', solubility, setSolubility, 0.01, 10, 0.01, 'mg/mL', 'Intrinsic solubility at dissolution pH. BCS Class II = typically < 0.1 mg/mL.')}
               {sliderRow('Stirring speed', stirring, setStirring, 10, 200, 10, 'RPM', 'Higher stirring = thinner diffusion layer (h) = faster dissolution.')}
@@ -281,8 +283,8 @@ export default function DissolutionPage() {
               <p style={{ fontSize: '12px', fontFamily: 'ui-monospace, monospace', color: '#93b4f7', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-line' }}>{'dC/dt = (D × A × Cs) / (h × V)\nC(t) = Cs × (1 − e^(−k·t))\nwhere k = D·A / (h·V)'}</p>
             </div>
 
-            <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: '#374151', lineHeight: 1.65 }}>
-              <strong style={{ color: '#1e40af' }}>Key insight:</strong> Dissolution rate is proportional to surface area. Halving particle radius → 8× smaller volume per particle → 2× more particles → 2× surface area for the same mass. This is the pharmacokinetic rationale for micronisation.
+            <div style={{ background: 'rgba(42,111,219,0.1)', border: '1px solid rgba(42,111,219,0.3)', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: 'rgba(240,244,255,0.65)', lineHeight: 1.65 }}>
+              <strong style={{ color: '#93b4f7' }}>Key insight:</strong> Dissolution rate is proportional to surface area. Halving particle radius → 8× smaller volume per particle → 2× more particles → 2× surface area for the same mass. This is the pharmacokinetic rationale for micronisation.
             </div>
           </div>
 
@@ -291,12 +293,12 @@ export default function DissolutionPage() {
               curves={[{ label: particleSize + 'μm', color: '#2563eb', pts: nw.map(p => ({ t: p.t, v: p.v })) }]}
               yLabel="% dissolved" xLabel="Time (min)" xMax={120} yMax={100} threshold={85}
             />
-            <p style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>
+            <p style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)', margin: 0 }}>
               The 85% dissolution threshold (dashed line) is the USP criterion for BCS-based biowaivers — if a formulation dissolves ≥85% in 30 minutes, in-vivo bioequivalence is generally inferred without a clinical PK study.
             </p>
 
             <div>
-              <p style={{ fontSize: '12px', fontWeight: '500', color: '#374151', marginBottom: '8px' }}>Particle size comparison (all other parameters fixed):</p>
+              <p style={{ fontSize: '12px', fontWeight: '500', color: 'rgba(240,244,255,0.65)', marginBottom: '8px' }}>Particle size comparison (all other parameters fixed):</p>
               <DissolutionCanvas
                 curves={particleCurves}
                 yLabel="% dissolved" xLabel="Time (min)" xMax={120} yMax={100} threshold={85}
@@ -310,7 +312,7 @@ export default function DissolutionPage() {
       {tab === 'release' && (
         <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '1.5rem', alignItems: 'start' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
               <p style={{ fontSize: '11px', fontWeight: '600', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 10px' }}>Show profiles</p>
               {RELEASE_PROFILES.map(rp => (
                 <label key={rp.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', cursor: 'pointer' }}>
@@ -318,7 +320,7 @@ export default function DissolutionPage() {
                     onChange={e => setShowProfiles(p => ({ ...p, [rp.id]: e.target.checked }))}
                     style={{ accentColor: rp.color, width: '14px', height: '14px' }} />
                   <div style={{ width: '20px', height: '2.5px', background: rp.color, borderRadius: '2px' }} />
-                  <span style={{ fontSize: '13px', color: '#374151' }}>{rp.label}</span>
+                  <span style={{ fontSize: '13px', color: 'rgba(240,244,255,0.7)' }}>{rp.label}</span>
                 </label>
               ))}
             </div>
@@ -343,10 +345,10 @@ export default function DissolutionPage() {
                 body: 'Constant release rate regardless of concentration. Ideal for chronic dosing — maintains near-constant plasma levels. Achieved by membrane-controlled systems (osmotic pumps, reservoir devices).',
               },
             ].map(item => (
-              <div key={item.title} style={{ background: item.bg, border: `1px solid ${item.border}`, borderRadius: '10px', padding: '10px 12px' }}>
+              <div key={item.title} style={{ background: `${item.color}12`, border: `1px solid ${item.color}33`, borderRadius: '10px', padding: '10px 12px' }}>
                 <p style={{ fontSize: '12px', fontWeight: '600', color: item.color, margin: '0 0 4px' }}>{item.title}</p>
                 <p style={{ fontSize: '10px', fontFamily: 'ui-monospace, monospace', color: item.color, margin: '0 0 5px', opacity: 0.8 }}>{item.model}</p>
-                <p style={{ fontSize: '11px', color: '#374151', margin: 0, lineHeight: 1.55 }}>{item.body}</p>
+                <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.65)', margin: 0, lineHeight: 1.55 }}>{item.body}</p>
               </div>
             ))}
           </div>
@@ -356,7 +358,7 @@ export default function DissolutionPage() {
               curves={releaseCurves}
               yLabel="% released" xLabel="Time (h)" xMax={tMax} yMax={100} threshold={null}
             />
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px 14px', fontSize: '13px', color: '#374151', lineHeight: 1.7 }}>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '12px 14px', fontSize: '13px', color: 'rgba(240,244,255,0.65)', lineHeight: 1.7 }}>
               <strong>Clinical relevance of release kinetics:</strong> Extended-release formulations reduce dosing frequency (once daily vs 3× daily), smooth plasma concentration peaks and troughs, reduce side effects (e.g. metformin XR causes less GI upset than IR), and can target specific GI sites. Zero-order release is the pharmacokinetic ideal for chronic conditions — constant Css without fluctuation.
             </div>
           </div>
@@ -365,7 +367,7 @@ export default function DissolutionPage() {
 
       {tab === 'bcs' && (
         <div>
-            <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '1.25rem', lineHeight: 1.6 }}>
+            <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.5)', marginBottom: '1.25rem', lineHeight: 1.6 }}>
                 The Biopharmaceutics Classification System (BCS) categorises drugs by aqueous solubility and intestinal permeability. It determines the rate-limiting step for oral absorption and guides formulation strategy and biowaiver decisions. Click a class to see its formulation strategies.
             </p>
 
@@ -379,8 +381,8 @@ export default function DissolutionPage() {
                 ].map(b => (
                     <div key={b.cls} onClick={() => setBcsClass(b.cls)}
                     style={{
-                        background: bcsClass === b.cls ? b.bg : 'white',
-                        border: `${bcsClass === b.cls ? 2 : 1}px solid ${bcsClass === b.cls ? b.color : '#e5e7eb'}`,
+                        background: bcsClass === b.cls ? `${b.color}18` : 'rgba(255,255,255,0.03)',
+                        border: `${bcsClass === b.cls ? 2 : 1}px solid ${bcsClass === b.cls ? b.color : 'rgba(255,255,255,0.08)'}`,
                         borderRadius: '12px', padding: '14px 16px', cursor: 'pointer', transition: 'all 0.12s',
                     }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
@@ -391,9 +393,9 @@ export default function DissolutionPage() {
                         {b.solubility} solubility · {b.permeability} permeability
                         </span>
                     </div>
-                    <p style={{ fontSize: '12px', color: '#374151', margin: '0 0 5px', lineHeight: 1.55 }}>{b.description}</p>
+                    <p style={{ fontSize: '12px', color: 'rgba(240,244,255,0.65)', margin: '0 0 5px', lineHeight: 1.55 }}>{b.description}</p>
                     <p style={{ fontSize: '11px', color: b.color, margin: '0 0 2px', fontWeight: '500' }}>e.g. {b.examples}</p>
-                    <p style={{ fontSize: '11px', color: '#9ca3af', margin: 0 }}>Typical log P: {b.logP}</p>
+                    <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', margin: 0 }}>Typical log P: {b.logP}</p>
                     </div>
                 ))}
             </div>
@@ -444,21 +446,21 @@ export default function DissolutionPage() {
                 const s = strategies[bcsClass]
                 const b = BCS_CLASSES.find(x => x.cls === bcsClass)
                 return (
-                    <div style={{ background: s.bg, border: `1.5px solid ${s.border}`, borderRadius: '12px', padding: '14px 16px', marginBottom: '1rem' }}>
+                    <div style={{ background: `${s.color}12`, border: `1.5px solid ${s.color}44`, borderRadius: '12px', padding: '14px 16px', marginBottom: '1rem' }}>
                     <p style={{ fontSize: '12px', fontWeight: '600', color: s.color, margin: '0 0 10px' }}>
                         Class {bcsClass} — formulation strategies
                     </p>
                     {s.items.map((item, i) => (
                         <div key={i} style={{ display: 'flex', gap: '8px', marginBottom: '6px' }}>
                         <span style={{ fontSize: '12px', color: s.color, fontWeight: '700', flexShrink: 0, marginTop: '1px' }}>→</span>
-                        <p style={{ fontSize: '12px', color: '#374151', margin: 0, lineHeight: 1.6 }}>{item}</p>
+                        <p style={{ fontSize: '12px', color: 'rgba(240,244,255,0.7)', margin: 0, lineHeight: 1.6 }}>{item}</p>
                         </div>
                     ))}
                     </div>
                 )
             })()}
 
-          <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '10px', padding: '12px 14px', fontSize: '12px', color: '#1e40af', lineHeight: 1.65 }}>
+          <div style={{ background: 'rgba(42,111,219,0.1)', border: '1px solid rgba(42,111,219,0.3)', borderRadius: '10px', padding: '12px 14px', fontSize: '12px', color: '#93b4f7', lineHeight: 1.65 }}>
             <strong>BCS biowaivers (FDA/EMA):</strong> For Class I and some Class III drugs, in-vivo bioequivalence studies can be waived if the formulation dissolves ≥85% in 30 minutes in multiple pH media. This saves significant time and cost in generic drug development — a pure dissolution test replaces a clinical PK study in healthy volunteers.
           </div>
         </div>
