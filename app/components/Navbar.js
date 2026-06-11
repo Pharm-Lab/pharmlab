@@ -10,6 +10,7 @@ const LINKS = [
   { href: '/formulas',       label: 'Formulas' },
   { href: '/harm-reduction', label: 'Harm Reduction' },
   { href: '/sources',        label: 'Sources' },
+  { href: '/about',          label: 'About' },
 ]
 
 export default function Navbar() {

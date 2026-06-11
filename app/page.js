@@ -25,7 +25,7 @@ const SLIDES = [
     eyebrow:   'Pharmacokinetics · Academic Tools',
     headline:  'Pharmacokinetics',
     accent:    'made tangible.',
-    sub:       'Twelve PK/PD models, RK4 numerical integration, population simulation — the same maths your textbook uses, interactive.',
+    sub:       'Twelve curriculum tools — compartment models, NCA, bioequivalence, dosage adjustment — the equations from your courses, interactive.',
     cta:       { label: 'Open PK Calculator', href: '/calculator' },
     ctaSecond: { label: 'All Tools', href: '/tools' },
     accentColor: C.blue,
@@ -332,7 +332,7 @@ const SPOTLIGHTS = [
     icon: '📈',
     tag: 'Academic · PK/PD',
     title: 'PK/PD Calculator',
-    desc: 'Twelve pharmacokinetic models including 1- and 2-compartment, Michaelis-Menten nonlinear clearance, and population simulation with RK4 integration. The closest thing to a full clinical PK workbench in a browser.',
+    desc: '1- and 2-compartment models, Michaelis-Menten nonlinear clearance, population simulation — plus NCA, bioequivalence, dosage adjustment, Lipinski, dissolution, and more. The curriculum in one place.',
     href: '/calculator',
     color: C.blue,
     grad: `linear-gradient(135deg, ${C.blue}22, ${C.purple}11)`,
@@ -350,7 +350,7 @@ const SPOTLIGHTS = [
   {
     size: 'small',
     icon: '🫀',
-    tag: 'Academic · ADME',
+    tag: 'Academic · Interactive',
     title: 'Interactive ADME',
     desc: 'Click organs on an anatomical diagram to explore absorption, first-pass metabolism, distribution, the BBB, and renal excretion.',
     href: '/tools/adme',
@@ -363,7 +363,7 @@ const SPOTLIGHTS = [
     tag: 'Academic · AI-assisted',
     title: 'Drug Interaction Checker',
     desc: 'Enter any two drugs and get a mechanism-level interaction analysis — enzyme pathway, severity, and clinical management.',
-    href: '/interactions',
+    href: '/harm-reduction/interactions',
     color: C.purple,
     grad: `linear-gradient(135deg, ${C.purple}22, #ec489911)`,
   },
@@ -372,10 +372,9 @@ const SPOTLIGHTS = [
 // ─── Stats strip ──────────────────────────────────────────────────────────────
 
 const STATS = [
-  { value: '12',  label: 'PK models' },
-  { value: '9',   label: 'Lab tools' },
+  { value: '12',  label: 'curriculum tools' },
+  { value: '9',   label: 'lab tools' },
   { value: '7',   label: 'HR calculators' },
-  { value: 'RK4', label: 'Numerical solver' },
   { value: '0',   label: 'AI in the maths' },
 ]
 
@@ -435,7 +434,7 @@ export default function Home() {
       `}</style>
 
       {/* ── HERO ── */}
-      <section style={{ position: 'relative', minHeight: '96vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', overflow: 'hidden', background: C.bg }}>
+      <section style={{ position: 'relative', height: '96vh', display: 'flex', alignItems: 'center', overflow: 'hidden', background: C.bg }}>
 
         {/* Animated canvas background */}
         <HeroCanvas type={current.animation} />
@@ -444,12 +443,15 @@ export default function Home() {
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, transparent 40%, rgba(10,15,30,0.7) 100%)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '220px', background: `linear-gradient(to bottom, transparent, ${C.bg})`, pointerEvents: 'none' }} />
 
-        {/* Content */}
-        <div style={{ position: 'relative', zIndex: 2, maxWidth: '800px', margin: '0 auto', padding: '0 2rem', paddingTop: '7rem' }}>
+        {/* Content — vertically centred, never shifts */}
+        <div style={{ position: 'relative', zIndex: 2, maxWidth: '800px', margin: '0 auto', padding: '0 2rem', width: '100%' }}>
+
+          {/* Fixed-height slide content */}
+          <div style={{ height: '320px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
 
           {/* Eyebrow */}
           <div className={`hero-content${fading ? ' fading' : ''}`} key={`eyebrow-${slide}`}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', background: `${current.accentColor}1a`, border: `1px solid ${current.accentColor}44`, borderRadius: '999px', padding: '5px 14px', marginBottom: '28px' }}>
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', background: `${current.accentColor}1a`, border: `1px solid ${current.accentColor}44`, borderRadius: '999px', padding: '5px 14px', marginBottom: '20px', alignSelf: 'flex-start' }}>
             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: current.accentColor, display: 'inline-block', animation: 'pulse 2s infinite' }} />
             <span style={{ fontSize: '11px', color: current.accentColor, letterSpacing: '0.1em', fontWeight: '600', textTransform: 'uppercase' }}>
               {current.eyebrow}
@@ -458,7 +460,7 @@ export default function Home() {
 
           {/* Headline */}
           <h1 className={`hero-content${fading ? ' fading' : ''}`} key={`headline-${slide}`}
-            style={{ fontSize: 'clamp(44px, 6.5vw, 80px)', fontWeight: '900', color: C.text, lineHeight: '1.02', letterSpacing: '-0.035em', marginBottom: '22px' }}>
+            style={{ fontSize: 'clamp(40px, 6vw, 76px)', fontWeight: '900', color: C.text, lineHeight: '1.02', letterSpacing: '-0.035em', marginBottom: '16px' }}>
             {current.headline}<br />
             <span style={{ background: current.accentGrad, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
               {current.accent}
@@ -467,13 +469,13 @@ export default function Home() {
 
           {/* Subheadline */}
           <p className={`hero-content${fading ? ' fading' : ''}`} key={`sub-${slide}`}
-            style={{ fontSize: '17px', color: C.textMid, lineHeight: '1.65', marginBottom: '40px', maxWidth: '520px' }}>
+            style={{ fontSize: '16px', color: C.textMid, lineHeight: '1.6', marginBottom: '28px', maxWidth: '520px' }}>
             {current.sub}
           </p>
 
           {/* CTAs */}
           <div className={`hero-content${fading ? ' fading' : ''}`} key={`cta-${slide}`}
-            style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center', marginBottom: '56px' }}>
+            style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
             <Link href={current.cta.href} style={{
               padding: '13px 28px', background: current.accentColor, color: 'white',
               borderRadius: '10px', fontWeight: '700', fontSize: '15px', textDecoration: 'none',
@@ -488,19 +490,33 @@ export default function Home() {
             }}>
               {current.ctaSecond.label}
             </Link>
+          </div>
 
+          </div>{/* end fixed-height block */}
+
+          {/* Nav controls — always same position */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '32px', marginBottom: '56px' }}>
+            {/* Dots */}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {SLIDES.map((_, i) => (
+                <button key={i} className="nav-dot" onClick={() => goTo(i)} aria-label={`Slide ${i+1}`} style={{
+                  width: i === slide ? '24px' : '7px', height: '7px', borderRadius: '999px',
+                  background: i === slide ? current.accentColor : C.textDim,
+                  border: 'none', cursor: 'pointer', padding: 0,
+                }} />
+              ))}
+            </div>
             {/* Prev / Next */}
-            <div style={{ display: 'flex', gap: '8px', marginLeft: '8px' }}>
+            <div style={{ display: 'flex', gap: '8px' }}>
               {[
                 { fn: prev, icon: '←', label: 'Previous' },
                 { fn: next, icon: '→', label: 'Next' },
               ].map(({ fn, icon, label }) => (
                 <button key={icon} onClick={fn} aria-label={label} style={{
-                  width: '40px', height: '40px', borderRadius: '50%',
+                  width: '36px', height: '36px', borderRadius: '50%',
                   border: `1px solid ${C.border}`, background: 'rgba(255,255,255,0.05)',
-                  color: C.textMid, fontSize: '16px', cursor: 'pointer',
+                  color: C.textMid, fontSize: '15px', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  transition: 'background 0.15s, border-color 0.15s',
                 }}>
                   {icon}
                 </button>
@@ -508,29 +524,26 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Slide dots */}
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '56px' }}>
-            {SLIDES.map((_, i) => (
-              <button key={i} className="nav-dot" onClick={() => goTo(i)} aria-label={`Slide ${i+1}`} style={{
-                width: i === slide ? '24px' : '7px', height: '7px', borderRadius: '999px',
-                background: i === slide ? current.accentColor : C.textDim,
-                border: 'none', cursor: 'pointer', padding: 0,
-              }} />
-            ))}
-          </div>
-
           {/* Stats strip */}
-          <div style={{ display: 'flex', gap: '40px', paddingTop: '28px', borderTop: `1px solid ${C.border}`, flexWrap: 'wrap' }}>
-            {STATS.map(s => (
-              <div key={s.label} style={{ textAlign: 'left' }}>
-                <div style={{ fontSize: '28px', fontWeight: '800', color: C.text, fontFamily: 'ui-monospace, monospace', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
-                  {s.value}
+          <div style={{ paddingTop: '28px', borderTop: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            {/* Left two */}
+            <div style={{ display: 'flex', gap: '48px' }}>
+              {STATS.slice(0, 2).map(s => (
+                <div key={s.label}>
+                  <div style={{ fontSize: '28px', fontWeight: '800', color: C.text, fontFamily: 'ui-monospace, monospace', letterSpacing: '-0.03em', lineHeight: 1.1 }}>{s.value}</div>
+                  <div style={{ fontSize: '11px', color: C.textDim, marginTop: '3px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{s.label}</div>
                 </div>
-                <div style={{ fontSize: '11px', color: C.textDim, marginTop: '3px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                  {s.label}
+              ))}
+            </div>
+            {/* Right two */}
+            <div style={{ display: 'flex', gap: '48px' }}>
+              {STATS.slice(2).map(s => (
+                <div key={s.label} style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '28px', fontWeight: '800', color: C.text, fontFamily: 'ui-monospace, monospace', letterSpacing: '-0.03em', lineHeight: 1.1 }}>{s.value}</div>
+                  <div style={{ fontSize: '11px', color: C.textDim, marginTop: '3px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{s.label}</div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 
@@ -556,7 +569,7 @@ export default function Home() {
               The tools you'll actually use.
             </h2>
             <p style={{ fontSize: '15px', color: C.textMid, maxWidth: '480px', lineHeight: '1.65' }}>
-              Every calculator runs on real equations — closed-form solutions or RK4 numerical integration. No black boxes.
+              Every calculator runs on the actual equations from your pharmacokinetics courses. Closed-form solutions where possible, numerical integration where needed. No approximations, no black boxes.
             </p>
           </div>
 
@@ -578,12 +591,9 @@ export default function Home() {
                   <h3 style={{ fontSize: tool.size === 'large' ? '22px' : '17px', fontWeight: '700', color: C.text, marginBottom: '10px', letterSpacing: '-0.02em' }}>
                     {tool.title}
                   </h3>
-                  <p style={{ fontSize: '13px', color: C.textMid, lineHeight: '1.65', marginBottom: '20px' }}>
+                  <p style={{ fontSize: '13px', color: C.textMid, lineHeight: '1.65', marginBottom: '8px' }}>
                     {tool.desc}
                   </p>
-                  <span style={{ fontSize: '12px', color: tool.color, fontWeight: '600', letterSpacing: '0.02em' }}>
-                    Open →
-                  </span>
                 </div>
               </Link>
             ))}
