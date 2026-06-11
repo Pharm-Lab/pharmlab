@@ -27,11 +27,11 @@ function purityInterpretation(a260_280, a260_230, type) {
   const expected280 = type === 'RNA' ? 2.0 : 1.8
   const msgs = []
 
-  if (a260_280 < 1.7) msgs.push({ text: 'A260/A280 low — likely protein contamination. Proteins absorb strongly at 280nm.', color: '#dc2626' })
+  if (a260_280 < 1.7) msgs.push({ text: 'A260/A280 low — likely protein contamination. Proteins absorb strongly at 280nm.', color: '#fca5a5' })
   else if (a260_280 > expected280 + 0.2) msgs.push({ text: `A260/A280 high (expected ~${expected280}) — may indicate RNA contamination or single-stranded regions.`, color: '#f97316' })
   else msgs.push({ text: `A260/A280 ${a260_280.toFixed(2)} — acceptable purity.`, color: '#16a34a' })
 
-  if (a260_230 && a260_230 < 1.7) msgs.push({ text: 'A260/A230 low — organic solvent (phenol, EDTA, guanidinium) contamination likely. Common after TRIzol extraction.', color: '#dc2626' })
+  if (a260_230 && a260_230 < 1.7) msgs.push({ text: 'A260/A230 low — organic solvent (phenol, EDTA, guanidinium) contamination likely. Common after TRIzol extraction.', color: '#fca5a5' })
   else if (a260_230 && a260_230 >= 2.0) msgs.push({ text: `A260/A230 ${a260_230.toFixed(2)} — good, minimal chaotropic salt or solvent contamination.`, color: '#16a34a' })
 
   return msgs
@@ -64,6 +64,34 @@ export default function SpectrophotometryPage() {
   const [batchEpsilon, setBatchEpsilon] = useState('')
   const [batchLength, setBatchLength] = useState('1')
   const [batchMW, setBatchMW] = useState('')
+
+  // Copy results to clipboard
+  function copyBLResult() {
+    if (!blConc) return
+    const lines = [
+      'Beer-Lambert Result',
+      `Absorbance: ${blAbsNum}`,
+      `ε: ${blEpsNum} M⁻¹cm⁻¹`,
+      `Path length: ${blLenNum} cm`,
+      `Concentration: ${(blConc*1e6).toFixed(3)} μM`,
+      blConcMgMl ? `Concentration: ${blConcMgMl.toFixed(4)} mg/mL` : '',
+    ].filter(Boolean).join('\n')
+    navigator.clipboard.writeText(lines)
+  }
+
+  function copyNAResult() {
+    if (!naA260Num) return
+    const lines = [
+      'Nucleic Acid Quantification',
+      `Sample type: ${naType}`,
+      `A260: ${naA260Num}`,
+      naA280Num ? `A260/A280: ${na260_280?.toFixed(2)}` : '',
+      naA230Num ? `A260/A230: ${na260_230?.toFixed(2)}` : '',
+      `Concentration: ${naConc.toFixed(2)} μg/mL`,
+      `Dilution factor: ×${naDilNum}`,
+    ].filter(Boolean).join('\n')
+    navigator.clipboard.writeText(lines)
+  }
 
   // Dilution back-calculator
   const [dilTarget, setDilTarget] = useState('')
@@ -135,10 +163,10 @@ export default function SpectrophotometryPage() {
   }
 
   return (
-    <main style={{ maxWidth: '1060px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
-      <a href="/lab" style={{ fontSize: '13px', color: '#6b7280', textDecoration: 'none' }}>← Lab Prep</a>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#111827', margin: '1rem 0 4px' }}>Spectrophotometry</h1>
-      <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '1.5rem', lineHeight: '1.6' }}>
+    <main style={{ maxWidth: '1060px', margin: '0 auto', padding: '2rem 1rem', fontFamily: "'Inter',system-ui,sans-serif", background: '#0a0f1e', minHeight: '100vh', color: '#f0f4ff' }}>
+      <a href="/lab" style={{ fontSize: '13px', color: 'rgba(240,244,255,0.45)', textDecoration: 'none' }}>← Lab Prep</a>
+      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#f0f4ff', margin: '1rem 0 4px' }}>Spectrophotometry</h1>
+      <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.45)', marginBottom: '1.5rem', lineHeight: '1.6' }}>
         Beer-Lambert calculator, nucleic acid quantification with purity interpretation, batch concentration mode, and dilution back-calculator.
       </p>
 
@@ -154,8 +182,8 @@ export default function SpectrophotometryPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
             {/* Mode selector */}
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-              <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', margin: '0 0 10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Solve for</p>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', margin: '0 0 10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Solve for</p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px' }}>
                 {[['conc', 'Concentration'], ['abs', 'Absorbance'], ['epsilon', 'Extinction ε']].map(([m, label]) => (
                   <button key={m} onClick={() => setBlMode(m)}
@@ -167,8 +195,8 @@ export default function SpectrophotometryPage() {
             </div>
 
             {/* Inputs */}
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-              <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', margin: '0 0 12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>A = ε × c × l</p>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', margin: '0 0 12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>A = ε × c × l</p>
 
               {[
                 { label: 'Absorbance (A)', key: 'abs', val: blAbs, set: setBlAbs, disabled: blMode === 'abs', placeholder: blMode === 'abs' ? 'calculated' : '0.000', unit: '' },
@@ -177,26 +205,26 @@ export default function SpectrophotometryPage() {
                 { label: 'Molecular weight (optional)', key: 'mw', val: blMW, set: setBlMW, disabled: false, placeholder: 'e.g. 14300', unit: 'g/mol' },
               ].map(f => (
                 <div key={f.key} style={{ marginBottom: '10px' }}>
-                  <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '3px' }}>{f.label}</label>
+                  <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '3px' }}>{f.label}</label>
                   <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                     <input type="number" step="any" value={f.val} onChange={e => !f.disabled && f.set(e.target.value)}
                       placeholder={f.placeholder} disabled={f.disabled}
                       style={{ flex: 1, padding: '7px 10px', borderRadius: '8px', border: `1px solid ${f.disabled ? '#f3f4f6' : '#d1d5db'}`, fontSize: '13px', background: f.disabled ? '#f3f4f6' : 'white', color: f.disabled ? '#9ca3af' : '#111827' }} />
-                    {f.unit && <span style={{ fontSize: '11px', color: '#9ca3af', minWidth: '55px' }}>{f.unit}</span>}
+                    {f.unit && <span style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', minWidth: '55px' }}>{f.unit}</span>}
                   </div>
                 </div>
               ))}
             </div>
 
             {/* Common ε quick-load */}
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '12px 14px' }}>
-              <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Common ε values</p>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '12px 14px' }}>
+              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Common ε values</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
                 {COMMON_COMPOUNDS.map(c => (
                   <button key={c.name} onClick={() => setBlEpsilon(String(c.e))}
-                    style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 8px', borderRadius: '6px', border: '1px solid #f3f4f6', background: 'white', cursor: 'pointer', fontSize: '11px', textAlign: 'left' }}>
-                    <span style={{ color: '#374151' }}>{c.name}</span>
-                    <span style={{ color: '#6b7280', fontFamily: 'monospace' }}>{c.e.toLocaleString()}</span>
+                    style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.04)', background: '#0f1629', cursor: 'pointer', fontSize: '11px', textAlign: 'left' }}>
+                    <span style={{ color: 'rgba(240,244,255,0.75)' }}>{c.name}</span>
+                    <span style={{ color: 'rgba(240,244,255,0.45)', fontFamily: 'monospace' }}>{c.e.toLocaleString()}</span>
                   </button>
                 ))}
               </div>
@@ -205,8 +233,8 @@ export default function SpectrophotometryPage() {
 
           {/* Result panel */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '20px' }}>
-              <p style={{ fontSize: '12px', fontWeight: '600', color: '#111827', margin: '0 0 16px' }}>Result</p>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '20px' }}>
+              <p style={{ fontSize: '12px', fontWeight: '600', color: '#f0f4ff', margin: '0 0 16px' }}>Result</p>
 
               {blMode === 'conc' && (
                 <>
@@ -217,14 +245,14 @@ export default function SpectrophotometryPage() {
                         { label: 'In μM', value: `${(blConc * 1e6).toFixed(3)} μM` },
                         ...(blConcMgMl !== null ? [{ label: 'Concentration (mg/mL)', value: `${blConcMgMl.toFixed(4)} mg/mL` }] : []),
                       ].map(m => (
-                        <div key={m.label} style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '10px', padding: '12px 14px' }}>
-                          <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '4px' }}>{m.label}</div>
-                          <div style={{ fontSize: '20px', fontWeight: '700', color: '#1d4ed8' }}>{m.value}</div>
+                        <div key={m.label} style={{ background: 'rgba(42,111,219,0.18)', border: '1px solid rgba(42,111,219,0.35)', borderRadius: '10px', padding: '12px 14px' }}>
+                          <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', marginBottom: '4px' }}>{m.label}</div>
+                          <div style={{ fontSize: '20px', fontWeight: '700', color: '#93b4f7' }}>{m.value}</div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p style={{ color: '#9ca3af', fontSize: '13px' }}>Enter absorbance and ε to calculate concentration.</p>
+                    <p style={{ color: 'rgba(240,244,255,0.3)', fontSize: '13px' }}>Enter absorbance and ε to calculate concentration.</p>
                   )}
                 </>
               )}
@@ -232,16 +260,16 @@ export default function SpectrophotometryPage() {
               {blMode === 'abs' && (
                 <>
                   {blAbsCalc !== null ? (
-                    <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '10px', padding: '14px 16px' }}>
-                      <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '4px' }}>Expected absorbance</div>
-                      <div style={{ fontSize: '28px', fontWeight: '700', color: '#1d4ed8' }}>{blAbsCalc.toFixed(4)}</div>
-                      <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
+                    <div style={{ background: 'rgba(42,111,219,0.18)', border: '1px solid rgba(42,111,219,0.35)', borderRadius: '10px', padding: '14px 16px' }}>
+                      <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', marginBottom: '4px' }}>Expected absorbance</div>
+                      <div style={{ fontSize: '28px', fontWeight: '700', color: '#93b4f7' }}>{blAbsCalc.toFixed(4)}</div>
+                      <div style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)', marginTop: '4px' }}>
                         {blAbsCalc > 1.0 && '⚠ Above 1.0 — dilute sample before measuring (Beer-Lambert is linear only below ~1.5)'}
                         {blAbsCalc < 0.05 && '⚠ Below 0.05 — very low signal, concentrate sample or use longer path length'}
                       </div>
                     </div>
                   ) : (
-                    <p style={{ color: '#9ca3af', fontSize: '13px' }}>Enter concentration (μM) as the first field and ε to calculate expected absorbance.</p>
+                    <p style={{ color: 'rgba(240,244,255,0.3)', fontSize: '13px' }}>Enter concentration (μM) as the first field and ε to calculate expected absorbance.</p>
                   )}
                 </>
               )}
@@ -249,13 +277,13 @@ export default function SpectrophotometryPage() {
               {blMode === 'epsilon' && (
                 <>
                   {blEpsCalc !== null ? (
-                    <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '10px', padding: '14px 16px' }}>
-                      <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '4px' }}>Extinction coefficient (ε)</div>
-                      <div style={{ fontSize: '28px', fontWeight: '700', color: '#1d4ed8' }}>{blEpsCalc.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
-                      <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>M⁻¹cm⁻¹ — enter A, concentration in mg/mL as the ε field, and MW to calculate.</div>
+                    <div style={{ background: 'rgba(42,111,219,0.18)', border: '1px solid rgba(42,111,219,0.35)', borderRadius: '10px', padding: '14px 16px' }}>
+                      <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', marginBottom: '4px' }}>Extinction coefficient (ε)</div>
+                      <div style={{ fontSize: '28px', fontWeight: '700', color: '#93b4f7' }}>{blEpsCalc.toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
+                      <div style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)', marginTop: '4px' }}>M⁻¹cm⁻¹ — enter A, concentration in mg/mL as the ε field, and MW to calculate.</div>
                     </div>
                   ) : (
-                    <p style={{ color: '#9ca3af', fontSize: '13px' }}>Enter absorbance, known concentration (mg/mL in the ε field), and MW to derive ε.</p>
+                    <p style={{ color: 'rgba(240,244,255,0.3)', fontSize: '13px' }}>Enter absorbance, known concentration (mg/mL in the ε field), and MW to derive ε.</p>
                   )}
                 </>
               )}
@@ -273,7 +301,7 @@ export default function SpectrophotometryPage() {
               </p>
             </div>
 
-            <div style={{ background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: '#92400e', lineHeight: '1.65' }}>
+            <div style={{ background: 'rgba(249,115,22,0.12)', border: '1px solid rgba(249,115,22,0.35)', borderRadius: '10px', padding: '10px 14px', fontSize: '12px', color: '#fdba74', lineHeight: '1.65' }}>
               <strong>Practical notes:</strong> Beer-Lambert is linear only when A is between ~0.05 and 1.5. Above 1.5, detector saturation causes underestimation. Below 0.05, noise dominates. Ideally measure at A = 0.1–0.8 by adjusting dilution or path length.
             </div>
           </div>
@@ -285,8 +313,8 @@ export default function SpectrophotometryPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '360px 1fr', gap: '1.5rem', alignItems: 'start' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-              <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', margin: '0 0 10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Sample type</p>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', margin: '0 0 10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Sample type</p>
               <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                 {Object.keys(NUCLEIC_TYPES).map(t => (
                   <button key={t} onClick={() => setNaType(t)}
@@ -297,32 +325,32 @@ export default function SpectrophotometryPage() {
               </div>
             </div>
 
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-              <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', margin: '0 0 12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Absorbance readings</p>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', margin: '0 0 12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Absorbance readings</p>
               {[
                 { label: 'A260', val: naA260, set: setNaA260, required: true },
                 { label: 'A280', val: naA280, set: setNaA280, required: false },
                 { label: 'A230', val: naA230, set: setNaA230, required: false },
               ].map(f => (
                 <div key={f.label} style={{ marginBottom: '8px' }}>
-                  <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '3px' }}>
-                    {f.label} {!f.required && <span style={{ color: '#9ca3af' }}>(optional — for purity)</span>}
+                  <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '3px' }}>
+                    {f.label} {!f.required && <span style={{ color: 'rgba(240,244,255,0.3)' }}>(optional — for purity)</span>}
                   </label>
                   <input type="number" step="0.001" value={f.val} onChange={e => f.set(e.target.value)}
                     placeholder="0.000"
-                    style={{ width: '100%', padding: '7px 10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '13px', boxSizing: 'border-box', background: 'white' }} />
+                    style={{ width: '100%', padding: '7px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '13px', boxSizing: 'border-box', background: '#0f1629' }} />
                 </div>
               ))}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '4px' }}>
                 <div>
-                  <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '3px' }}>Dilution factor</label>
+                  <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '3px' }}>Dilution factor</label>
                   <input type="number" step="1" min="1" value={naDilution} onChange={e => setNaDilution(e.target.value)}
-                    style={{ width: '100%', padding: '7px 10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '13px', boxSizing: 'border-box', background: 'white' }} />
+                    style={{ width: '100%', padding: '7px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '13px', boxSizing: 'border-box', background: '#0f1629' }} />
                 </div>
                 <div>
-                  <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '3px' }}>Path length (cm)</label>
+                  <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '3px' }}>Path length (cm)</label>
                   <input type="number" step="0.1" value={naLength} onChange={e => setNaLength(e.target.value)}
-                    style={{ width: '100%', padding: '7px 10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '13px', boxSizing: 'border-box', background: 'white' }} />
+                    style={{ width: '100%', padding: '7px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '13px', boxSizing: 'border-box', background: '#0f1629' }} />
                 </div>
               </div>
             </div>
@@ -338,9 +366,9 @@ export default function SpectrophotometryPage() {
                     { label: 'A260/A280', value: na260_280 ? na260_280.toFixed(2) : '—' },
                     { label: 'A260/A230', value: na260_230 ? na260_230.toFixed(2) : '—' },
                   ].map(m => (
-                    <div key={m.label} style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '10px 12px' }}>
-                      <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '3px' }}>{m.label}</div>
-                      <div style={{ fontSize: '22px', fontWeight: '700', color: '#111827' }}>{m.value}</div>
+                    <div key={m.label} style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 12px' }}>
+                      <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', marginBottom: '3px' }}>{m.label}</div>
+                      <div style={{ fontSize: '22px', fontWeight: '700', color: '#f0f4ff' }}>{m.value}</div>
                     </div>
                   ))}
                 </div>
@@ -355,8 +383,8 @@ export default function SpectrophotometryPage() {
                   </div>
                 )}
 
-                <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-                  <p style={{ fontSize: '12px', fontWeight: '600', color: '#111827', margin: '0 0 8px' }}>Conversion</p>
+                <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+                  <p style={{ fontSize: '12px', fontWeight: '600', color: '#f0f4ff', margin: '0 0 8px' }}>Conversion</p>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', fontSize: '12px' }}>
                     {[
                       { label: 'μg/mL', value: naConc.toFixed(2) },
@@ -364,22 +392,22 @@ export default function SpectrophotometryPage() {
                       { label: 'mg/mL', value: (naConc / 1000).toFixed(4) },
                       { label: 'μg/μL', value: (naConc / 1000).toFixed(4) },
                     ].map(r => (
-                      <div key={r.label} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 8px', background: 'white', borderRadius: '6px', border: '1px solid #f3f4f6' }}>
-                        <span style={{ color: '#9ca3af' }}>{r.label}</span>
-                        <span style={{ fontFamily: 'monospace', fontWeight: '600', color: '#111827' }}>{r.value}</span>
+                      <div key={r.label} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 8px', background: '#0f1629', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.04)' }}>
+                        <span style={{ color: 'rgba(240,244,255,0.3)' }}>{r.label}</span>
+                        <span style={{ fontFamily: 'monospace', fontWeight: '600', color: '#f0f4ff' }}>{r.value}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '10px', padding: '10px 14px', fontSize: '11px', color: '#1e40af', lineHeight: '1.7' }}>
+                <div style={{ background: 'rgba(42,111,219,0.18)', border: '1px solid rgba(42,111,219,0.35)', borderRadius: '10px', padding: '10px 14px', fontSize: '11px', color: '#1e40af', lineHeight: '1.7' }}>
                   <strong>For {naType}:</strong> {naInfo.note}. Concentration = A260 × {naInfo.e260} μg/mL × dilution factor / path length.
                   {naType === 'dsDNA' && ' For copy number, divide total mass by (MW per bp × 660 Da/bp × number of base pairs).'}
                 </div>
               </>
             ) : (
-              <div style={{ background: '#f9fafb', border: '1px dashed #d1d5db', borderRadius: '12px', padding: '3rem', textAlign: 'center', color: '#9ca3af' }}>
-                <p style={{ fontSize: '14px', margin: '0 0 4px', color: '#6b7280' }}>Enter your A260 reading</p>
+              <div style={{ background: '#0f1629', border: '1px dashed #d1d5db', borderRadius: '12px', padding: '3rem', textAlign: 'center', color: 'rgba(240,244,255,0.3)' }}>
+                <p style={{ fontSize: '14px', margin: '0 0 4px', color: 'rgba(240,244,255,0.45)' }}>Enter your A260 reading</p>
                 <p style={{ fontSize: '12px', margin: 0 }}>Add A280 and A230 for purity assessment</p>
               </div>
             )}
@@ -391,18 +419,18 @@ export default function SpectrophotometryPage() {
       {tab === 'batch' && (
         <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '1.5rem', alignItems: 'start' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-              <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', margin: '0 0 12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Shared parameters</p>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', margin: '0 0 12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Shared parameters</p>
               {[
                 { label: 'ε (M⁻¹cm⁻¹)', val: batchEpsilon, set: setBatchEpsilon, placeholder: '5500' },
                 { label: 'Path length (cm)', val: batchLength, set: setBatchLength, placeholder: '1' },
                 { label: 'MW (g/mol, optional)', val: batchMW, set: setBatchMW, placeholder: 'e.g. 14300' },
               ].map(f => (
                 <div key={f.label} style={{ marginBottom: '10px' }}>
-                  <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '3px' }}>{f.label}</label>
+                  <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '3px' }}>{f.label}</label>
                   <input type="number" step="any" value={f.val} onChange={e => f.set(e.target.value)}
                     placeholder={f.placeholder}
-                    style={{ width: '100%', padding: '7px 10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '13px', boxSizing: 'border-box', background: 'white' }} />
+                    style={{ width: '100%', padding: '7px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '13px', boxSizing: 'border-box', background: '#0f1629' }} />
                 </div>
               ))}
             </div>
@@ -411,35 +439,35 @@ export default function SpectrophotometryPage() {
           <div>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', marginBottom: '8px' }}>
               <thead>
-                <tr style={{ background: '#f3f4f6' }}>
-                  <th style={{ padding: '7px 10px', textAlign: 'left', color: '#6b7280', fontWeight: '600', borderRadius: '8px 0 0 0' }}>Sample</th>
-                  <th style={{ padding: '7px 10px', textAlign: 'right', color: '#6b7280', fontWeight: '600' }}>Absorbance</th>
-                  <th style={{ padding: '7px 10px', textAlign: 'right', color: '#6b7280', fontWeight: '600' }}>Blank</th>
-                  <th style={{ padding: '7px 10px', textAlign: 'right', color: '#6b7280', fontWeight: '600' }}>Adj. A</th>
-                  <th style={{ padding: '7px 10px', textAlign: 'right', color: '#6b7280', fontWeight: '600' }}>μM</th>
-                  <th style={{ padding: '7px 10px', textAlign: 'right', color: '#6b7280', fontWeight: '600', borderRadius: '0 8px 0 0' }}>mg/mL</th>
+                <tr style={{ background: 'rgba(255,255,255,0.06)' }}>
+                  <th style={{ padding: '7px 10px', textAlign: 'left', color: 'rgba(240,244,255,0.45)', fontWeight: '600', borderRadius: '8px 0 0 0' }}>Sample</th>
+                  <th style={{ padding: '7px 10px', textAlign: 'right', color: 'rgba(240,244,255,0.45)', fontWeight: '600' }}>Absorbance</th>
+                  <th style={{ padding: '7px 10px', textAlign: 'right', color: 'rgba(240,244,255,0.45)', fontWeight: '600' }}>Blank</th>
+                  <th style={{ padding: '7px 10px', textAlign: 'right', color: 'rgba(240,244,255,0.45)', fontWeight: '600' }}>Adj. A</th>
+                  <th style={{ padding: '7px 10px', textAlign: 'right', color: 'rgba(240,244,255,0.45)', fontWeight: '600' }}>μM</th>
+                  <th style={{ padding: '7px 10px', textAlign: 'right', color: 'rgba(240,244,255,0.45)', fontWeight: '600', borderRadius: '0 8px 0 0' }}>mg/mL</th>
                 </tr>
               </thead>
               <tbody>
                 {batchSamples.map((s, i) => {
                   const res = batchResults[i]
                   return (
-                    <tr key={i} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                    <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                       <td style={{ padding: '5px 8px' }}>
                         <input value={s.label} onChange={e => setBatchSamples(prev => prev.map((r, j) => j === i ? { ...r, label: e.target.value } : r))}
-                          style={{ width: '110px', padding: '3px 6px', borderRadius: '5px', border: '1px solid #e5e7eb', fontSize: '12px' }} />
+                          style={{ width: '110px', padding: '3px 6px', borderRadius: '5px', border: '1px solid rgba(255,255,255,0.07)', fontSize: '12px' }} />
                       </td>
                       <td style={{ padding: '5px 8px' }}>
                         <input type="number" step="0.001" value={s.abs} placeholder="—"
                           onChange={e => setBatchSamples(prev => prev.map((r, j) => j === i ? { ...r, abs: e.target.value } : r))}
-                          style={{ width: '70px', padding: '3px 6px', borderRadius: '5px', border: '1px solid #e5e7eb', fontSize: '12px', textAlign: 'right' }} />
+                          style={{ width: '70px', padding: '3px 6px', borderRadius: '5px', border: '1px solid rgba(255,255,255,0.07)', fontSize: '12px', textAlign: 'right' }} />
                       </td>
                       <td style={{ padding: '5px 8px' }}>
                         <input type="number" step="0.001" value={s.blank} placeholder="0"
                           onChange={e => setBatchSamples(prev => prev.map((r, j) => j === i ? { ...r, blank: e.target.value } : r))}
-                          style={{ width: '60px', padding: '3px 6px', borderRadius: '5px', border: '1px solid #e5e7eb', fontSize: '12px', textAlign: 'right' }} />
+                          style={{ width: '60px', padding: '3px 6px', borderRadius: '5px', border: '1px solid rgba(255,255,255,0.07)', fontSize: '12px', textAlign: 'right' }} />
                       </td>
-                      <td style={{ padding: '5px 8px', textAlign: 'right', fontFamily: 'monospace', color: '#374151' }}>{res.adj.toFixed(3)}</td>
+                      <td style={{ padding: '5px 8px', textAlign: 'right', fontFamily: 'monospace', color: 'rgba(240,244,255,0.75)' }}>{res.adj.toFixed(3)}</td>
                       <td style={{ padding: '5px 8px', textAlign: 'right', fontFamily: 'monospace', fontWeight: '600', color: res.cMol ? '#2563eb' : '#9ca3af' }}>
                         {res.cMol ? (res.cMol * 1e6).toFixed(2) : '—'}
                       </td>
@@ -452,7 +480,7 @@ export default function SpectrophotometryPage() {
               </tbody>
             </table>
             <button onClick={() => setBatchSamples(prev => [...prev, { label: `Sample ${prev.length + 1}`, abs: '', blank: '0' }])}
-              style={{ padding: '6px 14px', borderRadius: '7px', border: '1px dashed #d1d5db', background: 'transparent', fontSize: '12px', color: '#6b7280', cursor: 'pointer' }}>
+              style={{ padding: '6px 14px', borderRadius: '7px', border: '1px dashed #d1d5db', background: 'transparent', fontSize: '12px', color: 'rgba(240,244,255,0.45)', cursor: 'pointer' }}>
               + Add sample
             </button>
           </div>
@@ -462,8 +490,8 @@ export default function SpectrophotometryPage() {
       {/* ── TAB 4: Dilution calculator ── */}
       {tab === 'dilution' && (
         <div style={{ maxWidth: '600px' }}>
-          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '20px', marginBottom: '12px' }}>
-            <p style={{ fontSize: '12px', fontWeight: '600', color: '#111827', margin: '0 0 14px' }}>C₁V₁ = C₂V₂ — dilution calculator</p>
+          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '20px', marginBottom: '12px' }}>
+            <p style={{ fontSize: '12px', fontWeight: '600', color: '#f0f4ff', margin: '0 0 14px' }}>C₁V₁ = C₂V₂ — dilution calculator</p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
               {[
                 { label: 'Stock concentration (C₁)', val: dilCurrent, set: setDilCurrent, placeholder: 'e.g. 10' },
@@ -471,49 +499,49 @@ export default function SpectrophotometryPage() {
                 { label: 'Final volume (V₂)', val: dilVolume, set: setDilVolume, placeholder: 'e.g. 1000' },
               ].map(f => (
                 <div key={f.label}>
-                  <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '4px' }}>{f.label}</label>
+                  <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>{f.label}</label>
                   <input type="number" step="any" value={f.val} onChange={e => f.set(e.target.value)}
                     placeholder={f.placeholder}
-                    style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '14px', boxSizing: 'border-box', background: 'white' }} />
+                    style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', boxSizing: 'border-box', background: '#0f1629' }} />
                 </div>
               ))}
               <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-                <div style={{ padding: '8px 10px', background: '#f3f4f6', borderRadius: '8px', fontSize: '12px', color: '#6b7280', width: '100%' }}>
+                <div style={{ padding: '8px 10px', background: 'rgba(255,255,255,0.06)', borderRadius: '8px', fontSize: '12px', color: 'rgba(240,244,255,0.45)', width: '100%' }}>
                   Concentrations in same units; volume in μL or mL
                 </div>
               </div>
             </div>
 
             {dilVStock !== null && dilVDiluent !== null ? (
-              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '10px', padding: '14px 16px' }}>
-                <p style={{ fontSize: '12px', fontWeight: '600', color: '#15803d', margin: '0 0 10px' }}>Preparation</p>
+              <div style={{ background: 'rgba(22,163,74,0.12)', border: '1px solid rgba(22,163,74,0.35)', borderRadius: '10px', padding: '14px 16px' }}>
+                <p style={{ fontSize: '12px', fontWeight: '600', color: '#86efac', margin: '0 0 10px' }}>Preparation</p>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                  <div style={{ background: 'white', borderRadius: '8px', padding: '10px 12px', border: '1px solid #bbf7d0' }}>
-                    <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '3px' }}>Stock to add (V₁)</div>
-                    <div style={{ fontSize: '22px', fontWeight: '700', color: '#15803d' }}>{dilVStock.toFixed(2)}</div>
-                    <div style={{ fontSize: '11px', color: '#6b7280' }}>same units as V₂</div>
+                  <div style={{ background: '#0f1629', borderRadius: '8px', padding: '10px 12px', border: '1px solid rgba(22,163,74,0.35)' }}>
+                    <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', marginBottom: '3px' }}>Stock to add (V₁)</div>
+                    <div style={{ fontSize: '22px', fontWeight: '700', color: '#86efac' }}>{dilVStock.toFixed(2)}</div>
+                    <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)' }}>same units as V₂</div>
                   </div>
-                  <div style={{ background: 'white', borderRadius: '8px', padding: '10px 12px', border: '1px solid #bbf7d0' }}>
-                    <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '3px' }}>Diluent to add</div>
-                    <div style={{ fontSize: '22px', fontWeight: '700', color: '#15803d' }}>{dilVDiluent.toFixed(2)}</div>
-                    <div style={{ fontSize: '11px', color: '#6b7280' }}>same units as V₂</div>
+                  <div style={{ background: '#0f1629', borderRadius: '8px', padding: '10px 12px', border: '1px solid rgba(22,163,74,0.35)' }}>
+                    <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', marginBottom: '3px' }}>Diluent to add</div>
+                    <div style={{ fontSize: '22px', fontWeight: '700', color: '#86efac' }}>{dilVDiluent.toFixed(2)}</div>
+                    <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)' }}>same units as V₂</div>
                   </div>
                 </div>
-                <p style={{ fontSize: '12px', color: '#6b7280', margin: '10px 0 0' }}>
+                <p style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)', margin: '10px 0 0' }}>
                   Dilution factor: ×{(dilCurrentNum / dilTargetNum).toFixed(1)}
                 </p>
               </div>
             ) : (
               dilTarget && dilCurrent && parseFloat(dilTarget) >= parseFloat(dilCurrent) && (
-                <div style={{ padding: '10px 14px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', fontSize: '12px', color: '#dc2626' }}>
+                <div style={{ padding: '10px 14px', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.35)', borderRadius: '8px', fontSize: '12px', color: '#fca5a5' }}>
                   Target concentration must be lower than stock concentration.
                 </div>
               )
             )}
           </div>
 
-          <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '12px 14px', fontSize: '12px', color: '#6b7280', lineHeight: '1.7' }}>
-            <strong style={{ color: '#374151' }}>Serial dilutions:</strong> For a 1:10 serial dilution, take 10 μL of stock + 90 μL diluent, mix, take 10 μL from that + 90 μL diluent, and so on. Each step reduces concentration by 10×.
+          <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '12px 14px', fontSize: '12px', color: 'rgba(240,244,255,0.45)', lineHeight: '1.7' }}>
+            <strong style={{ color: 'rgba(240,244,255,0.75)' }}>Serial dilutions:</strong> For a 1:10 serial dilution, take 10 μL of stock + 90 μL diluent, mix, take 10 μL from that + 90 μL diluent, and so on. Each step reduces concentration by 10×.
           </div>
         </div>
       )}

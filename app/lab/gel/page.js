@@ -188,7 +188,7 @@ function CurveCanvas({ ladderBands, reg, unknownBands }) {
 
   return (
     <canvas ref={canvasRef}
-      style={{ width: '100%', height: '260px', borderRadius: '8px', border: '1px solid #e5e7eb', background: 'white' }} />
+      style={{ width: '100%', height: '260px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.07)', background: '#0f1629' }} />
   )
 }
 
@@ -278,7 +278,7 @@ function GelCanvas({ imgSrc, marks, onMark, mode, yWell, yFront, onSetWell, onSe
   return (
     <canvas ref={canvasRef}
       onClick={handleClick}
-      style={{ width: '100%', display: 'block', borderRadius: '8px', border: '1px solid #e5e7eb', cursor: cursors[mode] || 'crosshair' }} />
+      style={{ width: '100%', display: 'block', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.07)', cursor: cursors[mode] || 'crosshair' }} />
   )
 }
 
@@ -372,15 +372,15 @@ export default function GelAnalyserPage() {
   const canProceedStep3 = unknownBands.length > 0
 
   return (
-    <main style={{ maxWidth: '1060px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
-      <a href="/lab" style={{ fontSize: '13px', color: '#6b7280', textDecoration: 'none' }}>← Lab Prep</a>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#111827', margin: '1rem 0 4px' }}>Gel Image Analyser</h1>
-      <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '1.5rem', lineHeight: '1.6' }}>
+    <main style={{ maxWidth: '1060px', margin: '0 auto', padding: '2rem 1rem', fontFamily: "'Inter',system-ui,sans-serif", background: '#0a0f1e', minHeight: '100vh', color: '#f0f4ff' }}>
+      <a href="/lab" style={{ fontSize: '13px', color: 'rgba(240,244,255,0.45)', textDecoration: 'none' }}>← Lab Prep</a>
+      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#f0f4ff', margin: '1rem 0 4px' }}>Gel Image Analyser</h1>
+      <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.45)', marginBottom: '1.5rem', lineHeight: '1.6' }}>
         Upload a gel photo, mark your ladder bands and unknowns, and get estimated molecular weights from a standard curve. Works for SDS-PAGE (protein) and agarose (DNA) gels.
       </p>
 
       {/* Step indicator */}
-      <div style={{ display: 'flex', gap: '0', marginBottom: '1.5rem', background: '#f3f4f6', borderRadius: '10px', padding: '4px', width: 'fit-content' }}>
+      <div style={{ display: 'flex', gap: '0', marginBottom: '1.5rem', background: 'rgba(255,255,255,0.06)', borderRadius: '10px', padding: '4px', width: 'fit-content' }}>
         {steps.map((s, i) => (
           <button key={s} onClick={() => i <= step && setStep(i)}
             style={{ padding: '6px 14px', borderRadius: '8px', fontSize: '12px', fontWeight: step === i ? '600' : '400', border: 'none', cursor: i <= step ? 'pointer' : 'default', background: step === i ? '#111827' : 'transparent', color: step === i ? 'white' : i < step ? '#2563eb' : '#9ca3af' }}>
@@ -393,12 +393,12 @@ export default function GelAnalyserPage() {
       {step === 0 && (
         <div
           onClick={() => fileRef.current?.click()}
-          style={{ border: '2px dashed #d1d5db', borderRadius: '16px', padding: '4rem 2rem', textAlign: 'center', cursor: 'pointer', background: '#fafafa' }}
+          style={{ border: '2px dashed rgba(255,255,255,0.15)', borderRadius: '16px', padding: '4rem 2rem', textAlign: 'center', cursor: 'pointer', background: '#0f1629' }}
           onDragOver={e => e.preventDefault()}
           onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) { const u = URL.createObjectURL(f); setImgSrc(u); setStep(1); setMode('well') } }}>
           <div style={{ fontSize: '40px', marginBottom: '12px' }}>🔬</div>
-          <p style={{ fontSize: '15px', fontWeight: '600', color: '#374151', margin: '0 0 6px' }}>Drop your gel image here</p>
-          <p style={{ fontSize: '13px', color: '#9ca3af', margin: 0 }}>or click to browse · PNG, JPG, TIFF</p>
+          <p style={{ fontSize: '15px', fontWeight: '600', color: 'rgba(240,244,255,0.75)', margin: '0 0 6px' }}>Drop your gel image here</p>
+          <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.3)', margin: 0 }}>or click to browse · PNG, JPG, TIFF</p>
           <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFile} />
         </div>
       )}
@@ -409,16 +409,16 @@ export default function GelAnalyserPage() {
 
           {/* Left: gel image */}
           <div>
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '12px', marginBottom: '10px' }}>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '12px', marginBottom: '10px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <p style={{ fontSize: '12px', fontWeight: '600', color: '#374151', margin: 0 }}>
+                <p style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(240,244,255,0.75)', margin: 0 }}>
                   {mode === 'well' && '↓ Click to mark the well line (top of gel)'}
                   {mode === 'front' && '↓ Click to mark the dye front (bottom of gel)'}
                   {mode === 'ladder' && `↓ Click each ladder band top-to-bottom (${ladderMarks.length}/${ladderSizes.length} marked)`}
                   {mode === 'unknown' && `↓ Click each unknown band (${unknownMarks.length} marked)`}
                 </p>
                 <button onClick={() => fileRef.current?.click()}
-                  style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '6px', border: '1px solid #d1d5db', background: 'white', cursor: 'pointer', color: '#6b7280' }}>
+                  style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', background: '#0f1629', cursor: 'pointer', color: 'rgba(240,244,255,0.45)' }}>
                   Change image
                 </button>
               </div>
@@ -437,11 +437,11 @@ export default function GelAnalyserPage() {
 
             {/* Standard curve — show once we have ≥2 ladder bands */}
             {step >= 3 && (
-              <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '12px' }}>
-                <p style={{ fontSize: '12px', fontWeight: '600', color: '#374151', margin: '0 0 8px' }}>Standard curve</p>
+              <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '12px' }}>
+                <p style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(240,244,255,0.75)', margin: '0 0 8px' }}>Standard curve</p>
                 <CurveCanvas ladderBands={ladderBands} reg={reg} unknownBands={unknownBands} />
                 {reg && (
-                  <p style={{ fontSize: '11px', color: '#6b7280', margin: '6px 0 0' }}>
+                  <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', margin: '6px 0 0' }}>
                     log(MW) = {reg.m.toFixed(3)} × Rf + {reg.b.toFixed(3)} · R² = {reg.r2.toFixed(4)}
                     {reg.r2 < 0.97 && <span style={{ color: '#f97316', marginLeft: '8px' }}>⚠ Low R² — check band positions</span>}
                   </p>
@@ -455,9 +455,9 @@ export default function GelAnalyserPage() {
 
             {/* ── Step 1: Well & front ── */}
             {step === 1 && (
-              <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-                <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Step 1 — Reference lines</p>
-                <p style={{ fontSize: '12px', color: '#374151', marginBottom: '12px', lineHeight: '1.6' }}>
+              <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+                <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Step 1 — Reference lines</p>
+                <p style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', marginBottom: '12px', lineHeight: '1.6' }}>
                   Set two horizontal reference lines so band positions can be converted to Rf values. The well is where samples loaded; the dye front is the farthest the dye migrated.
                 </p>
 
@@ -473,7 +473,7 @@ export default function GelAnalyserPage() {
                 </div>
 
                 {yWell !== null && yFront !== null && yFront <= yWell && (
-                  <div style={{ padding: '8px 10px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', fontSize: '12px', color: '#dc2626', marginBottom: '10px' }}>
+                  <div style={{ padding: '8px 10px', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.35)', borderRadius: '8px', fontSize: '12px', color: '#fca5a5', marginBottom: '10px' }}>
                     Dye front must be below the well. Re-click the front line.
                   </div>
                 )}
@@ -487,27 +487,27 @@ export default function GelAnalyserPage() {
 
             {/* ── Step 2: Ladder bands ── */}
             {step === 2 && (
-              <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-                <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Step 2 — Ladder bands</p>
+              <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+                <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Step 2 — Ladder bands</p>
 
                 <div style={{ marginBottom: '10px' }}>
-                  <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '4px' }}>Ladder preset</label>
+                  <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Ladder preset</label>
                   <select value={selectedPreset} onChange={e => handlePresetChange(e.target.value)}
-                    style={{ width: '100%', padding: '7px 10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '12px', background: 'white' }}>
+                    style={{ width: '100%', padding: '7px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', background: '#0f1629' }}>
                     {Object.keys(LADDER_PRESETS).map(p => <option key={p}>{p}</option>)}
                   </select>
                 </div>
 
                 {selectedPreset === 'Custom' && (
                   <div style={{ marginBottom: '10px' }}>
-                    <label style={{ fontSize: '12px', color: '#374151', display: 'block', marginBottom: '4px' }}>Band sizes (kDa, comma-separated, largest first)</label>
+                    <label style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '4px' }}>Band sizes (kDa, comma-separated, largest first)</label>
                     <input value={customSizeInput} onChange={e => { setCustomSizeInput(e.target.value); setLadderSizes(e.target.value.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n))) }}
                       placeholder="200, 150, 100, 75, 50, 37, 25, 20"
-                      style={{ width: '100%', padding: '7px 10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '12px', boxSizing: 'border-box' }} />
+                      style={{ width: '100%', padding: '7px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', boxSizing: 'border-box' }} />
                   </div>
                 )}
 
-                <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px', lineHeight: '1.5' }}>
+                <p style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)', marginBottom: '8px', lineHeight: '1.5' }}>
                   Click each visible ladder band on the gel image from <strong>top to bottom</strong>. The sizes are assigned in order.
                 </p>
 
@@ -519,13 +519,13 @@ export default function GelAnalyserPage() {
                     return (
                       <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '5px 8px', borderRadius: '6px', background: marked ? '#eff6ff' : '#f9fafb', border: `1px solid ${marked ? '#bfdbfe' : '#e5e7eb'}` }}>
                         <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: marked ? '#2563eb' : '#d1d5db', flexShrink: 0 }} />
-                        <span style={{ fontSize: '12px', fontWeight: '600', color: '#111827', minWidth: '55px' }}>{size} kDa</span>
+                        <span style={{ fontSize: '12px', fontWeight: '600', color: '#f0f4ff', minWidth: '55px' }}>{size} kDa</span>
                         {marked
-                          ? <span style={{ fontSize: '11px', color: '#6b7280', flex: 1 }}>Rf = {rf !== null ? rf.toFixed(3) : '—'}</span>
-                          : <span style={{ fontSize: '11px', color: '#9ca3af', flex: 1 }}>not marked</span>}
+                          ? <span style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', flex: 1 }}>Rf = {rf !== null ? rf.toFixed(3) : '—'}</span>
+                          : <span style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', flex: 1 }}>not marked</span>}
                         {marked && (
                           <button onClick={() => removeLadderMark(i)}
-                            style={{ fontSize: '11px', padding: '1px 6px', borderRadius: '4px', border: '1px solid #fecaca', background: '#fef2f2', color: '#dc2626', cursor: 'pointer' }}>✕</button>
+                            style={{ fontSize: '11px', padding: '1px 6px', borderRadius: '4px', border: '1px solid rgba(239,68,68,0.35)', background: 'rgba(239,68,68,0.12)', color: '#fca5a5', cursor: 'pointer' }}>✕</button>
                         )}
                       </div>
                     )
@@ -533,7 +533,7 @@ export default function GelAnalyserPage() {
                 </div>
 
                 {reg && (
-                  <div style={{ padding: '8px 10px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', fontSize: '12px', color: '#15803d', marginBottom: '10px' }}>
+                  <div style={{ padding: '8px 10px', background: 'rgba(22,163,74,0.12)', border: '1px solid rgba(22,163,74,0.35)', borderRadius: '8px', fontSize: '12px', color: '#86efac', marginBottom: '10px' }}>
                     ✓ Standard curve ready · R² = {reg.r2.toFixed(4)}
                     {reg.r2 < 0.97 && ' — consider re-marking bands'}
                   </div>
@@ -541,7 +541,7 @@ export default function GelAnalyserPage() {
 
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button onClick={() => { setStep(1); setMode('well') }}
-                    style={{ flex: 1, padding: '8px', background: 'white', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '12px', cursor: 'pointer', color: '#374151' }}>
+                    style={{ flex: 1, padding: '8px', background: '#0f1629', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', fontSize: '12px', cursor: 'pointer', color: 'rgba(240,244,255,0.75)' }}>
                     ← Back
                   </button>
                   <button onClick={() => { setStep(3); setMode('unknown') }} disabled={!canProceedStep2}
@@ -554,9 +554,9 @@ export default function GelAnalyserPage() {
 
             {/* ── Step 3: Unknown bands ── */}
             {step === 3 && (
-              <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-                <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Step 3 — Unknown bands</p>
-                <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '10px', lineHeight: '1.5' }}>
+              <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+                <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Step 3 — Unknown bands</p>
+                <p style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)', marginBottom: '10px', lineHeight: '1.5' }}>
                   Click each band you want to estimate. You can label them below.
                 </p>
 
@@ -566,12 +566,12 @@ export default function GelAnalyserPage() {
                       <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: b.color, flexShrink: 0 }} />
                         <input value={unknownLabels[i] || ''} onChange={e => setUnknownLabels(prev => prev.map((l, j) => j === i ? e.target.value : l))}
-                          style={{ flex: 1, padding: '5px 8px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '12px', background: 'white' }} />
+                          style={{ flex: 1, padding: '5px 8px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', background: '#0f1629' }} />
                         <span style={{ fontSize: '12px', fontWeight: '700', color: b.color, minWidth: '65px', textAlign: 'right' }}>
                           {b.estimatedSize ? (b.estimatedSize >= 1 ? b.estimatedSize.toFixed(1) + ' kDa' : (b.estimatedSize * 1000).toFixed(0) + ' Da') : '—'}
                         </span>
                         <button onClick={() => removeUnknownMark(i)}
-                          style={{ fontSize: '11px', padding: '2px 6px', borderRadius: '4px', border: '1px solid #fecaca', background: '#fef2f2', color: '#dc2626', cursor: 'pointer' }}>✕</button>
+                          style={{ fontSize: '11px', padding: '2px 6px', borderRadius: '4px', border: '1px solid rgba(239,68,68,0.35)', background: 'rgba(239,68,68,0.12)', color: '#fca5a5', cursor: 'pointer' }}>✕</button>
                       </div>
                     ))}
                   </div>
@@ -579,7 +579,7 @@ export default function GelAnalyserPage() {
 
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button onClick={() => { setStep(2); setMode('ladder') }}
-                    style={{ flex: 1, padding: '8px', background: 'white', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '12px', cursor: 'pointer', color: '#374151' }}>
+                    style={{ flex: 1, padding: '8px', background: '#0f1629', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', fontSize: '12px', cursor: 'pointer', color: 'rgba(240,244,255,0.75)' }}>
                     ← Back
                   </button>
                   <button onClick={() => setStep(4)} disabled={!canProceedStep3}
@@ -593,14 +593,14 @@ export default function GelAnalyserPage() {
             {/* ── Step 4: Results ── */}
             {step === 4 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-                  <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Results</p>
+                <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+                  <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Results</p>
 
                   {unknownBands.map((b, i) => (
-                    <div key={i} style={{ padding: '10px 12px', borderRadius: '10px', background: 'white', border: `1px solid ${b.color}44`, marginBottom: '8px' }}>
+                    <div key={i} style={{ padding: '10px 12px', borderRadius: '10px', background: '#0f1629', border: `1px solid ${b.color}44`, marginBottom: '8px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                         <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: b.color, flexShrink: 0 }} />
-                        <span style={{ fontSize: '13px', fontWeight: '600', color: '#111827' }}>{b.label}</span>
+                        <span style={{ fontSize: '13px', fontWeight: '600', color: '#f0f4ff' }}>{b.label}</span>
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px' }}>
                         {[
@@ -608,9 +608,9 @@ export default function GelAnalyserPage() {
                           { label: 'Rf value', value: b.rf !== null ? b.rf.toFixed(3) : '—' },
                           { label: 'From curve', value: reg ? `R² ${reg.r2.toFixed(3)}` : '—' },
                         ].map(m => (
-                          <div key={m.label} style={{ background: '#f9fafb', borderRadius: '6px', padding: '6px 8px' }}>
-                            <div style={{ fontSize: '10px', color: '#9ca3af' }}>{m.label}</div>
-                            <div style={{ fontSize: '14px', fontWeight: '700', color: '#111827' }}>{m.value}</div>
+                          <div key={m.label} style={{ background: '#0f1629', borderRadius: '6px', padding: '6px 8px' }}>
+                            <div style={{ fontSize: '10px', color: 'rgba(240,244,255,0.3)' }}>{m.label}</div>
+                            <div style={{ fontSize: '14px', fontWeight: '700', color: '#f0f4ff' }}>{m.value}</div>
                           </div>
                         ))}
                       </div>
@@ -618,7 +618,7 @@ export default function GelAnalyserPage() {
                   ))}
 
                   {reg && (
-                    <div style={{ marginTop: '8px', padding: '8px 10px', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '8px', fontSize: '11px', color: '#1e40af', lineHeight: '1.6' }}>
+                    <div style={{ marginTop: '8px', padding: '8px 10px', background: 'rgba(42,111,219,0.18)', border: '1px solid rgba(42,111,219,0.35)', borderRadius: '8px', fontSize: '11px', color: '#1e40af', lineHeight: '1.6' }}>
                       <strong>Standard curve:</strong> log(MW) = {reg.m.toFixed(3)} × Rf + {reg.b.toFixed(3)} · R² = {reg.r2.toFixed(4)} · {validLadder.length} ladder points
                       {reg.r2 < 0.97 && <span style={{ color: '#f97316', display: 'block', marginTop: '3px' }}>⚠ R² below 0.97 — results may be less accurate. Check that band positions are correctly marked.</span>}
                     </div>
@@ -626,15 +626,15 @@ export default function GelAnalyserPage() {
                 </div>
 
                 {/* Ladder summary */}
-                <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-                  <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Ladder points used</p>
+                <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+                  <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Ladder points used</p>
                   <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
                     <thead>
-                      <tr style={{ background: '#f3f4f6' }}>
-                        <th style={{ padding: '5px 8px', textAlign: 'left', color: '#6b7280', fontWeight: '600' }}>Band</th>
-                        <th style={{ padding: '5px 8px', textAlign: 'right', color: '#6b7280', fontWeight: '600' }}>Size</th>
-                        <th style={{ padding: '5px 8px', textAlign: 'right', color: '#6b7280', fontWeight: '600' }}>Rf</th>
-                        <th style={{ padding: '5px 8px', textAlign: 'right', color: '#6b7280', fontWeight: '600' }}>Predicted</th>
+                      <tr style={{ background: 'rgba(255,255,255,0.06)' }}>
+                        <th style={{ padding: '5px 8px', textAlign: 'left', color: 'rgba(240,244,255,0.45)', fontWeight: '600' }}>Band</th>
+                        <th style={{ padding: '5px 8px', textAlign: 'right', color: 'rgba(240,244,255,0.45)', fontWeight: '600' }}>Size</th>
+                        <th style={{ padding: '5px 8px', textAlign: 'right', color: 'rgba(240,244,255,0.45)', fontWeight: '600' }}>Rf</th>
+                        <th style={{ padding: '5px 8px', textAlign: 'right', color: 'rgba(240,244,255,0.45)', fontWeight: '600' }}>Predicted</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -642,8 +642,8 @@ export default function GelAnalyserPage() {
                         const predicted = reg ? Math.pow(10, reg.m * b.rf + reg.b) : null
                         const err = predicted ? Math.abs((predicted - b.sizeKda) / b.sizeKda * 100) : null
                         return (
-                          <tr key={i} style={{ borderBottom: '1px solid #f3f4f6' }}>
-                            <td style={{ padding: '5px 8px', color: '#374151' }}>Band {i + 1}</td>
+                          <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                            <td style={{ padding: '5px 8px', color: 'rgba(240,244,255,0.75)' }}>Band {i + 1}</td>
                             <td style={{ padding: '5px 8px', textAlign: 'right', fontFamily: 'monospace' }}>{b.sizeKda} kDa</td>
                             <td style={{ padding: '5px 8px', textAlign: 'right', fontFamily: 'monospace' }}>{b.rf.toFixed(3)}</td>
                             <td style={{ padding: '5px 8px', textAlign: 'right', fontFamily: 'monospace', color: err && err > 10 ? '#f97316' : '#16a34a' }}>
@@ -657,7 +657,7 @@ export default function GelAnalyserPage() {
                 </div>
 
                 <button onClick={() => { setStep(3); setMode('unknown') }}
-                  style={{ padding: '9px', background: 'white', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', color: '#374151' }}>
+                  style={{ padding: '9px', background: '#0f1629', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', fontSize: '13px', cursor: 'pointer', color: 'rgba(240,244,255,0.75)' }}>
                   ← Add more bands
                 </button>
               </div>
@@ -665,8 +665,8 @@ export default function GelAnalyserPage() {
 
             {/* Mode switcher (steps 2–3) */}
             {(step === 2 || step === 3) && (
-              <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '10px 12px' }}>
-                <p style={{ fontSize: '11px', color: '#9ca3af', margin: '0 0 6px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Active tool</p>
+              <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 12px' }}>
+                <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', margin: '0 0 6px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Active tool</p>
                 <div style={{ display: 'flex', gap: '6px' }}>
                   {[
                     { m: 'ladder', label: 'Ladder', col: '#2563eb' },

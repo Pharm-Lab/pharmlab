@@ -2,6 +2,12 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
+const C = {
+  bg: '#0a0f1e', card: '#0f1629', border: 'rgba(255,255,255,0.07)',
+  blue: '#2a6fdb', blueLight: '#93b4f7',
+  text: '#f0f4ff', textMid: 'rgba(240,244,255,0.65)', textDim: 'rgba(240,244,255,0.35)',
+}
+
 function UnitConverter() {
   const [activeCategory, setActiveCategory] = useState('concentration')
   const [inputValue,     setInputValue]     = useState(1)
@@ -80,34 +86,40 @@ function UnitConverter() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+
+      {/* Category pills */}
       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
         {Object.entries(CATEGORIES).map(([id, c]) => (
           <button key={id} onClick={() => { setActiveCategory(id); setInputUnit(CATEGORIES[id].baseId) }}
             style={{ padding: '6px 14px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px',
               fontWeight: activeCategory === id ? '600' : '400',
-              border: activeCategory === id ? '2px solid #2563eb' : '1px solid #d1d5db',
-              background: activeCategory === id ? '#eff6ff' : 'white',
-              color: activeCategory === id ? '#1d4ed8' : '#374151' }}>
+              border: activeCategory === id ? `2px solid ${C.blue}` : `1px solid ${C.border}`,
+              background: activeCategory === id ? `${C.blue}18` : 'rgba(255,255,255,0.04)',
+              color: activeCategory === id ? C.blueLight : C.textMid }}>
             {c.label}
           </button>
         ))}
       </div>
 
+      {/* Input */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
         <div>
-          <label style={{ fontSize: '12px', color: '#6b7280', display: 'block', marginBottom: '3px' }}>Value</label>
+          <label style={{ fontSize: '12px', color: C.textDim, display: 'block', marginBottom: '3px' }}>Value</label>
           <input type="number" value={inputValue} onChange={e => setInputValue(parseFloat(e.target.value) || 0)}
-            style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '16px', fontWeight: '700', color: '#111827', boxSizing: 'border-box', background: 'white' }} />
+            style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: `1px solid ${C.border}`,
+              fontSize: '16px', fontWeight: '700', color: C.text, boxSizing: 'border-box', background: '#060b18' }} />
         </div>
         <div>
-          <label style={{ fontSize: '12px', color: '#6b7280', display: 'block', marginBottom: '3px' }}>From unit</label>
+          <label style={{ fontSize: '12px', color: C.textDim, display: 'block', marginBottom: '3px' }}>From unit</label>
           <select value={fromUnit} onChange={e => setInputUnit(e.target.value)}
-            style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '14px', color: '#111827', background: 'white', boxSizing: 'border-box' }}>
+            style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: `1px solid ${C.border}`,
+              fontSize: '14px', color: C.text, background: '#060b18', boxSizing: 'border-box' }}>
             {cat.units.map(u => <option key={u.id} value={u.id}>{u.label}</option>)}
           </select>
         </div>
       </div>
 
+      {/* Results grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '6px' }}>
         {cat.units.map(u => {
           let converted
@@ -119,9 +131,12 @@ function UnitConverter() {
           const isActive = u.id === fromUnit
           return (
             <div key={u.id} onClick={() => setInputUnit(u.id)}
-              style={{ background: isActive ? '#eff6ff' : '#f9fafb', border: `1px solid ${isActive ? '#bfdbfe' : '#e5e7eb'}`, borderRadius: '8px', padding: '10px 12px', cursor: 'pointer' }}>
-              <div style={{ fontSize: '11px', color: '#9ca3af', marginBottom: '2px' }}>{u.label}</div>
-              <div style={{ fontSize: '16px', fontWeight: '700', color: isActive ? '#1d4ed8' : '#111827' }}>
+              style={{ background: isActive ? `${C.blue}18` : C.card,
+                border: `1px solid ${isActive ? C.blue + '55' : C.border}`,
+                borderRadius: '8px', padding: '10px 12px', cursor: 'pointer',
+                transition: 'border-color 0.15s, background 0.15s' }}>
+              <div style={{ fontSize: '11px', color: C.textDim, marginBottom: '2px' }}>{u.label}</div>
+              <div style={{ fontSize: '16px', fontWeight: '700', color: isActive ? C.blueLight : C.text }}>
                 {Math.abs(converted) < 0.0001 || Math.abs(converted) >= 1e8
                   ? converted.toExponential(4)
                   : converted.toFixed(6).replace(/\.?0+$/, '')}
@@ -137,10 +152,11 @@ function UnitConverter() {
 
 export default function ConverterPage() {
   return (
-    <main style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
-      <Link href="/lab" style={{ fontSize: '13px', color: '#6b7280', textDecoration: 'none' }}>← Lab Prep</Link>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#111827', margin: '1rem 0 4px' }}>Unit converter</h1>
-      <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '1.5rem' }}>Concentration, mass, volume, pressure, and temperature conversions.</p>
+    <main style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1rem', fontFamily: "'Inter',system-ui,sans-serif", background: C.bg, minHeight: '100vh', color: C.text }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'); * { box-sizing:border-box; }`}</style>
+      <Link href="/lab" style={{ fontSize: '13px', color: C.textDim, textDecoration: 'none' }}>← Lab Prep</Link>
+      <h1 style={{ fontSize: '24px', fontWeight: '700', color: C.text, margin: '1rem 0 4px', letterSpacing: '-0.02em' }}>Unit converter</h1>
+      <p style={{ fontSize: '13px', color: C.textMid, marginBottom: '1.5rem' }}>Concentration, mass, volume, pressure, and temperature conversions.</p>
       <UnitConverter />
     </main>
   )

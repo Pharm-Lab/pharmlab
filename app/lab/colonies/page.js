@@ -124,16 +124,16 @@ function UploadZone({ onFile }) {
       onDragLeave={() => setDrag(false)}
       onDrop={e => { e.preventDefault(); setDrag(false); handle(e.dataTransfer.files[0]) }}
       style={{
-        border: `2px dashed ${drag ? '#2563eb' : '#d1d5db'}`,
+        border: `2px dashed ${drag ? '#2a6fdb' : 'rgba(255,255,255,0.15)'}`,
         borderRadius: '10px', padding: '1.25rem',
-        background: drag ? '#eff6ff' : '#f9fafb',
+        background: drag ? 'rgba(42,111,219,0.08)' : '#0f1629',
         cursor: 'pointer', textAlign: 'center', transition: 'all .15s',
       }}>
       <input ref={ref} type="file" accept="image/*" style={{ display:'none' }}
         onChange={e => handle(e.target.files[0])} />
       <div style={{ fontSize:'24px', marginBottom:'4px' }}>📁</div>
-      <p style={{ fontSize:'12px', fontWeight:'600', color:'#374151', margin:'0 0 2px' }}>Click to upload or drag & drop</p>
-      <p style={{ fontSize:'11px', color:'#9ca3af', margin:0 }}>JPG, PNG — any image format</p>
+      <p style={{ fontSize:'12px', fontWeight:'600', color:'#f0f4ff', margin:'0 0 2px' }}>Click to upload or drag & drop</p>
+      <p style={{ fontSize:'11px', color:'rgba(240,244,255,0.3)', margin:0 }}>JPG, PNG — any image format</p>
     </div>
   )
 }
@@ -472,9 +472,9 @@ export default function ColoniesPage() {
     <button onClick={() => { setMode(m); setAutoResult(null); setDots([]) }}
       style={{ flex:1, padding:'7px', borderRadius:'7px', cursor:'pointer', fontSize:'13px',
         fontWeight: mode===m ? '600' : '400',
-        border: `${mode===m?2:1}px solid ${mode===m?col:'#e5e7eb'}`,
-        background: mode===m ? col+'18' : 'white',
-        color: mode===m ? col : '#374151',
+        border: `${mode===m?2:1}px solid ${mode===m?col:'rgba(255,255,255,0.1)'}`,
+        background: mode===m ? col+'18' : 'rgba(255,255,255,0.04)',
+        color: mode===m ? col : 'rgba(240,244,255,0.65)',
         transition: 'all .12s' }}>
       {label}
     </button>
@@ -483,8 +483,8 @@ export default function ColoniesPage() {
   const sldr = (label, val, set, min, max, step, fmt) => (
     <div style={{ marginBottom:'8px' }}>
       <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'2px' }}>
-        <span style={{ fontSize:'11px', color:'#6b7280' }}>{label}</span>
-        <span style={{ fontSize:'11px', fontFamily:'ui-monospace,monospace', color:'#374151', fontWeight:'600' }}>
+        <span style={{ fontSize:'11px', color:'rgba(240,244,255,0.45)' }}>{label}</span>
+        <span style={{ fontSize:'11px', fontFamily:'ui-monospace,monospace', color:'rgba(240,244,255,0.75)', fontWeight:'600' }}>
           {fmt ? fmt(val) : val}
         </span>
       </div>
@@ -495,18 +495,19 @@ export default function ColoniesPage() {
   )
 
   const panel = (title, children) => (
-    <div style={{ background:'white', border:'1px solid #e5e7eb', borderRadius:'12px', padding:'12px' }}>
-      <p style={{ fontSize:'11px', fontWeight:'600', color:'#9ca3af', textTransform:'uppercase',
+    <div style={{ background:'#0f1629', border:'1px solid rgba(255,255,255,0.07)', borderRadius:'12px', padding:'12px' }}>
+      <p style={{ fontSize:'11px', fontWeight:'600', color:'rgba(240,244,255,0.3)', textTransform:'uppercase',
         letterSpacing:'.06em', margin:'0 0 10px' }}>{title}</p>
       {children}
     </div>
   )
 
   return (
-    <main style={{ maxWidth:'1200px', margin:'0 auto', padding:'2rem 1rem', fontFamily:'sans-serif' }}>
-      <Link href="/lab" style={{ fontSize:'13px', color:'#6b7280', textDecoration:'none' }}>← Lab Prep</Link>
-      <h1 style={{ fontSize:'24px', fontWeight:'700', color:'#111827', margin:'1rem 0 4px' }}>Colony counter</h1>
-      <p style={{ fontSize:'13px', color:'#6b7280', marginBottom:'1.5rem', lineHeight:1.6 }}>
+    <main style={{ maxWidth:'1200px', margin:'0 auto', padding:'2rem 1rem', fontFamily:"'Inter',system-ui,sans-serif", background:'#0a0f1e', minHeight:'100vh', color:'#f0f4ff' }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap'); * { box-sizing:border-box; } input[type=range]{ accent-color:#16a34a; }`}</style>
+      <Link href="/lab" style={{ fontSize:'13px', color:'rgba(240,244,255,0.4)', textDecoration:'none' }}>← Lab Prep</Link>
+      <h1 style={{ fontSize:'24px', fontWeight:'700', color:'#f0f4ff', margin:'1rem 0 4px', letterSpacing:'-0.02em' }}>Colony counter</h1>
+      <p style={{ fontSize:'13px', color:'rgba(240,244,255,0.5)', marginBottom:'1.5rem', lineHeight:1.6 }}>
         Manual: click each colony to mark it. Auto: threshold-based detection with live mask preview.
       </p>
 
@@ -519,8 +520,8 @@ export default function ColoniesPage() {
           {panel('Image',
             imageSrc
               ? <button onClick={() => { setImageSrc(null); setDots([]); setAutoResult(null); clearCrop() }}
-                  style={{ width:'100%', padding:'6px', borderRadius:'7px', border:'1px solid #e5e7eb',
-                    background:'#f9fafb', fontSize:'12px', cursor:'pointer', color:'#6b7280' }}>
+                  style={{ width:'100%', padding:'6px', borderRadius:'7px', border:'1px solid rgba(255,255,255,0.07)',
+                    background:'rgba(255,255,255,0.04)', fontSize:'12px', cursor:'pointer', color:'rgba(240,244,255,0.5)' }}>
                   ↩ Upload new image
                 </button>
               : <UploadZone onFile={loadImage} />
@@ -535,10 +536,10 @@ export default function ColoniesPage() {
                 {[['circle','⬤ Circle'],['rect','⬜ Rectangle']].map(([s, label]) => (
                   <button key={s} onClick={() => setCropShape(s)}
                     style={{ flex:1, padding:'4px', borderRadius:'6px', fontSize:'11px', cursor:'pointer',
-                      border:`${cropShape===s?2:1}px solid ${cropShape===s?'#f59e0b':'#e5e7eb'}`,
-                      background: cropShape===s ? '#fffbeb' : 'white',
+                      border:`${cropShape===s?2:1}px solid ${cropShape===s?'#f59e0b':'rgba(255,255,255,0.1)'}`,
+                      background: cropShape===s ? 'rgba(245,158,11,0.12)' : 'rgba(255,255,255,0.04)',
                       fontWeight: cropShape===s ? '600' : '400',
-                      color: cropShape===s ? '#d97706' : '#374151' }}>
+                      color: cropShape===s ? '#fbbf24' : 'rgba(240,244,255,0.65)' }}>
                     {label}
                   </button>
                 ))}
@@ -547,36 +548,36 @@ export default function ColoniesPage() {
               <div style={{ display:'flex', gap:'6px' }}>
                 <button onClick={() => setCropMode(!cropMode)}
                   style={{ flex:1, padding:'6px', borderRadius:'7px', fontSize:'12px', cursor:'pointer',
-                    border:`${cropMode?2:1}px solid ${cropMode?'#f59e0b':'#e5e7eb'}`,
-                    background: cropMode ? '#fffbeb' : 'white',
+                    border:`${cropMode?2:1}px solid ${cropMode?'#f59e0b':'rgba(255,255,255,0.1)'}`,
+                    background: cropMode ? 'rgba(245,158,11,0.12)' : 'rgba(255,255,255,0.04)',
                     fontWeight: cropMode ? '600' : '400',
-                    color: cropMode ? '#d97706' : '#374151' }}>
+                    color: cropMode ? '#fbbf24' : 'rgba(240,244,255,0.65)' }}>
                   {cropMode ? 'Drawing…' : `✂ Draw ${cropShape}`}
                 </button>
                 {cropHistory.length > 0 && (
                   <button onClick={undoCrop}
-                    style={{ padding:'6px 10px', borderRadius:'7px', border:'1px solid #e5e7eb',
-                      background:'white', fontSize:'12px', cursor:'pointer', color:'#374151' }}>
+                    style={{ padding:'6px 10px', borderRadius:'7px', border:'1px solid rgba(255,255,255,0.1)',
+                      background:'rgba(255,255,255,0.05)', fontSize:'12px', cursor:'pointer', color:'rgba(240,244,255,0.65)' }}>
                     ↩
                   </button>
                 )}
                 {(cropRect || circleCrop) && (
                   <button onClick={clearCrop}
-                    style={{ padding:'6px 10px', borderRadius:'7px', border:'1px solid #fecaca',
-                      background:'#fef2f2', fontSize:'12px', cursor:'pointer', color:'#dc2626' }}>
+                    style={{ padding:'6px 10px', borderRadius:'7px', border:'1px solid rgba(239,68,68,0.4)',
+                      background:'rgba(239,68,68,0.1)', fontSize:'12px', cursor:'pointer', color:'#fca5a5' }}>
                     ✕
                   </button>
                 )}
               </div>
               {cropMode && (
-                <p style={{ fontSize:'11px', color:'#d97706', margin:'6px 0 0', lineHeight:1.4 }}>
+                <p style={{ fontSize:'11px', color:'#fbbf24', margin:'6px 0 0', lineHeight:1.4 }}>
                   {cropShape === 'circle'
                     ? 'Click the centre of the dish, drag to set radius.'
                     : 'Click and drag to select area.'}
                 </p>
               )}
-              {circleCrop && <p style={{ fontSize:'11px', color:'#16a34a', margin:'6px 0 0' }}>Circle active — r={Math.round(circleCrop.r)}px</p>}
-              {cropRect   && <p style={{ fontSize:'11px', color:'#16a34a', margin:'6px 0 0' }}>Rect active — {cropRect.w}×{cropRect.h}px</p>}
+              {circleCrop && <p style={{ fontSize:'11px', color:'#86efac', margin:'6px 0 0' }}>Circle active — r={Math.round(circleCrop.r)}px</p>}
+              {cropRect   && <p style={{ fontSize:'11px', color:'#86efac', margin:'6px 0 0' }}>Rect active — {cropRect.w}×{cropRect.h}px</p>}
             </>)}
 
             {/* Mode */}
@@ -592,21 +593,21 @@ export default function ColoniesPage() {
               {sldr('Dot size', dotSize, setDotSize, 6, 32, 1)}
               <div style={{ display:'flex', gap:'6px', marginTop:'4px' }}>
                 <button onClick={() => setDots(p => p.slice(0,-1))} disabled={!dots.length}
-                  style={{ flex:1, padding:'6px', borderRadius:'7px', border:'1px solid #e5e7eb',
-                    background:'white', fontSize:'12px',
+                  style={{ flex:1, padding:'6px', borderRadius:'7px', border:'1px solid rgba(255,255,255,0.1)',
+                    background:'rgba(255,255,255,0.04)', fontSize:'12px',
                     cursor: dots.length ? 'pointer' : 'not-allowed',
-                    color: dots.length ? '#374151' : '#d1d5db' }}>
+                    color: dots.length ? 'rgba(240,244,255,0.7)' : 'rgba(240,244,255,0.2)' }}>
                   ↩ Undo
                 </button>
                 <button onClick={() => setDots([])} disabled={!dots.length}
-                  style={{ flex:1, padding:'6px', borderRadius:'7px', border:'1px solid #fecaca',
-                    background:'#fef2f2', fontSize:'12px',
+                  style={{ flex:1, padding:'6px', borderRadius:'7px', border:'1px solid rgba(239,68,68,0.35)',
+                    background:'rgba(239,68,68,0.1)', fontSize:'12px',
                     cursor: dots.length ? 'pointer' : 'not-allowed',
-                    color: dots.length ? '#dc2626' : '#d1d5db' }}>
+                    color: dots.length ? '#fca5a5' : 'rgba(240,244,255,0.2)' }}>
                   Clear
                 </button>
               </div>
-              <p style={{ fontSize:'11px', color:'#9ca3af', margin:'8px 0 0', lineHeight:1.5 }}>
+              <p style={{ fontSize:'11px', color:'rgba(240,244,255,0.3)', margin:'8px 0 0', lineHeight:1.5 }}>
                 Click a colony to place a dot. Click an existing dot to remove it.
               </p>
             </>)}
@@ -614,17 +615,17 @@ export default function ColoniesPage() {
             {/* Auto controls */}
             {mode === 'auto' && panel('Auto settings', <>
               <label style={{ display:'flex', alignItems:'center', gap:'6px', fontSize:'12px',
-                color:'#374151', cursor:'pointer', marginBottom:'10px' }}>
+                color:'rgba(240,244,255,0.7)', cursor:'pointer', marginBottom:'10px' }}>
                 <input type="checkbox" checked={darkOnLight} onChange={e => setDarkOnLight(e.target.checked)}
                   style={{ accentColor:'#16a34a' }} />
                 Dark colonies on light background
               </label>
 
               {/* Threshold block */}
-              <div style={{ background:'#f9fafb', borderRadius:'8px', padding:'8px 10px',
-                marginBottom:'8px', border:'1px solid #e5e7eb' }}>
+              <div style={{ background:'rgba(255,255,255,0.04)', borderRadius:'8px', padding:'8px 10px',
+                marginBottom:'8px', border:'1px solid rgba(255,255,255,0.07)' }}>
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'6px' }}>
-                  <span style={{ fontSize:'11px', fontWeight:'600', color:'#374151' }}>Threshold</span>
+                  <span style={{ fontSize:'11px', fontWeight:'600', color:'rgba(240,244,255,0.7)' }}>Threshold</span>
                   <label style={{ display:'flex', alignItems:'center', gap:'4px', fontSize:'10px',
                     color:'#16a34a', cursor:'pointer', fontWeight:'600' }}>
                     <input type="checkbox" checked={showMask} onChange={e => setShowMask(e.target.checked)}
@@ -634,7 +635,7 @@ export default function ColoniesPage() {
                 </div>
 
                 <label style={{ display:'flex', alignItems:'center', gap:'4px', fontSize:'11px',
-                  color:'#6b7280', cursor:'pointer', marginBottom:'6px' }}>
+                  color:'rgba(240,244,255,0.5)', cursor:'pointer', marginBottom:'6px' }}>
                   <input type="checkbox" checked={useManualThr} onChange={e => setUseManualThr(e.target.checked)}
                     style={{ accentColor:'#16a34a', width:'12px', height:'12px' }} />
                   Manual threshold
@@ -649,15 +650,15 @@ export default function ColoniesPage() {
                       <input type="number" min={0} max={255} step={1} value={threshold}
                         onChange={e => { const n=parseInt(e.target.value); if(!isNaN(n)&&n>=0&&n<=255) setThreshold(n) }}
                         style={{ width:'48px', padding:'3px 6px', borderRadius:'5px',
-                          border:'1px solid #d1d5db', fontSize:'12px', fontWeight:'600',
-                          color:'#111827', textAlign:'right', background:'white' }} />
+                          border:'1px solid rgba(255,255,255,0.1)', fontSize:'12px', fontWeight:'600',
+                          color:'#f0f4ff', textAlign:'right', background:'rgba(255,255,255,0.06)' }} />
                     </div>
-                    {showMask && <p style={{ fontSize:'10px', color:'#16a34a', margin:'2px 0 0' }}>
+                    {showMask && <p style={{ fontSize:'10px', color:'#86efac', margin:'2px 0 0' }}>
                       Green = detected colony pixels
                     </p>}
                   </div>
                 ) : (
-                  <p style={{ fontSize:'11px', color:'#9ca3af', margin:0 }}>Otsu's method — automatic</p>
+                  <p style={{ fontSize:'11px', color:'rgba(240,244,255,0.3)', margin:0 }}>Otsu's method — automatic</p>
                 )}
               </div>
 
@@ -667,38 +668,38 @@ export default function ColoniesPage() {
 
               <button onClick={runAuto} disabled={running}
                 style={{ width:'100%', padding:'9px', borderRadius:'8px', border:'none',
-                  background: running ? '#e5e7eb' : '#16a34a',
-                  color: running ? '#9ca3af' : 'white',
+                  background: running ? 'rgba(255,255,255,0.08)' : '#16a34a',
+                  color: running ? 'rgba(240,244,255,0.3)' : 'white',
                   fontSize:'13px', fontWeight:'600',
                   cursor: running ? 'not-allowed' : 'pointer', marginTop:'4px' }}>
                 {running ? 'Detecting…' : '▶ Run detection'}
               </button>
 
               {autoResult && (
-                <p style={{ fontSize:'11px', color:'#6b7280', margin:'6px 0 0', textAlign:'center' }}>
+                <p style={{ fontSize:'11px', color:'rgba(240,244,255,0.45)', margin:'6px 0 0', textAlign:'center' }}>
                   Threshold used: {autoResult.threshold}
                 </p>
               )}
 
-              <div style={{ marginTop:'8px', background:'#fffbeb', border:'1px solid #fde68a',
-                borderRadius:'7px', padding:'8px 10px', fontSize:'11px', color:'#92400e', lineHeight:1.5 }}>
+              <div style={{ marginTop:'8px', background:'rgba(245,158,11,0.1)', border:'1px solid rgba(245,158,11,0.3)',
+                borderRadius:'7px', padding:'8px 10px', fontSize:'11px', color:'#fde047', lineHeight:1.5 }}>
                 Best results on well-separated colonies. Touching colonies count as one — switch to Manual to correct.
               </div>
             </>)}
 
             {/* Count + zoom + export */}
             {panel('Result', <>
-              <div style={{ background:'#eff6ff', borderRadius:'8px', padding:'10px',
+              <div style={{ background:'rgba(42,111,219,0.15)', borderRadius:'8px', padding:'10px',
                 textAlign:'center', marginBottom:'10px' }}>
-                <span style={{ fontSize:'42px', fontWeight:'700', color:'#1d4ed8',
+                <span style={{ fontSize:'42px', fontWeight:'700', color:'#93b4f7',
                   fontFamily:'ui-monospace,monospace', lineHeight:1 }}>{count}</span>
-                <div style={{ fontSize:'12px', color:'#2563eb', marginTop:'2px' }}>colonies counted</div>
+                <div style={{ fontSize:'12px', color:'#93b4f7', marginTop:'2px' }}>colonies counted</div>
               </div>
               {sldr('Zoom', zoom, setZoom, 0.1, 3, 0.05, v => Math.round(v*100)+'%')}
               <button onClick={exportPNG}
                 style={{ width:'100%', padding:'8px', borderRadius:'8px', border:'none',
-                  background:'#111827', color:'white', fontSize:'13px',
-                  fontWeight:'500', cursor:'pointer' }}>
+                  background:'#2a6fdb', color:'white', fontSize:'13px',
+                  fontWeight:'600', cursor:'pointer' }}>
                 ↓ Export PNG
               </button>
             </>)}
@@ -709,17 +710,17 @@ export default function ColoniesPage() {
         {/* ── Right: canvas ── */}
         <div>
           {!imageSrc
-            ? <div style={{ background:'#f9fafb', border:'2px dashed #e5e7eb', borderRadius:'12px',
-                padding:'5rem', textAlign:'center', color:'#9ca3af' }}>
+            ? <div style={{ background:'#0f1629', border:'2px dashed rgba(255,255,255,0.1)', borderRadius:'12px',
+                padding:'5rem', textAlign:'center', color:'rgba(240,244,255,0.3)' }}>
                 <div style={{ fontSize:'48px', marginBottom:'12px' }}>🔬</div>
-                <p style={{ fontSize:'15px', fontWeight:'500', color:'#6b7280', margin:'0 0 4px' }}>
+                <p style={{ fontSize:'15px', fontWeight:'500', color:'rgba(240,244,255,0.55)', margin:'0 0 4px' }}>
                   Upload a plate image to begin
                 </p>
                 <p style={{ fontSize:'12px', margin:0 }}>Use the panel on the left</p>
               </div>
             : <div
                 style={{ overflowX:'auto', overflowY:'auto', maxHeight:'80vh',
-                  border:'1px solid #e5e7eb', borderRadius:'12px', background:'#1a1a1a',
+                  border:'1px solid rgba(255,255,255,0.07)', borderRadius:'12px', background:'#1a1a1a',
                   cursor: cropMode ? 'crosshair' : mode==='manual' ? 'crosshair' : 'default' }}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}

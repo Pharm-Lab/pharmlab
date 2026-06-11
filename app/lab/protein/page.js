@@ -1,5 +1,5 @@
 'use client'
-import { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 
 // ─── Amino acid data ──────────────────────────────────────────────────────────
 
@@ -120,8 +120,9 @@ function linearFit(xs, ys) {
 
 // ─── Assay curve canvas ────────────────────────────────────────────────────────
 
-function AssayCanvas({ standards, fit, unknowns }) {
+const AssayCanvas = React.forwardRef(function AssayCanvas({ standards, fit, unknowns }, ref) {
   const canvasRef = useRef(null)
+  React.useImperativeHandle(ref, () => canvasRef.current)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -193,8 +194,9 @@ function AssayCanvas({ standards, fit, unknowns }) {
     const ukColors = ['#ef4444', '#f97316', '#8b5cf6', '#16a34a', '#0891b2']
     unknowns.filter(u => u.abs > 0 && u.estConc !== null).forEach((u, i) => {
       const col = ukColors[i % ukColors.length]
-      const x = xS(u.estConc)
-      const y = yS(u.abs)
+      const preDilutionConc = u.estConc / (parseFloat(u.dilution) || 1)
+      const x = xS(preDilutionConc)
+      const y = yS(u.absAdj)
       ctx.strokeStyle = col; ctx.lineWidth = 1; ctx.setLineDash([3, 3])
       ctx.beginPath(); ctx.moveTo(x, yS(yMin)); ctx.lineTo(x, y); ctx.stroke()
       ctx.beginPath(); ctx.moveTo(xS(xMin), y); ctx.lineTo(x, y); ctx.stroke()
@@ -234,11 +236,27 @@ function AssayCanvas({ standards, fit, unknowns }) {
 
   return (
     <canvas ref={canvasRef}
-      style={{ width: '100%', height: '240px', borderRadius: '8px', border: '1px solid #e5e7eb', background: 'white' }} />
+      style={{ width: '100%', height: '240px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: '#f0f4ff' }} />
   )
-}
+})
 
 // ─── Main page ────────────────────────────────────────────────────────────────
+
+const EXAMPLE_BRADFORD = [
+  { conc: 0,    abs: '0.062' },
+  { conc: 0.125, abs: '0.143' },
+  { conc: 0.25,  abs: '0.224' },
+  { conc: 0.5,   abs: '0.388' },
+  { conc: 0.75,  abs: '0.541' },
+  { conc: 1.0,   abs: '0.698' },
+  { conc: 1.5,   abs: '0.991' },
+  { conc: 2.0,   abs: '1.274' },
+]
+const EXAMPLE_UNKNOWNS = [
+  { label: 'Sample 1', abs: '0.465', dilution: 1 },
+  { label: 'Sample 2', abs: '0.832', dilution: 2 },
+  { label: 'Sample 3', abs: '0.291', dilution: 1 },
+]
 
 const BSA_STANDARDS_BRADFORD = [
   { conc: 0,    abs: '' },
@@ -279,6 +297,34 @@ export default function ProteinToolsPage() {
   const [sequence, setSequence] = useState('MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR')
   const [seqError, setSeqError] = useState('')
 
+  const canvasRef = useRef(null)
+
+  function exportCurvePNG() {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const link = document.createElement('a')
+    link.download = 'standard-curve.png'
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+  }
+
+  function loadExample() {
+    setStandards(EXAMPLE_BRADFORD.map(s => ({ ...s })))
+    setUnknowns(EXAMPLE_UNKNOWNS.map(u => ({ ...u })))
+    setBlankAbs('0.062')
+    setAssayType('Bradford')
+  }
+
+  function clearExample() {
+    setStandards(BSA_STANDARDS_BRADFORD.map(s => ({ ...s })))
+    setUnknowns([
+      { label: 'Sample 1', abs: '', dilution: 1 },
+      { label: 'Sample 2', abs: '', dilution: 1 },
+      { label: 'Sample 3', abs: '', dilution: 1 },
+    ])
+    setBlankAbs('')
+  }
+
   function handleAssayTypeChange(type) {
     setAssayType(type)
     setStandards((type === 'Bradford' ? BSA_STANDARDS_BRADFORD : BSA_STANDARDS_BCA).map(s => ({ ...s })))
@@ -301,6 +347,9 @@ export default function ProteinToolsPage() {
     ? linearFit(validStds.map(s => s.conc), validStds.map(s => s.abs))
     : null
 
+  const stdConcMax = validStds.length > 0 ? Math.max(...validStds.map(s => s.conc)) : 0
+  const stdConcMin = validStds.length > 0 ? Math.min(...validStds.map(s => s.conc)) : 0
+
   const unknownResults = unknowns.map(u => {
     const absVal = (parseFloat(u.abs) || 0) - blankVal
     const dilution = parseFloat(u.dilution) || 1
@@ -308,7 +357,11 @@ export default function ProteinToolsPage() {
     if (fit && absVal > 0 && fit.m !== 0) {
       estConc = ((absVal - fit.b) / fit.m) * dilution
     }
-    return { ...u, absAdj: absVal, estConc }
+    const concBeforeDilution = estConc !== null ? estConc / dilution : null
+    const inRange = concBeforeDilution !== null
+      && concBeforeDilution >= stdConcMin
+      && concBeforeDilution <= stdConcMax * 1.05 // 5% tolerance
+    return { ...u, absAdj: absVal, estConc, inRange }
   })
 
   // pI / e280 calculations
@@ -322,18 +375,18 @@ export default function ProteinToolsPage() {
     padding: '8px 20px', cursor: 'pointer', fontSize: '13px',
     fontWeight: tab === active ? '600' : '400',
     border: 'none', borderBottom: tab === active ? '2px solid #2563eb' : '2px solid transparent',
-    background: 'transparent', color: tab === active ? '#1d4ed8' : '#6b7280', marginBottom: '-1px',
+    background: 'transparent', color: tab === active ? '#93b4f7' : 'rgba(240,244,255,0.4)', marginBottom: '-1px',
   })
 
   return (
-    <main style={{ maxWidth: '1060px', margin: '0 auto', padding: '2rem 1rem', fontFamily: 'sans-serif' }}>
-      <a href="/lab" style={{ fontSize: '13px', color: '#6b7280', textDecoration: 'none' }}>← Lab Prep</a>
-      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#111827', margin: '1rem 0 4px' }}>Protein Tools</h1>
-      <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '1.5rem', lineHeight: '1.6' }}>
+    <main style={{ maxWidth: '1060px', margin: '0 auto', padding: '2rem 1rem', fontFamily: "'Inter',system-ui,sans-serif", background: '#0a0f1e', minHeight: '100vh', color: '#f0f4ff' }}>
+      <a href="/lab" style={{ fontSize: '13px', color: 'rgba(240,244,255,0.45)', textDecoration: 'none' }}>← Lab Prep</a>
+      <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#f0f4ff', margin: '1rem 0 4px' }}>Protein Tools</h1>
+      <p style={{ fontSize: '13px', color: 'rgba(240,244,255,0.45)', marginBottom: '1.5rem', lineHeight: '1.6' }}>
         Bradford and BCA standard curves with automatic concentration back-calculation, plus isoelectric point and extinction coefficient from protein sequence.
       </p>
 
-      <div style={{ borderBottom: '1px solid #e5e7eb', marginBottom: '1.5rem', display: 'flex' }}>
+      <div style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', marginBottom: '1.5rem', display: 'flex' }}>
         <button onClick={() => setTab('assay')} style={tabBtn('assay')}>Protein assay (Bradford / BCA)</button>
         <button onClick={() => setTab('sequence')} style={tabBtn('sequence')}>pI & extinction coefficient</button>
       </div>
@@ -345,18 +398,30 @@ export default function ProteinToolsPage() {
           {/* Left: inputs */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
+            {/* Example toggle */}
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <button onClick={loadExample}
+                style={{ flex: 1, padding: '7px', borderRadius: '8px', border: '1px solid rgba(42,111,219,0.35)', background: 'rgba(42,111,219,0.1)', color: '#93b4f7', fontSize: '12px', fontWeight: '500', cursor: 'pointer' }}>
+                ↓ Load example
+              </button>
+              <button onClick={clearExample}
+                style={{ flex: 1, padding: '7px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'transparent', color: 'rgba(240,244,255,0.4)', fontSize: '12px', cursor: 'pointer' }}>
+                Clear
+              </button>
+            </div>
+
             {/* Assay type */}
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-              <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', margin: '0 0 10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Assay type</p>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', margin: '0 0 10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Assay type</p>
               <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
                 {['Bradford', 'BCA', 'Lowry'].map(t => (
                   <button key={t} onClick={() => handleAssayTypeChange(t)}
-                    style={{ flex: 1, padding: '7px', borderRadius: '8px', border: assayType === t ? '2px solid #2563eb' : '1px solid #e5e7eb', background: assayType === t ? '#eff6ff' : 'white', color: assayType === t ? '#1d4ed8' : '#374151', fontSize: '12px', fontWeight: assayType === t ? '600' : '400', cursor: 'pointer' }}>
+                    style={{ flex: 1, padding: '7px', borderRadius: '8px', border: assayType === t ? '2px solid #2a6fdb' : '1px solid rgba(255,255,255,0.1)', background: assayType === t ? 'rgba(42,111,219,0.18)' : 'rgba(255,255,255,0.04)', color: assayType === t ? '#93b4f7' : 'rgba(240,244,255,0.65)', fontSize: '12px', fontWeight: assayType === t ? '600' : '400', cursor: 'pointer' }}>
                     {t}
                   </button>
                 ))}
               </div>
-              <div style={{ fontSize: '11px', color: '#6b7280', lineHeight: '1.5', padding: '8px 10px', background: 'white', border: '1px solid #f3f4f6', borderRadius: '7px' }}>
+              <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', lineHeight: '1.5', padding: '8px 10px', background: '#0f1629', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '7px' }}>
                 {assayType === 'Bradford' && 'Coomassie Blue binding · A595 · BSA or γ-globulin standards · range 0.1–1.4 mg/mL'}
                 {assayType === 'BCA' && 'Cu²⁺ reduction + bicinchoninic acid · A562 · BSA standards · range 20–2000 μg/mL · compatible with reducing agents'}
                 {assayType === 'Lowry' && 'Folin-Ciocalteu · A750 · BSA standards · most sensitive · sensitive to detergents and reducing agents'}
@@ -364,41 +429,41 @@ export default function ProteinToolsPage() {
             </div>
 
             {/* Blank */}
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-              <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Blank absorbance</p>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Blank absorbance</p>
               <input type="number" step="0.001" value={blankAbs} onChange={e => setBlankAbs(e.target.value)}
                 placeholder="0.000"
-                style={{ width: '100%', padding: '7px 10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '14px', boxSizing: 'border-box', background: 'white' }} />
-              <p style={{ fontSize: '11px', color: '#9ca3af', margin: '4px 0 0' }}>Subtracted from all readings automatically.</p>
+                style={{ width: '100%', padding: '7px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '14px', boxSizing: 'border-box', background: '#0f1629' }} />
+              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', margin: '4px 0 0' }}>Subtracted from all readings automatically.</p>
             </div>
 
             {/* Standards table */}
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-              <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', margin: '0 0 10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>BSA standards</p>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', margin: '0 0 10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>BSA standards</p>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
                 <thead>
-                  <tr style={{ background: '#f3f4f6' }}>
-                    <th style={{ padding: '5px 8px', textAlign: 'left', color: '#6b7280', fontWeight: '600' }}>Conc (mg/mL)</th>
-                    <th style={{ padding: '5px 8px', textAlign: 'right', color: '#6b7280', fontWeight: '600' }}>Absorbance</th>
+                  <tr style={{ background: 'rgba(255,255,255,0.06)' }}>
+                    <th style={{ padding: '5px 8px', textAlign: 'left', color: 'rgba(240,244,255,0.45)', fontWeight: '600' }}>Conc (mg/mL)</th>
+                    <th style={{ padding: '5px 8px', textAlign: 'right', color: 'rgba(240,244,255,0.45)', fontWeight: '600' }}>Absorbance</th>
                   </tr>
                 </thead>
                 <tbody>
                   {standards.map((s, i) => (
-                    <tr key={i} style={{ borderBottom: '1px solid #f3f4f6' }}>
-                      <td style={{ padding: '4px 8px', fontFamily: 'monospace', color: '#374151' }}>
+                    <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                      <td style={{ padding: '4px 8px', fontFamily: 'monospace', color: 'rgba(240,244,255,0.75)' }}>
                         {s.conc === 0 ? 'Blank (0)' : s.conc}
                       </td>
                       <td style={{ padding: '4px 8px' }}>
                         <input type="number" step="0.001" value={s.abs} placeholder="—"
                           onChange={e => setStandards(prev => prev.map((row, j) => j === i ? { ...row, abs: e.target.value } : row))}
-                          style={{ width: '100%', padding: '3px 6px', borderRadius: '5px', border: '1px solid #e5e7eb', fontSize: '12px', textAlign: 'right', background: parseFloat(s.abs) > 0 ? '#f0fdf4' : 'white' }} />
+                          style={{ width: '100%', padding: '3px 6px', borderRadius: '5px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', textAlign: 'right', background: parseFloat(s.abs) > 0 ? 'rgba(22,163,74,0.15)' : 'rgba(255,255,255,0.05)', color: '#f0f4ff' }} />
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
               <button onClick={() => setStandards(prev => [...prev, { conc: '', abs: '' }])}
-                style={{ marginTop: '8px', width: '100%', padding: '6px', borderRadius: '7px', border: '1px dashed #d1d5db', background: 'transparent', fontSize: '12px', color: '#6b7280', cursor: 'pointer' }}>
+                style={{ marginTop: '8px', width: '100%', padding: '6px', borderRadius: '7px', border: '1px dashed rgba(255,255,255,0.15)', background: 'transparent', fontSize: '12px', color: 'rgba(240,244,255,0.45)', cursor: 'pointer' }}>
                 + Add row
               </button>
             </div>
@@ -408,28 +473,34 @@ export default function ProteinToolsPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
 
             {/* Standard curve plot */}
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '12px 14px' }}>
-              <p style={{ fontSize: '12px', fontWeight: '600', color: '#111827', margin: '0 0 8px' }}>Standard curve</p>
-              <AssayCanvas standards={adjustedStandards} fit={fit} unknowns={unknownResults} />
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '12px 14px' }}>
+              <p style={{ fontSize: '12px', fontWeight: '600', color: '#f0f4ff', margin: '0 0 8px' }}>Standard curve</p>
+              <AssayCanvas ref={canvasRef} standards={adjustedStandards} fit={fit} unknowns={unknownResults} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
               {fit && (
-                <p style={{ fontSize: '11px', color: '#6b7280', margin: '6px 0 0' }}>
+                <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', margin: '0' }}>
                   A = {fit.m.toFixed(4)} × [conc] + {fit.b.toFixed(4)} · R² = {fit.r2.toFixed(4)}
-                  {fit.r2 < 0.99 && <span style={{ color: '#f97316', marginLeft: '8px' }}>⚠ R² below 0.99 — check pipetting or standard preparation</span>}
+                  {fit.r2 < 0.99 && <span style={{ color: '#f97316', marginLeft: '8px' }}>⚠ R² below 0.99</span>}
                 </p>
               )}
+              {fit && <button onClick={exportCurvePNG}
+                style={{ fontSize: '12px', padding: '4px 10px', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'rgba(240,244,255,0.55)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                ↓ Export PNG
+              </button>}
+            </div>
             </div>
 
             {/* Unknown samples */}
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-              <p style={{ fontSize: '12px', fontWeight: '600', color: '#111827', margin: '0 0 10px' }}>Unknown samples</p>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+              <p style={{ fontSize: '12px', fontWeight: '600', color: '#f0f4ff', margin: '0 0 10px' }}>Unknown samples</p>
 
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', marginBottom: '8px' }}>
                 <thead>
-                  <tr style={{ background: '#f3f4f6' }}>
-                    <th style={{ padding: '5px 8px', textAlign: 'left', color: '#6b7280', fontWeight: '600' }}>Sample</th>
-                    <th style={{ padding: '5px 8px', textAlign: 'right', color: '#6b7280', fontWeight: '600' }}>Absorbance</th>
-                    <th style={{ padding: '5px 8px', textAlign: 'right', color: '#6b7280', fontWeight: '600' }}>Dilution ×</th>
-                    <th style={{ padding: '5px 8px', textAlign: 'right', color: '#6b7280', fontWeight: '600' }}>Result</th>
+                  <tr style={{ background: 'rgba(255,255,255,0.06)' }}>
+                    <th style={{ padding: '5px 8px', textAlign: 'left', color: 'rgba(240,244,255,0.45)', fontWeight: '600', width: '35%' }}>Sample</th>
+                    <th style={{ padding: '5px 8px', textAlign: 'right', color: 'rgba(240,244,255,0.45)', fontWeight: '600', width: '22%' }}>Absorbance</th>
+                    <th style={{ padding: '5px 8px', textAlign: 'right', color: 'rgba(240,244,255,0.45)', fontWeight: '600', width: '18%' }}>Dilution ×</th>
+                    <th style={{ padding: '5px 8px', textAlign: 'right', color: 'rgba(240,244,255,0.45)', fontWeight: '600', width: '25%' }}>Result</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -437,25 +508,28 @@ export default function ProteinToolsPage() {
                     const res = unknownResults[i]
                     const colors = ['#ef4444', '#f97316', '#8b5cf6', '#16a34a', '#0891b2']
                     return (
-                      <tr key={i} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                      <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                         <td style={{ padding: '4px 8px' }}>
                           <input value={u.label} onChange={e => setUnknowns(prev => prev.map((r, j) => j === i ? { ...r, label: e.target.value } : r))}
-                            style={{ width: '90px', padding: '3px 6px', borderRadius: '5px', border: '1px solid #e5e7eb', fontSize: '12px', background: 'white' }} />
+                            style={{ width: '100%', padding: '3px 6px', borderRadius: '5px', border: '1px solid rgba(255,255,255,0.07)', fontSize: '12px', background: '#0f1629', color: '#f0f4ff', boxSizing: 'border-box' }} />
                         </td>
                         <td style={{ padding: '4px 8px' }}>
                           <input type="number" step="0.001" value={u.abs} placeholder="—"
                             onChange={e => setUnknowns(prev => prev.map((r, j) => j === i ? { ...r, abs: e.target.value } : r))}
-                            style={{ width: '70px', padding: '3px 6px', borderRadius: '5px', border: '1px solid #e5e7eb', fontSize: '12px', textAlign: 'right', background: parseFloat(u.abs) > 0 ? '#eff6ff' : 'white' }} />
+                            style={{ width: '100%', padding: '3px 6px', borderRadius: '5px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', textAlign: 'right', background: parseFloat(u.abs) > 0 ? 'rgba(42,111,219,0.15)' : 'rgba(255,255,255,0.05)', color: '#f0f4ff', boxSizing: 'border-box' }} />
                         </td>
                         <td style={{ padding: '4px 8px' }}>
                           <input type="number" step="1" min="1" value={u.dilution}
                             onChange={e => setUnknowns(prev => prev.map((r, j) => j === i ? { ...r, dilution: e.target.value } : r))}
-                            style={{ width: '55px', padding: '3px 6px', borderRadius: '5px', border: '1px solid #e5e7eb', fontSize: '12px', textAlign: 'right', background: 'white' }} />
+                            style={{ width: '100%', padding: '3px 6px', borderRadius: '5px', border: '1px solid rgba(255,255,255,0.07)', fontSize: '12px', textAlign: 'right', background: '#0f1629', color: '#f0f4ff', boxSizing: 'border-box' }} />
                         </td>
                         <td style={{ padding: '4px 8px', textAlign: 'right' }}>
                           {res.estConc !== null && res.estConc > 0
-                            ? <span style={{ fontSize: '13px', fontWeight: '700', color: colors[i % colors.length] }}>{res.estConc.toFixed(3)} mg/mL</span>
-                            : <span style={{ color: '#9ca3af' }}>—</span>}
+                            ? <span style={{ fontSize: '13px', fontWeight: '700', color: colors[i % colors.length] }}>
+                                {res.estConc.toFixed(3)} mg/mL
+                                {!res.inRange && <span title="Outside standard range — dilute sample and re-measure" style={{ fontSize: '10px', color: '#f97316', marginLeft: '4px', cursor: 'help' }}>⚠ extrapolated</span>}
+                              </span>
+                            : <span style={{ color: 'rgba(240,244,255,0.3)' }}>—</span>}
                         </td>
                       </tr>
                     )
@@ -464,60 +538,60 @@ export default function ProteinToolsPage() {
               </table>
 
               <button onClick={() => setUnknowns(prev => [...prev, { label: `Sample ${prev.length + 1}`, abs: '', dilution: 1 }])}
-                style={{ width: '100%', padding: '6px', borderRadius: '7px', border: '1px dashed #d1d5db', background: 'transparent', fontSize: '12px', color: '#6b7280', cursor: 'pointer' }}>
+                style={{ width: '100%', padding: '6px', borderRadius: '7px', border: '1px dashed rgba(255,255,255,0.15)', background: 'transparent', fontSize: '12px', color: 'rgba(240,244,255,0.45)', cursor: 'pointer' }}>
                 + Add sample
               </button>
             </div>
 
             {/* Results summary */}
             {unknownResults.some(r => r.estConc !== null && r.estConc > 0) && (
-              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '14px 16px' }}>
-                <p style={{ fontSize: '12px', fontWeight: '600', color: '#15803d', margin: '0 0 10px' }}>Results summary</p>
+              <div style={{ background: 'rgba(22,163,74,0.12)', border: '1px solid rgba(22,163,74,0.35)', borderRadius: '12px', padding: '14px 16px' }}>
+                <p style={{ fontSize: '12px', fontWeight: '600', color: '#86efac', margin: '0 0 10px' }}>Results summary</p>
                 {unknownResults.filter(r => r.estConc !== null && r.estConc > 0).map((r, i) => (
                   <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '5px' }}>
-                    <span style={{ fontSize: '13px', color: '#374151' }}>{r.label}</span>
+                    <span style={{ fontSize: '13px', color: 'rgba(240,244,255,0.75)' }}>{r.label}</span>
                     <div style={{ textAlign: 'right' }}>
-                      <span style={{ fontSize: '16px', fontWeight: '700', color: '#15803d' }}>{r.estConc.toFixed(3)}</span>
-                      <span style={{ fontSize: '12px', color: '#6b7280', marginLeft: '4px' }}>mg/mL</span>
+                      <span style={{ fontSize: '16px', fontWeight: '700', color: '#86efac' }}>{r.estConc.toFixed(3)}</span>
+                      <span style={{ fontSize: '12px', color: 'rgba(240,244,255,0.45)', marginLeft: '4px' }}>mg/mL</span>
+                      {!r.inRange && <div style={{ fontSize: '10px', color: '#f97316' }}>⚠ outside standard range — dilute and re-measure</div>}
                       {parseFloat(r.dilution) > 1 && (
-                        <div style={{ fontSize: '11px', color: '#6b7280' }}>(× {r.dilution} dilution applied)</div>
+                        <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)' }}>(× {r.dilution} dilution applied)</div>
                       )}
                     </div>
                   </div>
                 ))}
-                <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #bbf7d0', fontSize: '11px', color: '#6b7280' }}>
+                <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px solid #bbf7d0', fontSize: '11px', color: 'rgba(240,244,255,0.45)' }}>
                   Equation: A = {fit?.m.toFixed(4)} × [protein] + {fit?.b.toFixed(4)} · R² = {fit?.r2.toFixed(4)}
                 </div>
               </div>
             )}
 
             {/* Notes */}
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '10px 14px', fontSize: '11px', color: '#6b7280', lineHeight: '1.7' }}>
-              <strong style={{ color: '#374151' }}>Tips:</strong> Absorbances should be measured within the linear range of your curve (ideally 0.1–0.9). Values above this range are unreliable — dilute and re-measure. If your R² is below 0.99, the most common cause is inaccurate pipetting of the lowest standards; remake the 0.125 and 0.25 mg/mL dilutions.
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 14px', fontSize: '11px', color: 'rgba(240,244,255,0.45)', lineHeight: '1.7' }}>
+              <strong style={{ color: 'rgba(240,244,255,0.75)' }}>Tips:</strong>{' '}
+              Absorbances should be measured within the linear range of your curve (ideally 0.1–0.9). Values above this range are unreliable — dilute and re-measure. If your R² is below 0.99, the most common cause is inaccurate pipetting of the lowest standards; remake the 0.125 and 0.25 mg/mL dilutions.
             </div>
           </div>
         </div>
-      )}
-
-      {/* ── TAB 2: pI & extinction coefficient ── */}
+      )}{/* end assay tab */}
       {tab === 'sequence' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', alignItems: 'start' }}>
 
           {/* Left: sequence input + composition */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-              <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Protein sequence (single-letter)</p>
+            <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+              <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Protein sequence (single-letter)</p>
               <textarea value={sequence} onChange={e => setSequence(e.target.value)} rows={6}
                 placeholder="Paste or type amino acid sequence..."
-                style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '12px', fontFamily: 'monospace', boxSizing: 'border-box', background: 'white', resize: 'vertical', lineHeight: '1.6' }} />
-              <div style={{ display: 'flex', gap: '10px', marginTop: '6px', fontSize: '11px', color: '#6b7280' }}>
+                style={{ width: '100%', padding: '8px 10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', fontFamily: 'monospace', boxSizing: 'border-box', background: '#0f1629', resize: 'vertical', lineHeight: '1.6' }} />
+              <div style={{ display: 'flex', gap: '10px', marginTop: '6px', fontSize: '11px', color: 'rgba(240,244,255,0.45)' }}>
                 <span>{cleanSeq.length} residues</span>
                 {seqMW && <span>MW: {(seqMW / 1000).toFixed(2)} kDa</span>}
               </div>
 
               {/* Quick-load examples */}
               <div style={{ marginTop: '8px' }}>
-                <p style={{ fontSize: '10px', color: '#9ca3af', margin: '0 0 5px' }}>Quick load:</p>
+                <p style={{ fontSize: '10px', color: 'rgba(240,244,255,0.3)', margin: '0 0 5px' }}>Quick load:</p>
                 <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                   {[
                     { name: 'Haemoglobin α', seq: 'MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSALSDLHAHKLRVDPVNFKLLSHCLLVTLAAHLPAEFTPAVHASLDKFLASVSTVLTSKYR' },
@@ -525,7 +599,7 @@ export default function ProteinToolsPage() {
                     { name: 'GFP', seq: 'MSKGEELFTGVVPILVELDGDVNGHKFSVSGEGEGDATYGKLTLKFICTTGKLPVPWPTLVTTLTYGVQCFSRYPDHMKQHDFFKSAMPEGYVQERTIFFKDDGNYKTRAEVKFEGDTLVNRIELKGIDFKEDGNILGHKLEYNYNSHNVYIMADKQKNGIKVNFKIRHNIEDGSVQLADHYQQNTPIGDGPVLLPDNHYLSTQSALSKDPNEKRDHMVLLEFVTAAGITLGMDELYK' },
                   ].map(ex => (
                     <button key={ex.name} onClick={() => setSequence(ex.seq)}
-                      style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '5px', border: '1px solid #e5e7eb', background: 'white', cursor: 'pointer', color: '#374151' }}>
+                      style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '5px', border: '1px solid rgba(255,255,255,0.07)', background: '#0f1629', cursor: 'pointer', color: 'rgba(240,244,255,0.75)' }}>
                       {ex.name}
                     </button>
                   ))}
@@ -535,16 +609,16 @@ export default function ProteinToolsPage() {
 
             {/* Amino acid composition */}
             {cleanSeq.length > 0 && (
-              <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '14px 16px' }}>
-                <p style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600', margin: '0 0 10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Amino acid composition</p>
+              <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '14px 16px' }}>
+                <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', fontWeight: '600', margin: '0 0 10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Amino acid composition</p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px' }}>
                   {Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([aa, n]) => (
-                    <div key={aa} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '4px 6px', background: 'white', borderRadius: '5px', border: '1px solid #f3f4f6' }}>
-                      <span style={{ fontSize: '12px', fontWeight: '700', color: '#111827', fontFamily: 'monospace', minWidth: '14px' }}>{aa}</span>
-                      <div style={{ flex: 1, height: '4px', background: '#e5e7eb', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div key={aa} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '4px 6px', background: '#0f1629', borderRadius: '5px', border: '1px solid rgba(255,255,255,0.04)' }}>
+                      <span style={{ fontSize: '12px', fontWeight: '700', color: '#f0f4ff', fontFamily: 'monospace', minWidth: '14px' }}>{aa}</span>
+                      <div style={{ flex: 1, height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
                         <div style={{ width: `${(n / Math.max(...Object.values(counts))) * 100}%`, height: '100%', background: '#2563eb', borderRadius: '2px' }} />
                       </div>
-                      <span style={{ fontSize: '11px', color: '#6b7280', minWidth: '16px', textAlign: 'right' }}>{n}</span>
+                      <span style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', minWidth: '16px', textAlign: 'right' }}>{n}</span>
                     </div>
                   ))}
                 </div>
@@ -564,30 +638,30 @@ export default function ProteinToolsPage() {
                     { label: 'ε₂₈₀ (reduced, no SS)', value: seqE280 ? seqE280.reduced.toLocaleString() : '—', sub: 'M⁻¹cm⁻¹' },
                     { label: 'ε₂₈₀ (oxidised, SS bonds)', value: seqE280 ? seqE280.oxidised.toLocaleString() : '—', sub: 'M⁻¹cm⁻¹' },
                   ].map(m => (
-                    <div key={m.label} style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '10px 12px' }}>
-                      <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '3px' }}>{m.label}</div>
-                      <div style={{ fontSize: '20px', fontWeight: '700', color: '#111827' }}>{m.value}</div>
-                      <div style={{ fontSize: '11px', color: '#9ca3af' }}>{m.sub}</div>
+                    <div key={m.label} style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '10px', padding: '10px 12px' }}>
+                      <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)', marginBottom: '3px' }}>{m.label}</div>
+                      <div style={{ fontSize: '20px', fontWeight: '700', color: '#f0f4ff' }}>{m.value}</div>
+                      <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)' }}>{m.sub}</div>
                     </div>
                   ))}
                 </div>
 
                 {/* ε280 breakdown */}
                 {seqE280 && (
-                  <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '12px 14px' }}>
-                    <p style={{ fontSize: '11px', fontWeight: '600', color: '#9ca3af', margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Extinction coefficient breakdown</p>
-                    <p style={{ fontSize: '12px', color: '#374151', margin: '0 0 8px', lineHeight: '1.6' }}>
+                  <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '12px 14px' }}>
+                    <p style={{ fontSize: '11px', fontWeight: '600', color: 'rgba(240,244,255,0.3)', margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Extinction coefficient breakdown</p>
+                    <p style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', margin: '0 0 8px', lineHeight: '1.6' }}>
                       Calculated by the Pace method: ε = 5500W + 1490Y + 125(C/2 as disulfide pairs)
                     </p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       {[
                         { label: `Trp (W) × ${seqE280.W}`, value: `${seqE280.W} × 5500 = ${(seqE280.W * 5500).toLocaleString()}`, color: '#7c3aed' },
-                        { label: `Tyr (Y) × ${seqE280.Y}`, value: `${seqE280.Y} × 1490 = ${(seqE280.Y * 1490).toLocaleString()}`, color: '#2563eb' },
+                        { label: `Tyr (Y) × ${seqE280.Y}`, value: `${seqE280.Y} × 1490 = ${(seqE280.Y * 1490).toLocaleString()}`, color: '#2a6fdb' },
                         { label: `Cys pairs × ${Math.floor(seqE280.C / 2)}`, value: `${Math.floor(seqE280.C / 2)} × 125 = ${(Math.floor(seqE280.C / 2) * 125).toLocaleString()}`, color: '#16a34a' },
                       ].map(row => (
-                        <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 8px', background: 'white', borderRadius: '6px', border: '1px solid #f3f4f6', fontSize: '12px' }}>
+                        <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 8px', background: '#0f1629', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.04)', fontSize: '12px' }}>
                           <span style={{ color: row.color, fontWeight: '500' }}>{row.label}</span>
-                          <span style={{ color: '#374151', fontFamily: 'monospace' }}>{row.value}</span>
+                          <span style={{ color: 'rgba(240,244,255,0.75)', fontFamily: 'monospace' }}>{row.value}</span>
                         </div>
                       ))}
                     </div>
@@ -599,9 +673,9 @@ export default function ProteinToolsPage() {
 
                 {/* pI context */}
                 {seqPI !== null && (
-                  <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '12px 14px' }}>
-                    <p style={{ fontSize: '11px', fontWeight: '600', color: '#9ca3af', margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>pI interpretation</p>
-                    <p style={{ fontSize: '12px', color: '#374151', lineHeight: '1.65', margin: 0 }}>
+                  <div style={{ background: '#0f1629', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '12px', padding: '12px 14px' }}>
+                    <p style={{ fontSize: '11px', fontWeight: '600', color: 'rgba(240,244,255,0.3)', margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>pI interpretation</p>
+                    <p style={{ fontSize: '12px', color: 'rgba(240,244,255,0.75)', lineHeight: '1.65', margin: 0 }}>
                       pI = {seqPI.toFixed(2)} — the protein carries <strong>zero net charge at this pH</strong>, minimum solubility, maximum aggregation tendency.
                       {' '}At physiological pH 7.4, this protein is <strong>{seqPI < 7.4 ? 'negatively charged (anionic)' : 'positively charged (cationic)'}</strong>.
                       {' '}For ion-exchange chromatography: use {seqPI < 7.4 ? 'anion exchange (AEX)' : 'cation exchange (CEX)'} to bind this protein at pH 7.4.
@@ -610,8 +684,8 @@ export default function ProteinToolsPage() {
                 )}
               </>
             ) : (
-              <div style={{ background: '#f9fafb', border: '1px dashed #d1d5db', borderRadius: '12px', padding: '3rem', textAlign: 'center', color: '#9ca3af' }}>
-                <p style={{ fontSize: '14px', margin: '0 0 4px', color: '#6b7280' }}>Enter a protein sequence</p>
+              <div style={{ background: '#0f1629', border: '1px dashed rgba(255,255,255,0.15)', borderRadius: '12px', padding: '3rem', textAlign: 'center', color: 'rgba(240,244,255,0.3)' }}>
+                <p style={{ fontSize: '14px', margin: '0 0 4px', color: 'rgba(240,244,255,0.45)' }}>Enter a protein sequence</p>
                 <p style={{ fontSize: '12px', margin: 0 }}>Or load one of the examples above</p>
               </div>
             )}
@@ -639,40 +713,40 @@ function BeerLambertCalc({ seqMW, seqE280 }) {
   const concMgMl = concMolar && seqMW ? concMolar * seqMW : null
 
   return (
-    <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '12px', padding: '12px 14px' }}>
+    <div style={{ background: 'rgba(42,111,219,0.18)', border: '1px solid rgba(42,111,219,0.35)', borderRadius: '12px', padding: '12px 14px' }}>
       <p style={{ fontSize: '11px', fontWeight: '600', color: '#1e40af', margin: '0 0 10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>A₂₈₀ → concentration</p>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
         <div>
-          <label style={{ fontSize: '11px', color: '#374151', display: 'block', marginBottom: '3px' }}>Absorbance at 280nm</label>
+          <label style={{ fontSize: '11px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '3px' }}>Absorbance at 280nm</label>
           <input type="number" step="0.001" value={a280} onChange={e => setA280(e.target.value)}
             placeholder="0.000"
-            style={{ width: '100%', padding: '6px 8px', borderRadius: '7px', border: '1px solid #bfdbfe', fontSize: '13px', boxSizing: 'border-box', background: 'white' }} />
+            style={{ width: '100%', padding: '6px 8px', borderRadius: '7px', border: '1px solid rgba(42,111,219,0.35)', fontSize: '13px', boxSizing: 'border-box', background: '#0f1629' }} />
         </div>
         <div>
-          <label style={{ fontSize: '11px', color: '#374151', display: 'block', marginBottom: '3px' }}>Path length (cm)</label>
+          <label style={{ fontSize: '11px', color: 'rgba(240,244,255,0.75)', display: 'block', marginBottom: '3px' }}>Path length (cm)</label>
           <input type="number" step="0.1" value={pathlength} onChange={e => setPathlength(e.target.value)}
-            style={{ width: '100%', padding: '6px 8px', borderRadius: '7px', border: '1px solid #bfdbfe', fontSize: '13px', boxSizing: 'border-box', background: 'white' }} />
+            style={{ width: '100%', padding: '6px 8px', borderRadius: '7px', border: '1px solid rgba(42,111,219,0.35)', fontSize: '13px', boxSizing: 'border-box', background: '#0f1629' }} />
         </div>
       </div>
-      <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#374151', marginBottom: '8px', cursor: 'pointer' }}>
+      <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'rgba(240,244,255,0.75)', marginBottom: '8px', cursor: 'pointer' }}>
         <input type="checkbox" checked={useSS} onChange={e => setUseSS(e.target.checked)} />
         Use oxidised ε (with disulfide bonds)
       </label>
       {concMgMl !== null && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-          <div style={{ background: 'white', borderRadius: '8px', padding: '8px 10px', border: '1px solid #bfdbfe' }}>
-            <div style={{ fontSize: '10px', color: '#6b7280' }}>Concentration</div>
-            <div style={{ fontSize: '18px', fontWeight: '700', color: '#1d4ed8' }}>{concMgMl.toFixed(3)}</div>
-            <div style={{ fontSize: '11px', color: '#6b7280' }}>mg/mL</div>
+          <div style={{ background: '#0f1629', borderRadius: '8px', padding: '8px 10px', border: '1px solid rgba(42,111,219,0.35)' }}>
+            <div style={{ fontSize: '10px', color: 'rgba(240,244,255,0.45)' }}>Concentration</div>
+            <div style={{ fontSize: '18px', fontWeight: '700', color: '#93b4f7' }}>{concMgMl.toFixed(3)}</div>
+            <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)' }}>mg/mL</div>
           </div>
-          <div style={{ background: 'white', borderRadius: '8px', padding: '8px 10px', border: '1px solid #bfdbfe' }}>
-            <div style={{ fontSize: '10px', color: '#6b7280' }}>Molar concentration</div>
-            <div style={{ fontSize: '18px', fontWeight: '700', color: '#1d4ed8' }}>{(concMolar * 1e6).toFixed(3)}</div>
-            <div style={{ fontSize: '11px', color: '#6b7280' }}>μM</div>
+          <div style={{ background: '#0f1629', borderRadius: '8px', padding: '8px 10px', border: '1px solid rgba(42,111,219,0.35)' }}>
+            <div style={{ fontSize: '10px', color: 'rgba(240,244,255,0.45)' }}>Molar concentration</div>
+            <div style={{ fontSize: '18px', fontWeight: '700', color: '#93b4f7' }}>{(concMolar * 1e6).toFixed(3)}</div>
+            <div style={{ fontSize: '11px', color: 'rgba(240,244,255,0.45)' }}>μM</div>
           </div>
         </div>
       )}
-      {!epsilon && <p style={{ fontSize: '11px', color: '#9ca3af', margin: 0 }}>Enter a sequence above to calculate ε₂₈₀.</p>}
+      {!epsilon && <p style={{ fontSize: '11px', color: 'rgba(240,244,255,0.3)', margin: 0 }}>Enter a sequence above to calculate ε₂₈₀.</p>}
     </div>
   )
 }
