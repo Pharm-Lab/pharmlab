@@ -105,6 +105,14 @@ const SOURCES = {
       { citation: 'U.S. Food and Drug Administration. (2017). Guidance for Industry: Waiver of In Vivo Bioavailability and Bioequivalence Studies for Immediate-Release Solid Oral Dosage Forms Based on a Biopharmaceutics Classification System.', note: 'BCS biowaiver criteria: ≥85% dissolution in 30 minutes.' },
     ]
   },
+  'Mass Spectrometry Tool': {
+    description: 'Spectral interpreter for ESI-MS and EI-MS: m/z calculator, adduct finder, neutral loss library, and fragmentation pattern trainer.',
+    sources: [
+      { citation: 'McLafferty, F.W., & Tureček, F. (1993). Interpretation of Mass Spectra (4th ed.). University Science Books.', note: 'EI fragmentation rules, McLafferty rearrangement, nitrogen rule, neutral loss patterns used in the fragmentation library.' },
+      { citation: 'Gross, J.H. (2017). Mass Spectrometry: A Textbook (3rd ed.). Springer.', note: 'ESI adduct formation ([M+H]+, [M+Na]+, [M+2H]2+), ionisation mechanisms, accurate mass calculation.' },
+      { citation: 'Kebarle, P., & Verkerk, U.H. (2009). Electrospray: from ions in solution to ions in the gas phase. Mass Spectrometry Reviews, 28(6).', note: 'ESI mechanism and adduct ion formation under different solvent/pH conditions.' },
+    ]
+  },
   'pKa & Ionisation': {
     description: 'Functional group pKa explorer with substituent effects and Henderson-Hasselbalch ionisation calculator.',
     sources: [
