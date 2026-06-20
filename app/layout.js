@@ -1,5 +1,6 @@
 import { ClerkProvider } from '@clerk/nextjs'
 import Navbar from './components/Navbar'
+import MobileRotatePrompt from './components/MobileRotatePrompt'
 import './globals.css'
 
 export const metadata = {
@@ -23,6 +24,7 @@ export default function RootLayout({ children }) {
           fontFamily: "'Inter', system-ui, sans-serif",
           minHeight: '100vh',
         }}>
+          <MobileRotatePrompt />
           <Navbar />
           {children}
         </body>
