@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { UserButton } from '@clerk/nextjs'
+import { UserButton, SignedIn, SignedOut, SignInButton } from '@clerk/nextjs'
 
 const LINKS = [
   { href: '/tools',          label: 'Tools' },
@@ -116,13 +116,31 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Right: user button */}
+        {/* Right: auth */}
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <UserButton afterSignOutUrl="/" appearance={{
-            elements: {
-              avatarBox: { width: 30, height: 30 },
-            }
-          }} />
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" appearance={{
+              elements: { avatarBox: { width: 30, height: 30 } }
+            }}>
+              <UserButton.MenuItems>
+                <UserButton.Link label="My Profile" labelIcon={<span>👤</span>} href="/user" />
+                <UserButton.Action label="manageAccount" />
+                <UserButton.Action label="signOut" />
+              </UserButton.MenuItems>
+            </UserButton>
+          </SignedIn>
+          <SignedOut>
+            <SignInButton mode="modal">
+              <button style={{
+                padding: '6px 16px', borderRadius: '8px',
+                border: '1px solid rgba(255,255,255,0.15)',
+                background: 'rgba(255,255,255,0.06)',
+                color: 'rgba(240,244,255,0.8)',
+                fontSize: '13px', fontWeight: '500', cursor: 'pointer',
+                fontFamily: "'Inter', system-ui, sans-serif",
+              }}>Sign in</button>
+            </SignInButton>
+          </SignedOut>
         </div>
 
         {/* Mobile menu button */}

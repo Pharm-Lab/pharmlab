@@ -1,6 +1,7 @@
 import { ClerkProvider } from '@clerk/nextjs'
 import Navbar from './components/Navbar'
 import MobileRotatePrompt from './components/MobileRotatePrompt'
+import WelcomePopup from './components/WelcomePopup'
 import './globals.css'
 
 export const metadata = {
@@ -25,6 +26,7 @@ export default function RootLayout({ children }) {
           minHeight: '100vh',
         }}>
           <MobileRotatePrompt />
+          <WelcomePopup />
           <Navbar />
           {children}
         </body>
