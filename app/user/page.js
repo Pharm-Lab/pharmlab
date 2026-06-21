@@ -55,13 +55,13 @@ function UsernameSetup({ clerkId, session, onDone }) {
     const db = createClerkSupabaseClient(session)
     const { error: err } = await db
       .from('user_profiles')
-      .insert({ clerk_id: clerkId, username: clean, xp: 0, streak: 0 })
+      .insert({ clerk_id: clerkId, username: clean, xp: 50, streak: 1, last_active: new Date().toISOString().split('T')[0] })
     if (err) {
       if (err.code === '23505') setError('Username already taken — try another')
       else setError('Something went wrong, try again')
       setLoading(false)
     } else {
-      onDone({ clerk_id: clerkId, username: clean, xp: 0, streak: 0 })
+      onDone({ clerk_id: clerkId, username: clean, xp: 50, streak: 1 })
     }
   }
 
@@ -227,7 +227,7 @@ export default function UserProfile() {
         {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '2rem' }}>
           <StatCard value={xp}    label="XP earned" />
-          <StatCard value={streak === 0 ? '—' : `${streak}d`} label="Study streak" />
+          <StatCard value={streak === 0 ? '—' : `${streak}d`} label="Study streak" sub={streak > 0 ? `${streak} day${streak !== 1 ? 's' : ''} in a row` : 'visit daily to build'} />
           <StatCard value="0"     label="Questions shared" sub="coming soon" />
           <StatCard value="0"     label="Quiz answers"     sub="coming soon" />
         </div>

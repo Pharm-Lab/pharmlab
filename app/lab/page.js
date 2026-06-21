@@ -1,5 +1,7 @@
 'use client'
 import { useEffect, useRef } from 'react'
+import { useUser, useSession } from '@clerk/nextjs'
+import { awardXp } from '../../lib/xp'
 import Link from 'next/link'
 
 const C = {
@@ -86,6 +88,17 @@ const TOOLS = [
 ]
 
 export default function LabPage() {
+  const { user } = useUser()
+  const { session } = useSession()
+  useEffect(() => {
+    if (!user) return
+    const key = 'pharmlab_visited_lab_landing'
+    if (!localStorage.getItem(key)) {
+      localStorage.setItem(key, '1')
+      awardXp(session, user.id, 25, 'lab_landing')
+    }
+  }, [user])
+
   return (
     <main style={{ fontFamily:"'Inter',system-ui,sans-serif", background:C.bg, minHeight:'100vh', color:C.text }}>
       <style>{`

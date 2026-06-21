@@ -1,5 +1,7 @@
 'use client'
 import { useEffect, useRef } from 'react'
+import { useUser, useSession } from '@clerk/nextjs'
+import { awardXp } from '../../lib/xp'
 import Link from 'next/link'
 
 const C = {
@@ -9,7 +11,6 @@ const C = {
   textDim: 'rgba(240,244,255,0.35)',
 }
 
-// Subtle multi-curve PK background — lighter than the hero
 function PKBackground() {
   const canvasRef = useRef(null)
   const frameRef  = useRef(null)
@@ -75,69 +76,33 @@ function PKBackground() {
 }
 
 const TOOLS = [
-  {
-    icon:'📈', tag:'PK/PD', title:'PK/PD Calculator',
-    desc:'Twelve models including 1- and 2-compartment, Michaelis-Menten, and population PK with RK4 integration.',
-    href:'/calculator', color:C.blue, grad:`linear-gradient(135deg,${C.blue}22,${C.purple}11)`,
-  },
-  {
-    icon:'💊', tag:'Dosing', title:'Dosage Adjustment',
-    desc:'Renal impairment via Cockcroft-Gault and hepatic impairment via Child-Pugh, with dose curve comparison.',
-    href:'/tools/dosage-adjustment', color:'#16a34a', grad:'linear-gradient(135deg,#16a34a22,#0891b211)',
-  },
-  {
-    icon:'🫀', tag:'ADME', title:'Interactive ADME',
-    desc:'Click organs on an anatomical diagram to explore absorption, first-pass, distribution, BBB, and renal excretion.',
-    href:'/tools/adme', color:'#f97316', grad:'linear-gradient(135deg,#f9731622,#dc262611)',
-  },
-  {
-    icon:'📉', tag:'NCA', title:'NCA Tool',
-    desc:'Non-compartmental analysis — trapezoidal AUC, λz regression, interactive terminal point selection.',
-    href:'/tools/nca', color:C.blue, grad:`linear-gradient(135deg,${C.blue}22,#0891b211)`,
-  },
-  {
-    icon:'⚖️', tag:'Bioequivalence', title:'Bioequivalence Analyser',
-    desc:'TOST procedure, 90% confidence interval plot, FDA and EMA acceptance criteria.',
-    href:'/tools/bioequivalence', color:C.purple, grad:`linear-gradient(135deg,${C.purple}22,#ec489911)`,
-  },
-  {
-    icon:'🧪', tag:'Analytics', title:'Analytical Technique Trainer',
-    desc:'Decision trainer, technique explorer, and quiz covering RP-HPLC, GC, IEX, SEC, CE, SPE, and LLE.',
-    href:'/tools/analytics', color:'#0891b2', grad:'linear-gradient(135deg,#0891b222,#16a34a11)',
-  },
-  {
-    icon:'⚗️', tag:'Physical chemistry', title:'pKa & Ionisation',
-    desc:'pKa explorer for eight functional groups with Henderson-Hasselbalch ionisation curve and key pH table.',
-    href:'/tools/pka', color:'#f97316', grad:'linear-gradient(135deg,#f9731622,#eab30811)',
-  },
-  {
-    icon:'💧', tag:'Formulation', title:'Dissolution & Drug Release',
-    desc:'Noyes-Whitney simulator, release profile modelling, and BCS classification with formulation strategy.',
-    href:'/tools/dissolution', color:'#16a34a', grad:'linear-gradient(135deg,#16a34a22,#0891b211)',
-  },
-  {
-    icon:'🔬', tag:'Drug design', title:'Lipinski & Drug-likeness',
-    desc:'Rule of Five calculator with per-rule explanations and marketed drug examples.',
-    href:'/tools/lipinski', color:C.blue, grad:`linear-gradient(135deg,${C.blue}22,#16a34a11)`,
-  },
-  {
-    icon:'🔭', tag:'Analytical', title:'Mass Spectrometry Interpreter',
-    desc:'Neutral loss identification, isotope patterns, fragmentation rules, and six curated drug practice spectra.',
-    href:'/tools/mass-spec', color:'#0891b2', grad:'linear-gradient(135deg,#0891b222,#6366f111)',
-  },
-  {
-    icon:'✏️', tag:'AI-assisted', title:'Exercise Helper',
-    desc:'Step-by-step solutions to PK/PD problems with exam tips and follow-up questions.',
-    href:'/exercises', color:C.purple, grad:`linear-gradient(135deg,${C.purple}22,${C.blue}11)`,
-  },
-  {
-    icon:'⚗️', tag:'AI-assisted', title:'Drug Interaction Checker',
-    desc:'Mechanism-level interaction analysis — enzyme pathway, severity, and clinical management.',
-    href:'/interactions', color:'#dc2626', grad:'linear-gradient(135deg,#dc262622,#f9731611)',
-  },
+  { icon:'📈', tag:'PK/PD', title:'PK/PD Calculator', desc:'Twelve models including 1- and 2-compartment, Michaelis-Menten, and population PK with RK4 integration.', href:'/calculator', color:C.blue, grad:`linear-gradient(135deg,${C.blue}22,${C.purple}11)` },
+  { icon:'💊', tag:'Dosing', title:'Dosage Adjustment', desc:'Renal impairment via Cockcroft-Gault and hepatic impairment via Child-Pugh, with dose curve comparison.', href:'/tools/dosage-adjustment', color:'#16a34a', grad:'linear-gradient(135deg,#16a34a22,#0891b211)' },
+  { icon:'🫀', tag:'ADME', title:'Interactive ADME', desc:'Click organs on an anatomical diagram to explore absorption, first-pass, distribution, BBB, and renal excretion.', href:'/tools/adme', color:'#f97316', grad:'linear-gradient(135deg,#f9731622,#dc262611)' },
+  { icon:'📉', tag:'NCA', title:'NCA Tool', desc:'Non-compartmental analysis — trapezoidal AUC, λz regression, interactive terminal point selection.', href:'/tools/nca', color:C.blue, grad:`linear-gradient(135deg,${C.blue}22,#0891b211)` },
+  { icon:'⚖️', tag:'Bioequivalence', title:'Bioequivalence Analyser', desc:'TOST procedure, 90% confidence interval plot, FDA and EMA acceptance criteria.', href:'/tools/bioequivalence', color:C.purple, grad:`linear-gradient(135deg,${C.purple}22,#ec489911)` },
+  { icon:'🧪', tag:'Analytics', title:'Analytical Technique Trainer', desc:'Decision trainer, technique explorer, and quiz covering RP-HPLC, GC, IEX, SEC, CE, SPE, and LLE.', href:'/tools/analytics', color:'#0891b2', grad:'linear-gradient(135deg,#0891b222,#16a34a11)' },
+  { icon:'⚗️', tag:'Physical chemistry', title:'pKa & Ionisation', desc:'pKa explorer for eight functional groups with Henderson-Hasselbalch ionisation curve and key pH table.', href:'/tools/pka', color:'#f97316', grad:'linear-gradient(135deg,#f9731622,#eab30811)' },
+  { icon:'💧', tag:'Formulation', title:'Dissolution & Drug Release', desc:'Noyes-Whitney simulator, release profile modelling, and BCS classification with formulation strategy.', href:'/tools/dissolution', color:'#16a34a', grad:'linear-gradient(135deg,#16a34a22,#0891b211)' },
+  { icon:'🔬', tag:'Drug design', title:'Lipinski & Drug-likeness', desc:'Rule of Five calculator with per-rule explanations and marketed drug examples.', href:'/tools/lipinski', color:C.blue, grad:`linear-gradient(135deg,${C.blue}22,#16a34a11)` },
+  { icon:'🔭', tag:'Analytical', title:'Mass Spectrometry Interpreter', desc:'Neutral loss identification, isotope patterns, fragmentation rules, and six curated drug practice spectra.', href:'/tools/mass-spec', color:'#0891b2', grad:'linear-gradient(135deg,#0891b222,#6366f111)' },
+  { icon:'✏️', tag:'AI-assisted', title:'Exercise Helper', desc:'Step-by-step solutions to PK/PD problems with exam tips and follow-up questions.', href:'/exercises', color:C.purple, grad:`linear-gradient(135deg,${C.purple}22,${C.blue}11)` },
+  { icon:'⚗️', tag:'AI-assisted', title:'Drug Interaction Checker', desc:'Mechanism-level interaction analysis — enzyme pathway, severity, and clinical management.', href:'/interactions', color:'#dc2626', grad:'linear-gradient(135deg,#dc262622,#f9731611)' },
 ]
 
 export default function ToolsPage() {
+  const { user } = useUser()
+  const { session } = useSession()
+
+  useEffect(() => {
+    if (!user) return
+    const key = 'pharmlab_visited_tools_landing'
+    if (!localStorage.getItem(key)) {
+      localStorage.setItem(key, '1')
+      awardXp(session, user.id, 25, 'tools_landing')
+    }
+  }, [user])
+
   return (
     <main style={{ fontFamily:"'Inter',system-ui,sans-serif", background:C.bg, minHeight:'100vh', color:C.text }}>
       <style>{`
@@ -147,7 +112,6 @@ export default function ToolsPage() {
         .tool-card:hover { border-color: rgba(255,255,255,0.16) !important; transform: translateY(-2px); }
       `}</style>
 
-      {/* Header bar with animated bg */}
       <div style={{ position:'relative', overflow:'hidden', borderBottom:`1px solid ${C.border}`, height:'120px' }}>
         <PKBackground />
         <div style={{ position:'absolute', inset:0, background:`linear-gradient(to right, ${C.bg}cc, transparent 40%, transparent 60%, ${C.bg}cc)`, pointerEvents:'none' }} />
@@ -162,7 +126,6 @@ export default function ToolsPage() {
         </div>
       </div>
 
-      {/* Tool grid */}
       <div style={{ maxWidth:'1000px', margin:'0 auto', padding:'2.5rem 2rem' }}>
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(280px,1fr))', gap:'12px' }}>
           {TOOLS.map(t => (
@@ -178,7 +141,6 @@ export default function ToolsPage() {
             </Link>
           ))}
         </div>
-
         <div style={{ marginTop:'2rem', paddingTop:'1.5rem', borderTop:`1px solid ${C.border}` }}>
           <Link href="/formulas" style={{ fontSize:'13px', color:C.textDim, textDecoration:'none' }}>
             Formula Reference — searchable equation database →
