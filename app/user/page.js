@@ -2,7 +2,7 @@
 import { useUser, useSession } from '@clerk/nextjs'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { createClerkSupabaseClient } from '../../lib/supabase'
+import { createClerkSupabaseClient, supabase } from '../../lib/supabase'
 
 const C = {
   bg: '#0a0f1e', card: '#0f1629', border: 'rgba(255,255,255,0.07)',
@@ -124,6 +124,11 @@ export default function UserProfile() {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [needsUsername, setNeedsUsername] = useState(false)
+  const [followerCount, setFollowerCount] = useState(0)
+  const [followingCount, setFollowingCount] = useState(0)
+  const [followerList, setFollowerList] = useState([])
+  const [followingList, setFollowingList] = useState([])
+  const [modal, setModal] = useState(null) // 'followers' | 'following' | null
 
   useEffect(() => {
     if (!isLoaded || !user) return
@@ -138,10 +143,52 @@ export default function UserProfile() {
         setNeedsUsername(true)
       } else {
         setProfile(data)
-        await db
-          .from('user_profiles')
-          .update({ last_active: new Date().toISOString().split('T')[0], avatar_url: user.imageUrl || null })
-          .eq('clerk_id', user.id)
+        // Streak + avatar sync handled below
+        const today = new Date().toISOString().split('T')[0]
+        const lastActive = data.last_active
+        let newStreak = data.streak || 0
+        let newXp = data.xp || 0
+
+        if (lastActive !== today) {
+          const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
+          if (lastActive === yesterday) {
+            newStreak += 1
+            if (newStreak === 3)  newXp += 25
+            if (newStreak === 7)  newXp += 75
+            if (newStreak === 14) newXp += 150
+            if (newStreak === 30) newXp += 500
+          } else {
+            newStreak = 1
+          }
+          await db.from('user_profiles').update({
+            last_active: today, streak: newStreak, xp: newXp,
+            avatar_url: user.imageUrl || data.avatar_url,
+          }).eq('clerk_id', user.id)
+          setProfile({ ...data, streak: newStreak, xp: newXp, avatar_url: user.imageUrl || data.avatar_url })
+        } else {
+          if (user.imageUrl && user.imageUrl !== data.avatar_url) {
+            await db.from('user_profiles').update({ avatar_url: user.imageUrl }).eq('clerk_id', user.id)
+          }
+          setProfile({ ...data, avatar_url: user.imageUrl || data.avatar_url })
+        }
+
+        // Load follower/following counts + lists
+        const { count: fc } = await supabase.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', user.id)
+        const { count: fg } = await supabase.from('follows').select('*', { count: 'exact', head: true }).eq('follower_id', user.id)
+        setFollowerCount(fc || 0)
+        setFollowingCount(fg || 0)
+
+        // Load follower usernames
+        const { data: followerRows } = await supabase.from('follows').select('follower_id').eq('following_id', user.id)
+        const { data: followingRows } = await supabase.from('follows').select('following_id').eq('follower_id', user.id)
+        if (followerRows?.length) {
+          const { data: fProfiles } = await supabase.from('user_profiles').select('username, avatar_url, xp').in('clerk_id', followerRows.map(r => r.follower_id))
+          setFollowerList(fProfiles || [])
+        }
+        if (followingRows?.length) {
+          const { data: gProfiles } = await supabase.from('user_profiles').select('username, avatar_url, xp').in('clerk_id', followingRows.map(r => r.following_id))
+          setFollowingList(gProfiles || [])
+        }
       }
       setLoading(false)
     }
@@ -211,18 +258,56 @@ export default function UserProfile() {
 
         {/* Social stats */}
         <div style={{ display: 'flex', gap: '20px', marginBottom: '1.5rem', alignItems: 'center' }}>
-          <Link href="/search" style={{ display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}>
-            <span style={{ fontSize: '15px', fontWeight: '800', color: C.text, fontFamily: 'ui-monospace, monospace' }}>—</span>
+          <button onClick={() => setModal('followers')}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+            <span style={{ fontSize: '15px', fontWeight: '800', color: C.text, fontFamily: 'ui-monospace, monospace' }}>{followerCount}</span>
             <span style={{ fontSize: '12px', color: C.textDim }}>followers</span>
-          </Link>
-          <Link href="/search" style={{ display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}>
-            <span style={{ fontSize: '15px', fontWeight: '800', color: C.text, fontFamily: 'ui-monospace, monospace' }}>—</span>
+          </button>
+          <button onClick={() => setModal('following')}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+            <span style={{ fontSize: '15px', fontWeight: '800', color: C.text, fontFamily: 'ui-monospace, monospace' }}>{followingCount}</span>
             <span style={{ fontSize: '12px', color: C.textDim }}>following</span>
-          </Link>
+          </button>
           <Link href="/search" style={{ marginLeft: 'auto', fontSize: '13px', color: C.blueLight, textDecoration: 'none', background: `${C.blue}18`, border: `1px solid ${C.blue}33`, borderRadius: '8px', padding: '5px 12px' }}>
             Find people →
           </Link>
         </div>
+
+        {/* Followers / Following modal */}
+        {modal && (
+          <>
+            <div onClick={() => setModal(null)} style={{ position: 'fixed', inset: 0, zIndex: 998, background: 'rgba(10,15,30,0.7)', backdropFilter: 'blur(4px)' }} />
+            <div style={{ position: 'fixed', zIndex: 999, top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 'min(360px, calc(100vw - 2rem))', background: C.card, border: `1px solid ${C.border}`, borderRadius: '16px', overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.5)', fontFamily: "'Inter',system-ui,sans-serif" }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 18px', borderBottom: `1px solid ${C.border}` }}>
+                <h3 style={{ fontSize: '15px', fontWeight: '700', color: C.text, margin: 0 }}>{modal === 'followers' ? 'Followers' : 'Following'}</h3>
+                <button onClick={() => setModal(null)} style={{ background: 'none', border: 'none', color: C.textDim, fontSize: '20px', cursor: 'pointer', lineHeight: 1, padding: '2px 6px' }}>×</button>
+              </div>
+              <div style={{ maxHeight: '400px', overflowY: 'auto', padding: '8px 0' }}>
+                {(modal === 'followers' ? followerList : followingList).length === 0 ? (
+                  <p style={{ textAlign: 'center', color: C.textDim, fontSize: '13px', padding: '2rem' }}>
+                    {modal === 'followers' ? 'No followers yet.' : 'Not following anyone yet.'}
+                  </p>
+                ) : (
+                  (modal === 'followers' ? followerList : followingList).map(u => (
+                    <Link key={u.username} href={`/u/${u.username}`} onClick={() => setModal(null)}
+                      style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 18px', textDecoration: 'none', transition: 'background 0.1s' }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                      {u.avatar_url
+                        ? <img src={u.avatar_url} alt={u.username} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                        : <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: `linear-gradient(135deg, ${C.blue}, ${C.purple})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px', fontWeight: '800', color: 'white', flexShrink: 0 }}>{u.username?.[0]?.toUpperCase()}</div>
+                      }
+                      <div>
+                        <div style={{ fontSize: '14px', fontWeight: '600', color: C.text }}>@{u.username}</div>
+                        <div style={{ fontSize: '12px', color: C.textDim }}>{u.xp || 0} XP</div>
+                      </div>
+                    </Link>
+                  ))
+                )}
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '2rem' }}>
