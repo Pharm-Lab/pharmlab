@@ -177,8 +177,10 @@ export default function UserProfile() {
       {/* Header */}
       <div style={{ borderBottom: `1px solid ${C.border}`, background: C.card }}>
         <div style={{ maxWidth: '860px', margin: '0 auto', padding: '2.5rem 2rem', display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
-          <img src={user.imageUrl} alt="Avatar"
-            style={{ width: '76px', height: '76px', borderRadius: '50%', border: `2px solid ${C.border}`, flexShrink: 0 }} />
+          {user.imageUrl
+            ? <img src={user.imageUrl} alt="Avatar" style={{ width: '76px', height: '76px', borderRadius: '50%', border: `2px solid ${C.border}`, flexShrink: 0, objectFit: 'cover' }} />
+            : <div style={{ width: '76px', height: '76px', borderRadius: '50%', background: `linear-gradient(135deg, ${C.blue}, ${C.purple})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', fontWeight: '800', color: 'white', flexShrink: 0 }}>{profile?.username?.[0]?.toUpperCase()}</div>
+          }
           <div style={{ flex: 1, minWidth: '180px' }}>
             <h1 style={{ fontSize: '22px', fontWeight: '800', color: C.text, margin: '0 0 2px', letterSpacing: '-0.02em' }}>
               {user.fullName || profile?.username}
@@ -206,6 +208,21 @@ export default function UserProfile() {
       </div>
 
       <div style={{ maxWidth: '860px', margin: '0 auto', padding: '2rem' }}>
+
+        {/* Social stats */}
+        <div style={{ display: 'flex', gap: '20px', marginBottom: '1.5rem', alignItems: 'center' }}>
+          <Link href="/search" style={{ display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}>
+            <span style={{ fontSize: '15px', fontWeight: '800', color: C.text, fontFamily: 'ui-monospace, monospace' }}>—</span>
+            <span style={{ fontSize: '12px', color: C.textDim }}>followers</span>
+          </Link>
+          <Link href="/search" style={{ display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}>
+            <span style={{ fontSize: '15px', fontWeight: '800', color: C.text, fontFamily: 'ui-monospace, monospace' }}>—</span>
+            <span style={{ fontSize: '12px', color: C.textDim }}>following</span>
+          </Link>
+          <Link href="/search" style={{ marginLeft: 'auto', fontSize: '13px', color: C.blueLight, textDecoration: 'none', background: `${C.blue}18`, border: `1px solid ${C.blue}33`, borderRadius: '8px', padding: '5px 12px' }}>
+            Find people →
+          </Link>
+        </div>
 
         {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '2rem' }}>

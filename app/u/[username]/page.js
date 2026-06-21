@@ -121,10 +121,11 @@ export default function PublicProfilePage({ params: paramsPromise }) {
         <div style={{ maxWidth: '680px', margin: '0 auto', padding: '2.5rem 2rem' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '20px', flexWrap: 'wrap' }}>
 
-            {/* Avatar placeholder */}
-            <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: `linear-gradient(135deg, ${C.blue}, ${C.purple})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', fontWeight: '800', color: 'white', flexShrink: 0 }}>
-              {profile.username?.[0]?.toUpperCase()}
-            </div>
+            {/* Avatar */}
+            {profile.avatar_url
+              ? <img src={profile.avatar_url} alt={profile.username} style={{ width: '72px', height: '72px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: `2px solid ${C.border}` }} />
+              : <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: `linear-gradient(135deg, ${C.blue}, ${C.purple})`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', fontWeight: '800', color: 'white', flexShrink: 0 }}>{profile.username?.[0]?.toUpperCase()}</div>
+            }
 
             <div style={{ flex: 1, minWidth: '180px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '6px' }}>
