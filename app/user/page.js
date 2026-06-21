@@ -140,7 +140,7 @@ export default function UserProfile() {
         setProfile(data)
         await db
           .from('user_profiles')
-          .update({ last_active: new Date().toISOString().split('T')[0] })
+          .update({ last_active: new Date().toISOString().split('T')[0], avatar_url: user.imageUrl || null })
           .eq('clerk_id', user.id)
       }
       setLoading(false)
