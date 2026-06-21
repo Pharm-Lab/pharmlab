@@ -240,20 +240,28 @@ export default function UserProfile() {
         {/* Coming soon */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
           {[
-            { title: 'Study groups',    desc: 'Join a cohort, share questions, compete on the leaderboard.', emoji: '👥' },
+            { title: 'Study groups',    desc: 'Join a cohort, share questions, compete on the leaderboard.', emoji: '👥', href: '/groups', live: true },
             { title: 'Quiz history',    desc: 'Track which questions you got right, wrong, and need to revisit.', emoji: '📋' },
             { title: 'Pomodoro stats',  desc: 'Total study time, sessions completed, longest streak.', emoji: '🍅' },
             { title: 'PK Guessr',       desc: 'Your weekly score and ranking against your study group.', emoji: '📈' },
-          ].map((s, i) => (
-            <div key={i} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '12px', padding: '16px 18px', opacity: 0.6 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-                <span style={{ fontSize: '18px' }}>{s.emoji}</span>
-                <span style={{ fontSize: '13px', fontWeight: '600', color: C.text }}>{s.title}</span>
-                <span style={{ fontSize: '10px', color: C.blueLight, fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase', background: `${C.blue}18`, border: `1px solid ${C.blue}33`, borderRadius: '999px', padding: '1px 7px', marginLeft: 'auto' }}>Soon</span>
+          ].map((s, i) => {
+            const inner = (
+              <div key={i} style={{ background: C.card, border: `1px solid ${s.live ? C.blue + '44' : C.border}`, borderRadius: '12px', padding: '16px 18px', opacity: s.live ? 1 : 0.6, transition: 'border-color 0.15s' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                  <span style={{ fontSize: '18px' }}>{s.emoji}</span>
+                  <span style={{ fontSize: '13px', fontWeight: '600', color: C.text }}>{s.title}</span>
+                  {s.live
+                    ? <span style={{ fontSize: '10px', color: '#86efac', fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase', background: 'rgba(22,163,74,0.15)', border: '1px solid rgba(22,163,74,0.35)', borderRadius: '999px', padding: '1px 7px', marginLeft: 'auto' }}>Live</span>
+                    : <span style={{ fontSize: '10px', color: C.blueLight, fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase', background: `${C.blue}18`, border: `1px solid ${C.blue}33`, borderRadius: '999px', padding: '1px 7px', marginLeft: 'auto' }}>Soon</span>
+                  }
+                </div>
+                <p style={{ fontSize: '12px', color: C.textDim, margin: 0, lineHeight: '1.5' }}>{s.desc}</p>
               </div>
-              <p style={{ fontSize: '12px', color: C.textDim, margin: 0, lineHeight: '1.5' }}>{s.desc}</p>
-            </div>
-          ))}
+            )
+            return s.href
+              ? <Link key={i} href={s.href} style={{ textDecoration: 'none' }}>{inner}</Link>
+              : <div key={i}>{inner}</div>
+          })}
         </div>
 
       </div>

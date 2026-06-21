@@ -8,6 +8,7 @@ const isPublicRoute = createRouteMatcher([
   '/harm-reduction(.*)',
   '/tools',
   '/lab',
+  '/u(.*)',
   '/sign-in(.*)',
   '/sign-up(.*)',
 ])
