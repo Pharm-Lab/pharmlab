@@ -28,14 +28,12 @@ export default function WelcomePopup() {
 
   return (
     <>
-      {/* Backdrop */}
       <div onClick={dismiss} style={{
         position: 'fixed', inset: 0, zIndex: 998,
         background: 'rgba(10,15,30,0.75)',
         backdropFilter: 'blur(6px)',
       }} />
 
-      {/* Centered card */}
       <div style={{
         position: 'fixed', zIndex: 999,
         top: '50%', left: '50%',
@@ -44,33 +42,33 @@ export default function WelcomePopup() {
         background: C.card,
         border: `1px solid ${C.border}`,
         borderRadius: '18px',
-        padding: '28px',
+        padding: '26px',
         boxShadow: '0 32px 80px rgba(0,0,0,0.6)',
         fontFamily: "'Inter',system-ui,sans-serif",
       }}>
 
         {/* Close */}
         <button onClick={dismiss} style={{
-          position: 'absolute', top: '16px', right: '16px',
+          position: 'absolute', top: '14px', right: '16px',
           background: 'none', border: 'none', color: C.textDim,
           fontSize: '20px', cursor: 'pointer', lineHeight: 1, padding: '2px 6px',
         }}>×</button>
 
         {/* Header */}
-        <div style={{ marginBottom: '20px' }}>
-          <div style={{ fontSize: '28px', marginBottom: '10px' }}>👋</div>
+        <div style={{ marginBottom: '18px' }}>
+          <div style={{ fontSize: '26px', marginBottom: '10px' }}>👋</div>
           <h2 style={{ fontSize: '18px', fontWeight: '800', color: C.text, margin: '0 0 8px', letterSpacing: '-0.02em' }}>
             Welcome to PharmLab
           </h2>
           <p style={{ fontSize: '13px', color: C.textMid, margin: 0, lineHeight: '1.65' }}>
-            PK tools, lab calculators, and harm reduction resources built by a BPS student at Leiden. Free during early access — sign up to save your progress when features roll out.
+            PK tools, lab calculators, and harm reduction resources built by a BPS student at Leiden. Create an account to access the academic and lab tools, save your progress, and unlock features as they roll out.
           </p>
         </div>
 
-        {/* Free during early access box */}
+        {/* Free tools box */}
         <div style={{
-          background: `${C.blue}10`, border: `1px solid ${C.blue}30`,
-          borderRadius: '10px', padding: '12px 14px', marginBottom: '20px'
+          background: `${C.blue}10`, border: `1px solid ${C.blue}28`,
+          borderRadius: '10px', padding: '12px 14px', marginBottom: '8px'
         }}>
           <p style={{ fontSize: '10px', fontWeight: '700', color: C.blueLight, textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 10px' }}>
             Free during early access
@@ -78,17 +76,42 @@ export default function WelcomePopup() {
           {[
             { emoji: '📐', text: 'All academic PK/PD tools' },
             { emoji: '🧪', text: 'All lab prep calculators' },
-            { emoji: '💊', text: 'All harm reduction tools' },
-            { emoji: '🎓', text: 'Study groups & quiz bank' },
-          ].map((item, i, arr) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: i < arr.length - 1 ? '7px' : 0 }}>
+          ].map((item, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '7px' }}>
               <span style={{ fontSize: '14px' }}>{item.emoji}</span>
               <span style={{ fontSize: '13px', color: C.textMid }}>{item.text}</span>
             </div>
           ))}
+          {/* Coming soon — greyed */}
+          <div style={{ borderTop: `1px solid ${C.border}`, marginTop: '8px', paddingTop: '8px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.45 }}>
+              <span style={{ fontSize: '14px' }}>👥</span>
+              <span style={{ fontSize: '13px', color: C.textMid }}>Study groups</span>
+              <span style={{ fontSize: '10px', color: C.textDim, marginLeft: 'auto', fontStyle: 'italic' }}>in development</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: 0.45 }}>
+              <span style={{ fontSize: '14px' }}>📋</span>
+              <span style={{ fontSize: '13px', color: C.textMid }}>Quiz bank</span>
+              <span style={{ fontSize: '10px', color: C.textDim, marginLeft: 'auto', fontStyle: 'italic' }}>in development</span>
+            </div>
+          </div>
           <p style={{ fontSize: '11px', color: C.textDim, margin: '10px 0 0', lineHeight: '1.5' }}>
-            Early users will be rewarded — sign up now to lock in free access before the full launch.
+            Early users will be rewarded — sign up now to lock in free access before full launch.
           </p>
+        </div>
+
+        {/* Always free box */}
+        <div style={{
+          background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.25)',
+          borderRadius: '10px', padding: '12px 14px', marginBottom: '16px'
+        }}>
+          <p style={{ fontSize: '10px', fontWeight: '700', color: '#c4b5fd', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 10px' }}>
+            Always free — no account needed
+          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '14px' }}>💊</span>
+            <span style={{ fontSize: '13px', color: C.textMid }}>All harm reduction tools</span>
+          </div>
         </div>
 
         {/* CTAs */}

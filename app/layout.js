@@ -7,6 +7,10 @@ import './globals.css'
 export const metadata = {
   title: 'PharmLab',
   description: 'Pharmacokinetics and lab tools for biopharmaceutical sciences students.',
+  icons: {
+    icon: '/pharmlab_logo.png',
+    apple: '/pharmlab_logo.png',
+  },
 }
 
 export default function RootLayout({ children }) {
