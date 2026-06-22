@@ -148,23 +148,15 @@ function QuestionCard({ q, currentUserId, session, onVote, onReport, onDelete })
                 </button>
               )}
               {mcqSubmitted && (
-                <div style={{ marginTop: '8px' }}>
-                  <p style={{ fontSize: '12px', color: mcqSelected === q.correct_option ? C.greenLight : '#fca5a5', margin: '0 0 8px', fontWeight: '600' }}>
-                    {mcqSelected === q.correct_option ? '✓ Correct! +7 XP' : `✗ Incorrect — correct answer was ${q.correct_option}: ${q.options?.find(o => o.label === q.correct_option)?.text || ''}`}
-                  </p>
-                  {q.explanation && (
-                    <div style={{ background: `${C.blue}08`, border: `1px solid ${C.blue}28`, borderRadius: '8px', padding: '10px 12px' }}>
-                      <p style={{ fontSize: '11px', fontWeight: '700', color: C.blueLight, textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 4px' }}>Explanation</p>
-                      <p style={{ fontSize: '13px', color: C.textMid, margin: 0, lineHeight: '1.6', whiteSpace: 'pre-wrap' }}>{q.explanation}</p>
-                    </div>
-                  )}
-                </div>
+                <p style={{ fontSize: '12px', color: mcqSelected === q.correct_option ? C.greenLight : '#fca5a5', margin: '4px 0 0', fontWeight: '600' }}>
+                  {mcqSelected === q.correct_option ? '✓ Correct! +7 XP' : `✗ Incorrect — correct answer was ${q.correct_option}`}
+                </p>
               )}
             </div>
           )}
 
-          {/* Reveal answer — free text only */}
-          {q.question_type === 'multiple_choice' ? null : !revealed ? (
+          {/* Reveal answer — hide for MCQ once submitted */}
+          {q.question_type === 'multiple_choice' && mcqSubmitted ? null : !revealed ? (
             <button onClick={() => setRevealed(true)}
               style={{ padding: '8px 16px', borderRadius: '8px', border: `1px solid ${C.border}`, background: 'rgba(255,255,255,0.04)', color: C.textMid, fontSize: '13px', cursor: 'pointer', marginBottom: '12px', fontFamily: "'Inter',system-ui,sans-serif" }}>
               Reveal answer
@@ -310,12 +302,18 @@ export default function QuizPage() {
               <h1 style={{ fontSize: '22px', fontWeight: '800', color: C.text, margin: '0 0 4px', letterSpacing: '-0.02em' }}>Quiz bank</h1>
               <p style={{ fontSize: '13px', color: C.textMid, margin: 0 }}>{questions.length} question{questions.length !== 1 ? 's' : ''} · community-contributed · attempt and earn XP</p>
             </div>
-            {isLoaded && user && (
-              <button onClick={() => setShowUpload(true)}
-                style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', background: C.blue, color: 'white', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: "'Inter',system-ui,sans-serif" }}>
-                + Upload question
-              </button>
-            )}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <Link href="/quiz/exam"
+                style={{ padding: '8px 16px', borderRadius: '8px', border: `1px solid ${C.border}`, background: 'rgba(255,255,255,0.04)', color: C.textMid, fontSize: '13px', fontWeight: '600', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+                📋 Exam mode
+              </Link>
+              {isLoaded && user && (
+                <button onClick={() => setShowUpload(true)}
+                  style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', background: C.blue, color: 'white', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: "'Inter',system-ui,sans-serif" }}>
+                  + Upload question
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
