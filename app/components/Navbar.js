@@ -8,8 +8,9 @@ const LINKS = [
   { href: '/tools',          label: 'Tools' },
   { href: '/lab',            label: 'Lab Prep' },
   { href: '/formulas',       label: 'Formulas' },
-  { href: '/harm-reduction', label: 'Harm Reduction' },
+  { href: '/quiz',           label: 'Quiz' },
   { href: '/play',           label: 'Play' },
+  { href: '/harm-reduction', label: 'Harm Reduction' },
   { href: '/sources',        label: 'Sources' },
   { href: '/about',          label: 'About' },
 ]

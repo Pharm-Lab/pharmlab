@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, use } from 'react'
+import React, { useState, useEffect, use } from 'react'
 import { useUser, useSession } from '@clerk/nextjs'
 import Link from 'next/link'
 import { createClerkSupabaseClient } from '../../../lib/supabase'
@@ -18,6 +18,53 @@ function getLevel(xp) {
   let l = 0
   for (let i = 0; i < LEVEL_MINS.length; i++) { if (xp >= LEVEL_MINS[i]) l = i }
   return LEVEL_NAMES[l]
+}
+
+function SynthesisLeaderboard({ members, userId }) {
+  const [expanded, setExpanded] = React.useState(false)
+  const sorted = [...members].filter(m => m.gameScore > 0).sort((a, b) => b.gameScore - a.gameScore)
+  const myEntry = sorted.find(m => m.clerk_id === userId)
+  const myGameRank = myEntry ? sorted.indexOf(myEntry) + 1 : null
+
+  const C = {
+    border: 'rgba(255,255,255,0.07)', card: '#0f1629',
+    purple: '#7c3aed', purpleLight: '#c4b5fd',
+    text: '#f0f4ff', textDim: 'rgba(240,244,255,0.35)',
+  }
+
+  return (
+    <div style={{ background: C.card, border: `1px solid ${C.purple}33`, borderRadius: '12px', overflow: 'hidden' }}>
+      {/* Header — always visible, click to toggle */}
+      <button onClick={() => setExpanded(e => !e)}
+        style={{ width: '100%', padding: '12px 16px', background: `${C.purple}08`, border: 'none', borderBottom: expanded ? `1px solid ${C.border}` : 'none', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontFamily: "'Inter',system-ui,sans-serif" }}>
+        <span style={{ fontSize: '14px' }}>🧪</span>
+        <span style={{ fontSize: '12px', fontWeight: '700', color: C.purpleLight, textTransform: 'uppercase', letterSpacing: '0.08em', flex: 1, textAlign: 'left' }}>
+          Synthesis Rush — group best scores
+        </span>
+        {/* Show your rank when collapsed */}
+        {!expanded && myGameRank && (
+          <span style={{ fontSize: '12px', color: C.purpleLight, fontFamily: 'ui-monospace, monospace', fontWeight: '700' }}>
+            you #{myGameRank} · {myEntry.gameScore.toLocaleString()}
+          </span>
+        )}
+        <span style={{ fontSize: '12px', color: C.textDim, marginLeft: '4px' }}>{expanded ? '▲' : '▼'}</span>
+      </button>
+
+      {/* Expanded list */}
+      {expanded && sorted.map((m, i) => {
+        const isMe = m.clerk_id === userId
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : null
+        return (
+          <div key={m.clerk_id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 16px', borderBottom: i < sorted.length - 1 ? `1px solid ${C.border}` : 'none', background: isMe ? `rgba(124,58,237,0.06)` : 'transparent' }}>
+            <span style={{ fontSize: '14px', minWidth: '24px' }}>{medal || `${i + 1}`}</span>
+            <span style={{ fontSize: '13px', fontWeight: isMe ? '700' : '500', color: isMe ? C.purpleLight : C.text, flex: 1 }}>@{m.username}</span>
+            {isMe && <span style={{ fontSize: '10px', color: C.purpleLight, background: 'rgba(124,58,237,0.18)', border: '1px solid rgba(124,58,237,0.33)', borderRadius: '999px', padding: '1px 6px' }}>you</span>}
+            <span style={{ fontSize: '13px', fontWeight: '700', color: C.purpleLight, fontFamily: 'ui-monospace, monospace' }}>{m.gameScore.toLocaleString()}</span>
+          </div>
+        )
+      })}
+    </div>
+  )
 }
 
 export default function GroupDetailPage({ params: paramsPromise }) {
@@ -58,9 +105,18 @@ export default function GroupDetailPage({ params: paramsPromise }) {
     const { data: profiles } = await db()
       .from('user_profiles').select('clerk_id, username, xp').in('clerk_id', clerkIds)
 
+    // Best Synthesis Rush score per member
+    const { data: gameScores } = await db()
+      .from('game_scores').select('clerk_id, score')
+      .eq('game', 'synthesis_rush').in('clerk_id', clerkIds)
+    const bestScores = {}
+    ;(gameScores || []).forEach(g => {
+      if (!bestScores[g.clerk_id] || g.score > bestScores[g.clerk_id]) bestScores[g.clerk_id] = g.score
+    })
+
     const merged = (memberRows || []).map(m => {
       const p = profiles?.find(p => p.clerk_id === m.clerk_id)
-      return { ...m, username: p?.username || 'Unknown', xp: p?.xp || 0 }
+      return { ...m, username: p?.username || 'Unknown', xp: p?.xp || 0, gameScore: bestScores[m.clerk_id] || 0 }
     }).sort((a, b) => b.xp - a.xp)
 
     setMembers(merged)
@@ -207,37 +263,58 @@ export default function GroupDetailPage({ params: paramsPromise }) {
         {/* Leaderboard */}
         {view === 'leaderboard' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {myRank > 0 && (
-              <div style={{ background: `${C.blue}10`, border: `1px solid ${C.blue}28`, borderRadius: '12px', padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '13px', color: C.textMid }}>Your rank</span>
-                <span style={{ fontSize: '22px', fontWeight: '800', color: C.blueLight, fontFamily: 'ui-monospace, monospace' }}>
-                  #{myRank} <span style={{ fontSize: '13px', fontWeight: '500', color: C.textDim }}>of {members.length}</span>
+
+            {/* Top cards row */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              {/* Your rank */}
+              <div style={{ background: `${C.blue}10`, border: `1px solid ${C.blue}28`, borderRadius: '12px', padding: '14px 18px' }}>
+                <p style={{ fontSize: '11px', fontWeight: '700', color: C.textDim, textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 6px' }}>Your rank</p>
+                <span style={{ fontSize: '26px', fontWeight: '800', color: C.blueLight, fontFamily: 'ui-monospace, monospace' }}>
+                  {myRank > 0 ? `#${myRank}` : '—'}
                 </span>
+                <span style={{ fontSize: '13px', fontWeight: '500', color: C.textDim, marginLeft: '6px' }}>of {members.length}</span>
               </div>
-            )}
-            <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '12px', overflow: 'hidden' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '36px 1fr auto auto', gap: '12px', padding: '10px 16px', borderBottom: `1px solid ${C.border}`, background: 'rgba(255,255,255,0.03)' }}>
-                {['#','Member','Level','XP'].map((h, i) => (
-                  <span key={h} style={{ fontSize: '11px', color: C.textDim, fontWeight: '600', textAlign: i === 3 ? 'right' : 'left' }}>{h}</span>
-                ))}
+
+              {/* Quiz bank placeholder */}
+              <div style={{ background: 'rgba(255,255,255,0.02)', border: `1px solid ${C.border}`, borderRadius: '12px', padding: '14px 18px', opacity: 0.6 }}>
+                <p style={{ fontSize: '11px', fontWeight: '700', color: C.textDim, textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 6px' }}>Quiz bank</p>
+                <span style={{ fontSize: '13px', color: C.textDim }}>Coming soon</span>
+                <span style={{ fontSize: '10px', color: C.blueLight, background: `${C.blue}18`, border: `1px solid ${C.blue}33`, borderRadius: '999px', padding: '1px 7px', marginLeft: '8px', fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Soon</span>
               </div>
-              {members.map((m, i) => {
-                const isMe = m.clerk_id === user.id
-                const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : null
-                return (
-                  <div key={m.clerk_id} style={{ display: 'grid', gridTemplateColumns: '36px 1fr auto auto', gap: '12px', padding: '12px 16px', alignItems: 'center', borderBottom: i < members.length - 1 ? `1px solid ${C.border}` : 'none', background: isMe ? `${C.blue}08` : 'transparent' }}>
-                    <span style={{ fontSize: '14px', fontWeight: '700', color: C.textDim, fontFamily: 'ui-monospace, monospace' }}>{medal || `${i + 1}`}</span>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Link href={`/u/${m.username}`} style={{ fontSize: '14px', fontWeight: isMe ? '700' : '500', color: isMe ? C.blueLight : C.text, textDecoration: 'none' }}>@{m.username}</Link>
-                      {isMe && <span style={{ fontSize: '10px', color: C.blueLight, background: `${C.blue}18`, border: `1px solid ${C.blue}33`, borderRadius: '999px', padding: '1px 6px' }}>you</span>}
-                      {m.role === 'owner' && <span style={{ fontSize: '10px', color: '#fbbf24', background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.3)', borderRadius: '999px', padding: '1px 6px' }}>owner</span>}
-                      {m.role === 'admin' && <span style={{ fontSize: '10px', color: C.purpleLight, background: `${C.purple}18`, border: `1px solid ${C.purple}33`, borderRadius: '999px', padding: '1px 6px' }}>admin</span>}
+            </div>
+
+            {/* Synthesis Rush leaderboard — collapsible */}
+            {members.some(m => m.gameScore > 0) && <SynthesisLeaderboard members={members} userId={user.id} />}
+
+            {/* Main XP leaderboard */}
+            <div>
+              <p style={{ fontSize: '11px', fontWeight: '700', color: C.textDim, textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 10px' }}>
+                XP leaderboard — {members.length} member{members.length !== 1 ? 's' : ''}
+              </p>
+              <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '12px', overflow: 'hidden' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '36px 1fr auto auto', gap: '12px', padding: '10px 16px', borderBottom: `1px solid ${C.border}`, background: 'rgba(255,255,255,0.03)' }}>
+                  {['#','Member','Level','XP'].map((h, i) => (
+                    <span key={h} style={{ fontSize: '11px', color: C.textDim, fontWeight: '600', textAlign: i >= 3 ? 'right' : 'left' }}>{h}</span>
+                  ))}
+                </div>
+                {members.map((m, i) => {
+                  const isMe = m.clerk_id === user.id
+                  const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : null
+                  return (
+                    <div key={m.clerk_id} style={{ display: 'grid', gridTemplateColumns: '36px 1fr auto auto', gap: '12px', padding: '12px 16px', alignItems: 'center', borderBottom: i < members.length - 1 ? `1px solid ${C.border}` : 'none', background: isMe ? `${C.blue}08` : 'transparent' }}>
+                      <span style={{ fontSize: '14px', fontWeight: '700', color: C.textDim, fontFamily: 'ui-monospace, monospace' }}>{medal || `${i + 1}`}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Link href={`/u/${m.username}`} style={{ fontSize: '14px', fontWeight: isMe ? '700' : '500', color: isMe ? C.blueLight : C.text, textDecoration: 'none' }}>@{m.username}</Link>
+                        {isMe && <span style={{ fontSize: '10px', color: C.blueLight, background: `${C.blue}18`, border: `1px solid ${C.blue}33`, borderRadius: '999px', padding: '1px 6px' }}>you</span>}
+                        {m.role === 'owner' && <span style={{ fontSize: '10px', color: '#fbbf24', background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.3)', borderRadius: '999px', padding: '1px 6px' }}>owner</span>}
+                        {m.role === 'admin' && <span style={{ fontSize: '10px', color: C.purpleLight, background: `${C.purple}18`, border: `1px solid ${C.purple}33`, borderRadius: '999px', padding: '1px 6px' }}>admin</span>}
+                      </div>
+                      <span style={{ fontSize: '12px', color: C.textDim, whiteSpace: 'nowrap' }}>{getLevel(m.xp)}</span>
+                      <span style={{ fontSize: '13px', fontWeight: '600', color: C.text, textAlign: 'right', fontFamily: 'ui-monospace, monospace' }}>{m.xp}</span>
                     </div>
-                    <span style={{ fontSize: '12px', color: C.textDim, whiteSpace: 'nowrap' }}>{getLevel(m.xp)}</span>
-                    <span style={{ fontSize: '13px', fontWeight: '600', color: C.text, textAlign: 'right', fontFamily: 'ui-monospace, monospace' }}>{m.xp}</span>
-                  </div>
-                )
-              })}
+                  )
+                })}
+              </div>
             </div>
           </div>
         )}
@@ -349,24 +426,7 @@ export default function GroupDetailPage({ params: paramsPromise }) {
           </div>
         )}
 
-        {/* Coming soon */}
-        {view === 'leaderboard' && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '1rem' }}>
-            {[
-              { emoji: '📋', title: 'Shared quiz bank', desc: 'Upload and attempt questions together' },
-              { emoji: '📈', title: 'PK Guessr scores', desc: 'Weekly mini-game leaderboard' },
-            ].map((s, i) => (
-              <div key={i} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '10px', padding: '14px 16px', opacity: 0.55 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '5px' }}>
-                  <span style={{ fontSize: '16px' }}>{s.emoji}</span>
-                  <span style={{ fontSize: '13px', fontWeight: '600', color: C.text }}>{s.title}</span>
-                  <span style={{ fontSize: '10px', color: C.blueLight, background: `${C.blue}18`, border: `1px solid ${C.blue}33`, borderRadius: '999px', padding: '1px 6px', marginLeft: 'auto' }}>Soon</span>
-                </div>
-                <p style={{ fontSize: '12px', color: C.textDim, margin: 0 }}>{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        )}
+
 
       </div>
     </main>

@@ -125,6 +125,9 @@ export default function UserProfile() {
   const [loading, setLoading] = useState(true)
   const [needsUsername, setNeedsUsername] = useState(false)
   const [followerCount, setFollowerCount] = useState(0)
+  const [pomodoroSessions, setPomodoroSessions] = useState(0)
+  const [pomodoroMins,     setPomodoroMins]     = useState(0)
+  const [gameHighscore,    setGameHighscore]    = useState(0)
   const [followingCount, setFollowingCount] = useState(0)
   const [followerList, setFollowerList] = useState([])
   const [followingList, setFollowingList] = useState([])
@@ -171,6 +174,17 @@ export default function UserProfile() {
           }
           setProfile({ ...data, avatar_url: user.imageUrl || data.avatar_url })
         }
+
+        // Load pomodoro stats
+        const { data: pomData } = await db.from('sessions').select('duration_mins').eq('clerk_id', user.id)
+        if (pomData) {
+          setPomodoroSessions(pomData.length)
+          setPomodoroMins(pomData.reduce((a, s) => a + (s.duration_mins || 0), 0))
+        }
+
+        // Load game highscore
+        const { data: gsData } = await db.from('game_scores').select('score').eq('clerk_id', user.id).eq('game', 'synthesis_rush').order('score', { ascending: false }).limit(1).single()
+        if (gsData) setGameHighscore(gsData.score)
 
         // Load follower/following counts + lists
         const { count: fc } = await supabase.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', user.id)
@@ -313,8 +327,8 @@ export default function UserProfile() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '2rem' }}>
           <StatCard value={xp}    label="XP earned" />
           <StatCard value={streak === 0 ? '—' : `${streak}d`} label="Study streak" sub={streak > 0 ? `${streak} day${streak !== 1 ? 's' : ''} in a row` : 'visit daily to build'} />
-          <StatCard value="0"     label="Questions shared" sub="coming soon" />
-          <StatCard value="0"     label="Quiz answers"     sub="coming soon" />
+          <StatCard value={pomodoroSessions} label="Pomodoros" sub={pomodoroMins > 0 ? `${pomodoroMins} min studied` : 'start a session'} />
+          <StatCard value={gameHighscore > 0 ? gameHighscore.toLocaleString() : '—'} label="Best score" sub="Synthesis Rush" />
         </div>
 
         {/* Badges */}
@@ -339,25 +353,22 @@ export default function UserProfile() {
           </div>
         </div>
 
-        {/* Coming soon */}
+        {/* Feature cards */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
           {[
-            { title: 'Study groups',    desc: 'Join a cohort, share questions, compete on the leaderboard.', emoji: '👥', href: '/groups', live: true },
-            { title: 'Quiz history',    desc: 'Track which questions you got right, wrong, and need to revisit.', emoji: '📋' },
-            { title: 'Pomodoro stats',  desc: 'Total study time, sessions completed, longest streak.', emoji: '🍅' },
-            { title: 'PK Guessr',       desc: 'Your weekly score and ranking against your study group.', emoji: '📈' },
+            { title: 'Study groups',   desc: 'Join a cohort, share questions, compete on the leaderboard.', emoji: '👥', href: '/groups' },
+            { title: 'Synthesis Rush', desc: `Best score: ${gameHighscore > 0 ? gameHighscore.toLocaleString() : '—'}. Play during Pomodoro breaks.`, emoji: '🧪', href: '/play' },
+            { title: 'Pomodoro',       desc: `${pomodoroSessions} session${pomodoroSessions !== 1 ? 's' : ''} · ${pomodoroMins} min studied.`, emoji: '🍅' },
+            { title: 'Quiz bank',      desc: 'Upload and attempt community questions.', emoji: '📋', soon: true },
           ].map((s, i) => {
             const inner = (
-              <div key={i} style={{ background: C.card, border: `1px solid ${s.live ? C.blue + '44' : C.border}`, borderRadius: '12px', padding: '16px 18px', opacity: s.live ? 1 : 0.6, transition: 'border-color 0.15s' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+              <div key={i} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: '12px', padding: '16px 18px', height: '100%', boxSizing: 'border-box' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
                   <span style={{ fontSize: '18px' }}>{s.emoji}</span>
                   <span style={{ fontSize: '13px', fontWeight: '600', color: C.text }}>{s.title}</span>
-                  {s.live
-                    ? <span style={{ fontSize: '10px', color: '#86efac', fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase', background: 'rgba(22,163,74,0.15)', border: '1px solid rgba(22,163,74,0.35)', borderRadius: '999px', padding: '1px 7px', marginLeft: 'auto' }}>Live</span>
-                    : <span style={{ fontSize: '10px', color: C.blueLight, fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase', background: `${C.blue}18`, border: `1px solid ${C.blue}33`, borderRadius: '999px', padding: '1px 7px', marginLeft: 'auto' }}>Soon</span>
-                  }
+                  {s.soon && <span style={{ fontSize: '10px', color: C.blueLight, fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase', background: `${C.blue}18`, border: `1px solid ${C.blue}33`, borderRadius: '999px', padding: '1px 7px', marginLeft: 'auto' }}>Soon</span>}
                 </div>
-                <p style={{ fontSize: '12px', color: C.textDim, margin: 0, lineHeight: '1.5' }}>{s.desc}</p>
+                <p style={{ fontSize: '12px', color: C.textDim, margin: 0, lineHeight: '1.6' }}>{s.desc}</p>
               </div>
             )
             return s.href
