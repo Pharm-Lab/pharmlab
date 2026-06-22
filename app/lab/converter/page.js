@@ -12,6 +12,7 @@ function UnitConverter() {
   const [activeCategory, setActiveCategory] = useState('concentration')
   const [inputValue,     setInputValue]     = useState(1)
   const [inputUnit,      setInputUnit]      = useState('')
+  const [mw,             setMw]             = useState('')
 
   const CATEGORIES = {
     concentration: {
@@ -22,7 +23,7 @@ function UnitConverter() {
         { id: 'umol_L',  label: 'μmol/L (μM)', toBase: v => v / 1e6 },
         { id: 'nmol_L',  label: 'nmol/L (nM)', toBase: v => v / 1e9 },
         { id: 'pmol_L',  label: 'pmol/L (pM)', toBase: v => v / 1e12 },
-        { id: 'mg_mL',   label: 'mg/mL',       toBase: v => v * 1000, note: '÷ MW for molar' },
+        { id: 'mg_mL',   label: 'mg/mL',       toBase: v => v * 1000 },
         { id: 'ug_mL',   label: 'μg/mL',       toBase: v => v },
         { id: 'ng_mL',   label: 'ng/mL',       toBase: v => v / 1000 },
         { id: 'pg_mL',   label: 'pg/mL',       toBase: v => v / 1e6 },
@@ -101,6 +102,21 @@ function UnitConverter() {
         ))}
       </div>
 
+      {/* MW input — only for concentration */}
+      {activeCategory === 'concentration' && (
+        <div style={{ background: `${C.blue}08`, border: `1px solid ${C.blue}28`, borderRadius: '10px', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: '180px' }}>
+            <label style={{ fontSize: '12px', color: C.blueLight, fontWeight: '600', whiteSpace: 'nowrap' }}>MW (g/mol)</label>
+            <input type="number" value={mw} onChange={e => setMw(e.target.value)} placeholder="e.g. 180.16"
+              style={{ flex: 1, padding: '6px 10px', borderRadius: '7px', border: `1px solid ${C.blue}33`, background: '#060b18', color: C.text, fontSize: '14px', fontWeight: '600', outline: 'none' }} />
+          </div>
+          {mw && parseFloat(mw) > 0
+            ? <span style={{ fontSize: '12px', color: C.blueLight }}>✓ MW-aware conversions active</span>
+            : <span style={{ fontSize: '12px', color: C.textDim }}>Enter MW to convert between mass and molar units</span>
+          }
+        </div>
+      )}
+
       {/* Input */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
         <div>
@@ -128,6 +144,36 @@ function UnitConverter() {
           } else {
             converted = baseVal / u.toBase(1)
           }
+
+          // MW-aware molar↔mass interconversion for concentration
+          const mwVal = parseFloat(mw)
+          const massUnits  = ['mg_mL', 'ug_mL', 'ng_mL', 'pg_mL']
+          const molarUnits = ['mol_L', 'mmol_L', 'umol_L', 'nmol_L', 'pmol_L']
+          if (activeCategory === 'concentration' && mwVal > 0) {
+            const fromIsMass  = massUnits.includes(fromUnit)
+            const fromIsMolar = molarUnits.includes(fromUnit)
+            const toIsMass    = massUnits.includes(u.id)
+            const toIsMolar   = molarUnits.includes(u.id)
+            if (fromIsMass && toIsMolar) {
+              // mass → molar: divide by MW, then do unit conversion
+              // baseVal is in μg/mL; convert to mol/L first: (μg/mL) / (MW g/mol * 1000) = mmol/L / 1000
+              const molPerL = (baseVal / 1000) / mwVal  // mol/L
+              converted = molPerL / u.toBase(1)          // then to target molar unit
+            } else if (fromIsMolar && toIsMass) {
+              // molar → mass: multiply by MW
+              // baseVal is in mol/L (toBase normalises to mol/L for molar units)
+              // Wait — for molar units toBase goes to mol/L already
+              // We need μg/mL as base for mass units
+              const ugPerMl = baseVal * mwVal * 1000     // mol/L * g/mol * 1000 = mg/L = μg/mL
+              converted = ugPerMl / u.toBase(1)
+            }
+          }
+
+          const needsMW = activeCategory === 'concentration' && (
+            (massUnits.includes(fromUnit) && molarUnits.includes(u.id)) ||
+            (molarUnits.includes(fromUnit) && massUnits.includes(u.id))
+          ) && !(mwVal > 0)
+
           const isActive = u.id === fromUnit
           return (
             <div key={u.id} onClick={() => setInputUnit(u.id)}
@@ -137,11 +183,13 @@ function UnitConverter() {
                 transition: 'border-color 0.15s, background 0.15s' }}>
               <div style={{ fontSize: '11px', color: C.textDim, marginBottom: '2px' }}>{u.label}</div>
               <div style={{ fontSize: '16px', fontWeight: '700', color: isActive ? C.blueLight : C.text }}>
-                {Math.abs(converted) < 0.0001 || Math.abs(converted) >= 1e8
-                  ? converted.toExponential(4)
-                  : converted.toFixed(6).replace(/\.?0+$/, '')}
+                {needsMW
+                  ? <span style={{ fontSize: '12px', color: C.textDim, fontWeight: '400' }}>enter MW</span>
+                  : (Math.abs(converted) < 0.0001 || Math.abs(converted) >= 1e8
+                    ? converted.toExponential(4)
+                    : converted.toFixed(6).replace(/\.?0+$/, ''))
+                }
               </div>
-              {u.note && <div style={{ fontSize: '10px', color: '#f59e0b', marginTop: '2px' }}>{u.note}</div>}
             </div>
           )
         })}

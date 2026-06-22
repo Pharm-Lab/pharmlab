@@ -9,6 +9,7 @@ const LINKS = [
   { href: '/lab',            label: 'Lab Prep' },
   { href: '/formulas',       label: 'Formulas' },
   { href: '/harm-reduction', label: 'Harm Reduction' },
+  { href: '/play',           label: 'Play' },
   { href: '/sources',        label: 'Sources' },
   { href: '/about',          label: 'About' },
 ]
@@ -65,8 +66,7 @@ export default function Navbar() {
           font-family: 'Inter', system-ui, sans-serif;
           display: flex;
           align-items: center;
-          gap: 10px;
-          line-height: 1;
+          gap: 8px;
         }
         .nav-logo:hover { color: #fff; }
         @media (max-width: 680px) {
@@ -97,9 +97,9 @@ export default function Navbar() {
 
         {/* Logo */}
         <Link href="/" className="nav-logo">
-          <svg width="32" height="32" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0, display: 'block' }}>
-            <ellipse cx="399.99999" cy="400.00001" rx="256" ry="256" stroke={accentColor} strokeWidth="38" fill="none"/>
-            <path d="M188.33331,519.6217 C202.83331,517.6217 218.33331,499.6217 239.08331,459.6217 C257.20831,427.6217 268.08331,369.6217 293.45831,344.6217 C311.58331,321.6217 329.70831,321.6217 347.83331,337.6217 C369.58331,357.6217 384.08331,399.6217 405.83331,439.6217 C427.58331,477.6217 450.45831,504.6217 482.95831,517.6217 C515.45831,527.6217 551.95831,531.6217 624.45832,533.6217" stroke={accentColor} strokeWidth="28" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="9" stroke={accentColor} strokeWidth="1.5" fill="none"/>
+            <path d="M6 13 Q8 7 10 10 Q12 13 14 7" stroke={accentColor} strokeWidth="1.8" strokeLinecap="round" fill="none"/>
           </svg>
           PharmLab
         </Link>

@@ -9,6 +9,7 @@ const isPublicRoute = createRouteMatcher([
   '/tools',
   '/tools/pk-database',
   '/lab',
+  '/play',
   '/u(.*)',
   '/sign-in(.*)',
   '/sign-up(.*)',
