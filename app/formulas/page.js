@@ -1,5 +1,7 @@
 'use client'
 import { useState, useMemo } from 'react'
+import { useUser, useSession } from '@clerk/nextjs'
+import { awardXp } from '../../lib/xp'
 
 // ─── Data ─────────────────────────────────────────────────────────
 
@@ -1028,8 +1030,151 @@ function FormulaCard({ formula, isExpanded, onToggle }) {
   )
 }
 
+
+// ─── Flashcard Mode ───────────────────────────────────────────────
+
+function FlashcardMode({ formulas }) {
+  const { user } = useUser()
+  const { session } = useSession()
+  const [deck, setDeck] = useState(() => [...formulas].sort(() => Math.random() - 0.5))
+  const [idx, setIdx] = useState(0)
+  const [flipped, setFlipped] = useState(false)
+  const [score, setScore] = useState({ correct: 0, incorrect: 0 })
+  const [mode, setMode] = useState('name') // 'name' = show name, guess formula | 'formula' = show formula, guess name
+  const [done, setDone] = useState(false)
+
+  const card = deck[idx]
+
+  function shuffle() {
+    setDeck([...formulas].sort(() => Math.random() - 0.5))
+    setIdx(0); setFlipped(false); setScore({ correct: 0, incorrect: 0 }); setDone(false)
+  }
+
+  function answer(correct) {
+    setScore(s => ({ ...s, [correct ? 'correct' : 'incorrect']: s[correct ? 'correct' : 'incorrect'] + 1 }))
+    // Award 1 XP for every correct answer
+    if (correct && user) awardXp(session, user.id, 1, 'flashcard_correct')
+    if (idx + 1 >= deck.length) {
+      // Award 15 XP completion bonus
+      if (user) awardXp(session, user.id, 15, 'flashcard_deck_complete')
+      setDone(true)
+    } else {
+      setIdx(i => i + 1)
+      setFlipped(false)
+    }
+  }
+
+  if (!formulas.length) return (
+    <div style={{ textAlign: 'center', padding: '4rem', color: C.textDim }}>No formulas to study.</div>
+  )
+
+  if (done) return (
+    <div style={{ maxWidth: '520px', margin: '0 auto', textAlign: 'center', padding: '4rem 2rem' }}>
+      <div style={{ fontSize: '48px', marginBottom: '16px' }}>🎓</div>
+      <h2 style={{ fontSize: '22px', fontWeight: '800', color: C.text, margin: '0 0 8px', letterSpacing: '-0.02em' }}>Deck complete!</h2>
+      <p style={{ fontSize: '14px', color: C.textMid, margin: '0 0 24px' }}>
+        {score.correct} correct · {score.incorrect} incorrect out of {deck.length} cards
+        {user && <span style={{ color: '#86efac', display: 'block', marginTop: '6px', fontSize: '13px' }}>+{score.correct + 15} XP earned this run</span>}
+      </p>
+      <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+        <button onClick={shuffle}
+          style={{ padding: '10px 20px', borderRadius: '9px', background: C.blue, color: 'white', border: 'none', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>
+          Shuffle & restart
+        </button>
+        <button onClick={() => { setIdx(0); setFlipped(false); setDone(false); setScore({ correct: 0, incorrect: 0 }) }}
+          style={{ padding: '10px 20px', borderRadius: '9px', background: 'rgba(255,255,255,0.06)', color: C.textMid, border: `1px solid ${C.border}`, fontSize: '14px', cursor: 'pointer' }}>
+          Restart same order
+        </button>
+      </div>
+    </div>
+  )
+
+  const front = mode === 'name' ? card.name : card.formula
+  const back  = mode === 'name' ? card.formula : card.name
+  const progress = ((idx) / deck.length) * 100
+
+  return (
+    <div style={{ maxWidth: '560px', margin: '0 auto', padding: '1rem 0' }}>
+
+      {/* Controls */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <div style={{ display: 'flex', gap: '6px' }}>
+          {[['name', 'Name → Formula'], ['formula', 'Formula → Name']].map(([val, label]) => (
+            <button key={val} onClick={() => { setMode(val); shuffle() }}
+              style={{ padding: '5px 12px', borderRadius: '7px', border: `1px solid ${mode === val ? C.blue : C.border}`, background: mode === val ? `${C.blue}18` : 'rgba(255,255,255,0.04)', color: mode === val ? C.blueLight : C.textDim, fontSize: '12px', cursor: 'pointer' }}>
+              {label}
+            </button>
+          ))}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <span style={{ fontSize: '12px', color: '#86efac' }}>✓ {score.correct}</span>
+          <span style={{ fontSize: '12px', color: '#fca5a5' }}>✗ {score.incorrect}</span>
+          <button onClick={shuffle} style={{ fontSize: '12px', color: C.textDim, background: 'none', border: 'none', cursor: 'pointer' }}>Shuffle ↺</button>
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div style={{ height: '3px', background: 'rgba(255,255,255,0.08)', borderRadius: '999px', marginBottom: '24px', overflow: 'hidden' }}>
+        <div style={{ height: '100%', width: `${progress}%`, background: `linear-gradient(90deg, ${C.blue}, ${C.purple})`, borderRadius: '999px', transition: 'width 0.3s ease' }} />
+      </div>
+      <p style={{ fontSize: '11px', color: C.textDim, textAlign: 'right', margin: '-18px 0 16px', fontFamily: 'ui-monospace, monospace' }}>{idx + 1} / {deck.length}</p>
+
+      {/* Card */}
+      <div onClick={() => setFlipped(f => !f)}
+        style={{ background: C.bgCard, border: `1px solid ${flipped ? `${C.blue}44` : C.border}`, borderRadius: '16px', padding: '2.5rem 2rem', minHeight: '220px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', transition: 'border-color 0.2s, background 0.2s', marginBottom: '16px', position: 'relative' }}>
+
+        {/* Category badge */}
+        <span style={{ position: 'absolute', top: '14px', left: '16px', fontSize: '10px', color: C.textDim, background: 'rgba(255,255,255,0.05)', border: `1px solid ${C.border}`, borderRadius: '999px', padding: '2px 8px' }}>
+          {card.category}
+        </span>
+
+        {!flipped ? (
+          <>
+            <p style={{ fontSize: '11px', color: C.textDim, textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 16px', fontWeight: '600' }}>
+              {mode === 'name' ? 'Name' : 'Formula'}
+            </p>
+            <p style={{ fontSize: mode === 'name' ? '20px' : '15px', fontWeight: '700', color: C.text, margin: 0, letterSpacing: mode === 'name' ? '-0.02em' : '0', fontFamily: mode === 'formula' ? 'ui-monospace, monospace' : 'inherit', lineHeight: 1.5 }}>
+              {front}
+            </p>
+            <p style={{ fontSize: '12px', color: C.textDim, margin: '20px 0 0' }}>tap to reveal</p>
+          </>
+        ) : (
+          <>
+            <p style={{ fontSize: '11px', color: C.blueLight, textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 16px', fontWeight: '600' }}>
+              {mode === 'name' ? 'Formula' : 'Name'}
+            </p>
+            <p style={{ fontSize: mode === 'formula' ? '20px' : '15px', fontWeight: '700', color: C.blueLight, margin: 0, letterSpacing: mode === 'formula' ? '-0.02em' : '0', fontFamily: mode === 'name' ? 'ui-monospace, monospace' : 'inherit', lineHeight: 1.5 }}>
+              {back}
+            </p>
+            {card.notes && (
+              <p style={{ fontSize: '12px', color: C.textDim, margin: '16px 0 0', lineHeight: '1.6', maxWidth: '400px' }}>
+                {card.notes.length > 120 ? card.notes.slice(0, 120) + '…' : card.notes}
+              </p>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Answer buttons — only show when flipped */}
+      {flipped && (
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button onClick={() => answer(false)}
+            style={{ flex: 1, padding: '12px', borderRadius: '10px', border: '1px solid rgba(239,68,68,0.4)', background: 'rgba(185,28,28,0.15)', color: '#fca5a5', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>
+            ✗ Didn't know
+          </button>
+          <button onClick={() => answer(true)}
+            style={{ flex: 1, padding: '12px', borderRadius: '10px', border: '1px solid rgba(22,163,74,0.4)', background: 'rgba(22,78,30,0.2)', color: '#86efac', fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>
+            ✓ Got it
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function Formulas() {
   const [tab,       setTab]       = useState('pk')
+  const [flashFilter, setFlashFilter] = useState('pk')
   const [query,     setQuery]     = useState('')
   const [expanded,  setExpanded]  = useState(new Set())
   const [catFilter, setCatFilter] = useState('All')
@@ -1094,6 +1239,7 @@ export default function Formulas() {
           {[
             { key: 'pk',   label: '💊 PK / PD / Biopharmaceutics' },
             { key: 'math', label: '📐 Statistics, Algebra & Calculus' },
+            { key: 'flash', label: '🎴 Flashcards' },
           ].map(t => (
             <button key={t.key} className="tab-btn"
               onClick={() => { setTab(t.key); setCatFilter('All'); setQuery('') }}
@@ -1111,7 +1257,27 @@ export default function Formulas() {
         </div>
       </div>
 
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '1.5rem 2rem 4rem' }}>
+      {tab === 'flash' && (
+        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '1.5rem 2rem 4rem' }}>
+          {/* Flash deck filter */}
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '13px', color: C.textDim, alignSelf: 'center' }}>Study:</span>
+            {[['pk', '💊 PK / PD formulas'], ['math', '📐 Maths & Stats'], ['both', '🎯 Everything']].map(([val, label]) => (
+              <button key={val} onClick={() => setFlashFilter(val)}
+                style={{ padding: '6px 14px', borderRadius: '8px', border: `1px solid ${flashFilter === val ? C.blue : C.border}`, background: flashFilter === val ? `${C.blue}18` : 'rgba(255,255,255,0.04)', color: flashFilter === val ? C.blueLight : C.textDim, fontSize: '13px', cursor: 'pointer' }}>
+                {label}
+              </button>
+            ))}
+          </div>
+          <FlashcardMode key={flashFilter} formulas={
+            flashFilter === 'pk' ? PK_FORMULAS :
+            flashFilter === 'math' ? MATH_FORMULAS :
+            [...PK_FORMULAS, ...MATH_FORMULAS]
+          } />
+        </div>
+      )}
+
+      {tab !== 'flash' && <div style={{ maxWidth: '900px', margin: '0 auto', padding: '1.5rem 2rem 4rem' }}>
 
         {/* Search + category filter */}
         <div style={{ display: 'flex', gap: '10px', marginBottom: '12px', flexWrap: 'wrap' }}>
@@ -1172,7 +1338,7 @@ export default function Formulas() {
             </div>
           ))
         )}
-      </div>
+      </div>}
     </main>
   )
 }
