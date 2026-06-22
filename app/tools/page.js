@@ -88,6 +88,7 @@ const TOOLS = [
   { icon:'🔭', tag:'Analytical', title:'Mass Spectrometry Interpreter', desc:'Neutral loss identification, isotope patterns, fragmentation rules, and six curated drug practice spectra.', href:'/tools/mass-spec', color:'#0891b2', grad:'linear-gradient(135deg,#0891b222,#6366f111)' },
   { icon:'✏️', tag:'AI-assisted', title:'Exercise Helper', desc:'Step-by-step solutions to PK/PD problems with exam tips and follow-up questions.', href:'/exercises', color:C.purple, grad:`linear-gradient(135deg,${C.purple}22,${C.blue}11)` },
   { icon:'⚗️', tag:'AI-assisted', title:'Drug Interaction Checker', desc:'Mechanism-level interaction analysis — enzyme pathway, severity, and clinical management.', href:'/interactions', color:'#dc2626', grad:'linear-gradient(135deg,#dc262622,#f9731611)' },
+  { icon:'💾', tag:'Reference', title:'PK Parameter Database', desc:'Searchable database of 81 drugs — t½, Vd, CL, bioavailability, PPB and MW with primary source citations.', href:'/tools/pk-database', color:'#0891b2', grad:'linear-gradient(135deg,#0891b222,#2a6fdb11)' },
 ]
 
 export default function ToolsPage() {
